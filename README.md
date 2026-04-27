@@ -7,12 +7,51 @@
 
 ## 项目定位
 
-银月钱庄是 OpenClaw 生态的核心节点，负责：
-- **Agent 编排**：33 个角色（银月/李长寿/美杜莎/萧炎/药老等）的调度与协作
-- **支付网关**：Stripe 收单、对账、风控（CashClaw 子系统）
-- **量化哨兵**：萧炎交易策略引擎，实时行情监控
-- **多通道通信**：Telegram 主通道 + Discord 备用通道
-- **记忆系统**：长期记忆库 + 向量检索 + 反思进化
+银月钱庄是 OpenClaw 生态的核心节点，一套**全链路金融自动化架构**：
+
+```
+用户 (Telegram/Discord)
+    │
+    ▼
+┌─────────────────────────────────────────┐
+│         银月网关 (main.js :18791)        │
+│  ┌──────────┐  ┌──────────┐  ┌────────┐ │
+│  │ 意图路由  │  │ Agent调度 │  │ 工具链  │ │
+│  │ brain-   │  │ agents   │  │ tool-  │ │
+│  │ router   │  │ .js      │  │ router │ │
+│  └────┬─────┘  └────┬─────┘  └────┬───┘ │
+│       │             │             │      │
+│  ┌────▼─────────────▼─────────────▼───┐ │
+│  │        33 个 Agent 宗门 (sects/)    │ │
+│  │  银月/李长寿/美杜莎/萧炎/药老/韩立.. │ │
+│  └────────────────────────────────────┘ │
+│       │             │             │      │
+│  ┌────▼─────┐  ┌────▼─────┐  ┌────▼───┐ │
+│  │ 记忆系统  │  │ 定时任务  │  │ 支付网关│ │
+│  │ memory   │  │ cron.js  │  │ stripe │ │
+│  │ .js      │  │          │  │ -event │ │
+│  └──────────┘  └──────────┘  └────────┘ │
+└─────────────────────────────────────────┘
+    │
+    ▼
+┌──────────┐  ┌──────────┐  ┌──────────────┐
+│ Ollama   │  │ OpenRelay│  │ Stripe/LS    │
+│ (本地推理) │  │ (云端推理)│  │ (支付处理)    │
+└──────────┘  └──────────┘  └──────────────┘
+```
+
+### 核心能力
+
+| 模块 | 说明 | 关键文件 |
+|------|------|---------|
+| **Agent 编排** | 33 个角色的调度、路由、协作 | `lib/agents.js`, `lib/brain-router.js` |
+| **支付网关** | Stripe 收单、对账、风控 | `lib/stripe-event.js`, `lib/stripe-ledger-ingest.js` |
+| **量化哨兵** | 萧炎交易策略引擎，实时行情 | `lib/xiaoyan-crawler.js`, `lib/xiaoyan-trade-guard.js` |
+| **记忆系统** | 长期记忆 + 向量检索 + 反思进化 | `lib/memory.js`, `lib/mempalace-bridge.js` |
+| **多通道通信** | Telegram 主通道 + Discord 备用 | `lib/telegram-bridge.js`, `lib/discord-send-fallback.js` |
+| **风控合规** | 反幻觉守卫、审批门、执行审计 | `lib/anti-hallucination-guard.js`, `lib/approval-gate.js` |
+| **定时任务** | 11 个 Cron 任务（行情/简报/巡检） | `lib/cron.js`, `lib/task-patrol.js` |
+| **工具链** | 搜索/抓取/代码执行/TTS/提醒 | `lib/tool-router.js` |
 
 ## 环境依赖
 
@@ -21,24 +60,27 @@
 - **Ollama**（本地推理，推荐 `gemma4:e4b` 轻量模型）
 - **OpenRelay**（可选，提供 Codex/NVIDIA NIM 等云端推理）
 
-### 系统依赖
-- `better-sqlite3` — 本地持久化存储
-- `discord.js` — Discord 机器人 SDK
-- `node-telegram-bot-api` — Telegram 机器人 SDK
-- `playwright` — 网页抓取与自动化
-- `crawlee` — 爬虫框架
-- `node-cron` — 定时任务调度
+### npm 依赖
+| 包 | 用途 |
+|---|------|
+| `better-sqlite3` | 本地持久化存储 |
+| `discord.js` | Discord 机器人 SDK |
+| `node-telegram-bot-api` | Telegram 机器人 SDK |
+| `playwright` | 网页抓取与自动化 |
+| `crawlee` | 爬虫框架 |
+| `node-cron` | 定时任务调度 |
+| `undici` | HTTP 客户端 |
 
-### 可选依赖
-- `deer-flow` — 字节跳动开源 Super Agent Harness（端口 2026）
-- `openclaw-control-center` — Web 控制面板（端口 4310）
+### 可选组件
+- **deer-flow** — 字节跳动开源 Super Agent Harness（端口 2026）
+- **openclaw-control-center** — Web 控制面板（端口 4310）
 
 ## 快速部署
 
 ```bash
 # 1. 克隆仓库
-git clone https://github.com/<your-org>/openclaw.git
-cd openclaw
+git clone https://github.com/Alanlsl/silvermoon-openclaw.git
+cd silvermoon-openclaw
 
 # 2. 安装依赖
 npm install
@@ -46,11 +88,11 @@ npm install
 # 3. 配置环境变量
 cp .env.example .env
 # 编辑 .env 填入以下密钥：
-#   - TELEGRAM_BOT_TOKEN
-#   - DISCORD_BOT_TOKEN（可选）
-#   - STRIPE_SECRET_KEY（可选）
-#   - NVIDIA_API_KEY（可选，用于 OpenRelay）
-#   - GROQ_API_KEY（可选）
+#   TELEGRAM_BOT_TOKEN=     # Telegram 机器人 Token（必填）
+#   DISCORD_BOT_TOKEN=      # Discord 机器人 Token（可选）
+#   STRIPE_SECRET_KEY=      # Stripe 密钥（可选）
+#   NVIDIA_API_KEY=         # NVIDIA NIM API（可选）
+#   GROQ_API_KEY=           # Groq API（可选）
 
 # 4. 启动银月网关
 node main.js
@@ -65,37 +107,68 @@ curl http://127.0.0.1:18791/health
 ```
 openclaw/
 ├── main.js                 # 银月网关主入口（端口 18791）
-├── openclaw.json           # 全局配置（Agent 列表/模型路由）
-├── lib/                    # 核心库模块
+├── openclaw.json           # 全局配置（Agent 列表/模型路由/提供商）
+├── .gitignore              # Git 排除规则
+├── README.md               # 本文件
+│
+├── lib/                    # 核心库模块（50+ 文件）
 │   ├── agents.js           # Agent 加载与调度
-│   ├── brain-router.js     # 意图路由
+│   ├── brain-router.js     # 意图路由引擎
 │   ├── conversation.js     # 对话管理
-│   ├── cron.js             # 定时任务
+│   ├── cron.js             # 定时任务调度器（11 个任务）
 │   ├── finance-fallback.js # 金融降级逻辑
 │   ├── gemini-client.js    # Gemini API 客户端
-│   ├── memory.js           # 记忆系统
+│   ├── memory.js           # 记忆系统（长期/短期/向量）
 │   ├── stripe-event.js     # Stripe Webhook 处理
 │   ├── telegram-bridge.js  # Telegram 桥接
-│   └── ...                 # 50+ 核心模块
-├── sects/                  # Agent 宗门配置（SOUL.md + TASK.json）
-│   ├── 银月/               # 总管
+│   ├── tool-router.js      # 工具链路由
+│   └── ...                 # 更多模块
+│
+├── sects/                  # Agent 宗门配置
+│   ├── 银月/               # 总管 — SOUL.md + TASK.json
 │   ├── 李长寿/             # 护法/架构师
 │   ├── 美杜莎/             # UI/UX 设计
 │   ├── 萧炎/               # 交易策略
+│   ├── 韩立/               # 调查/情报
 │   ├── 药老/               # 增长/合规
-│   └── ...                 # 28 个扩展角色
+│   ├── 雅妃/               # 财务/会计
+│   ├── 墨影/               # 工匠/后端
+│   ├── 小医仙/             # 社交媒体
+│   ├── 紫灵/               # 礼宾/客服
+│   ├── 紫研/               # 数据分析
+│   └── ...                 # 22 个扩展角色
+│
 ├── tests/                  # 测试套件（40+ 单元测试）
+│   ├── brain-router.test.js
+│   ├── finance-fallback.test.js
+│   ├── memory-fts.test.js
+│   └── ...
+│
 ├── landing/                # Next.js 官网落地页
+│   ├── app/                # Next.js App Router
+│   ├── components/         # React 组件
+│   └── public/             # 静态资源
+│
 ├── plugins/                # 插件系统
-│   ├── rtk/                # Rewrite Token Kit
-│   └── agency-agents/      # Agent 扩展
-└── silvermoon_local/       # 银月本地配置副本
+│   ├── rtk/                # Rewrite Token Kit（Token 节省 90%）
+│   ├── agency-agents/      # Agent 扩展框架
+│   └── task-dag-plugin/    # 任务 DAG 编排
+│
+├── silvermoon_local/       # 银月本地配置副本
+│
+├── Soul.md                 # 灵魂契约（主权/权限/进化）
+├── CLAUDE.md               # 开发指南（RTK Token Saver）
+├── Core_Evolution_Protocol.md  # 核心进化协议
+│
+├── openclaw.cmd            # 启动命令（快捷方式）
+├── gateway.cmd             # 网关启动
+└── node.cmd                # Node 快捷方式
 ```
 
 ## Agent 宗门一览
 
-| 角色 | 职责 | 模型 |
-|------|------|------|
+| 角色 | 职责 | 分配模型 |
+|------|------|---------|
 | 银月 | 总管，协调所有 Agent | `nvidia/llama-3.3-nemotron-super-49b-v1` |
 | 李长寿 | 护法/全栈架构师 | `nvidia/deepseek-r1` |
 | 美杜莎 | UI/UX 设计专家 | `nvidia/qwen-2.5-72b-instruct` |
@@ -104,16 +177,18 @@ openclaw/
 | 韩立 | 调查/情报分析 | `nvidia/qwen-2.5-72b-instruct` |
 | 紫灵 | 礼宾/客服 | `or-codex/gpt-5.4-mini` |
 | 紫研 | 数据分析 | `or-codex/gpt-5.4-mini` |
-| 墨影 | 工匠/后端 | `nvidia/llama-3.3-nemotron-super-49b-v1` |
+| 墨影 | 工匠/后端开发 | `nvidia/llama-3.3-nemotron-super-49b-v1` |
 | 雅妃 | 财务/会计 | `nvidia/qwen-2.5-72b-instruct` |
-| 小医仙 | 社交媒体 | `or-codex/gpt-5.4-mini` |
-| 六扫清台 | 系统清理 | `ollama/gemma4:e4b` |
+| 小医仙 | 社交媒体运营 | `or-codex/gpt-5.4-mini` |
+| 六扫清台 | 系统清理维护 | `ollama/gemma4:e4b` |
 
 ## 通信通道
 
-- **Telegram**：主通道，支持文字/语音/TTS
-- **Discord**：备用通道（当前禁用）
-- **HTTP API**：`http://127.0.0.1:18791`
+| 通道 | 状态 | 说明 |
+|------|------|------|
+| **Telegram** | ✅ 主通道 | 支持文字/语音/TTS，@SilverMoon_Bank |
+| **Discord** | ⏸️ 备用 | 当前禁用，可随时启用 |
+| **HTTP API** | ✅ 内部 | `http://127.0.0.1:18791` |
 
 ## 维护命令
 
@@ -128,7 +203,29 @@ curl http://127.0.0.1:18791/health
 tail -f logs/gateway-out.log
 
 # 重启银月
-taskkill /F /PID (获取的 PID)
+taskkill /F /PID <PID>
+node main.js
+```
+
+## 换电脑恢复步骤
+
+```bash
+# 1. 安装 Node.js 22.x + Git
+# 2. 安装 Ollama + 拉取模型
+ollama pull gemma4:e4b
+
+# 3. 克隆仓库
+git clone https://github.com/Alanlsl/silvermoon-openclaw.git
+cd silvermoon-openclaw
+
+# 4. 安装依赖
+npm install
+
+# 5. 配置 .env（从原机器导出或重新申请密钥）
+cp .env.example .env
+# 填入 TELEGRAM_BOT_TOKEN 等密钥
+
+# 6. 启动
 node main.js
 ```
 
