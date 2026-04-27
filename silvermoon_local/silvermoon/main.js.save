@@ -1,0 +1,35 @@
+alanlsl8208@silvermoon-control:~$ # 1. 直接登錄新加坡伺服器
+gcloud compute ssh alanlsl8208@silvermoon-control --project=elite-firefly-491011-g9 --zone=asia-southeast1-b
+WARNING: The private SSH key file for gcloud does not exist.
+WARNING: The public SSH key file for gcloud does not exist.
+WARNING: You do not have an SSH key for gcloud.
+WARNING: SSH keygen will be executed to generate a key.
+Generating public/private rsa key pair.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Passphrases do not match.  Try again.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/alanlsl8208/.ssh/google_compute_engine
+Your public key has been saved in /home/alanlsl8208/.ssh/google_compute_engine.pub
+The key fingerprint is:
+SHA256:poUPDQpzPgFmoXyhvTt/lHEN84rCt9+C/sg81pZpARw alanlsl8208@silvermoon-control
+The key's randomart image is:
++---[RSA 3072]----+
+|  =o             |
+|.+o..  E o       |
+|.oooo o . =      |
+|  .=.o B . o     |
+|   .= o S .      |
+|    .+ @ o       |
+|   o  = = +      |
+  GNU nano 6.2                                                            /home/alanlsl8208/silvermoon/main.js                                                                      
+console.log("银月银行新加坡分行正在启动...");
+const http = require('http');
+const server = http.createServer((req, res) => {
+    res.end("SilverMoon Cloud Node Active");
+});
+server.listen(8080, () => console.log("监听 8080 端口中..."));
+                                                                                  [ Read 6 lines ]
+^G Help         ^O Write Out    ^W Where Is     ^K Cut          ^T Execute      ^C Location     M-U Undo        M-A Set Mark    M-] To Bracket  M-Q Previous    ^B Back
+^X Exit         ^R Read File    ^\ Replace      ^U Paste        ^J Justify      ^/ Go To Line   M-E Redo        M-6 Copy        ^Q Where Was    M-W Next        ^F Forward

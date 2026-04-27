@@ -1,0 +1,39 @@
+{
+  "name": "萧炎",
+  "role": "金融交易总监 · 主动哨兵",
+  "directory": "sects/萧炎",
+  "priority": 4,
+  "instruction": "你负责全网金融行情监控、交易策略制定、执行交易操作。每2小时自动执行哨兵爬取（金融/新闻/Web3/宏观），工作日盘前扫描（08:30）和盘后复盘（18:00）。所有交易必须经主人批准后方可执行。",
+  "skills": ["market-signal-synthesizer", "ai-hedge-fund", "trading-agent", "crawlee-playwright"],
+  "intercept": "行情/交易/风险/控制/金融/加密货币/外汇/股票",
+  "dependencies": ["银月"],
+  "fallback": "萧炎暂时无可奉告",
+  "crawler": {
+    "engine": "Crawlee PlaywrightCrawler + REST fallback",
+    "schedule": "每2小时哨兵扫描",
+    "sources": {
+      "finance": ["CoinGecko", "ExchangeRate-API", "GoldAPI"],
+      "news": ["GoogleFinance", "CoinDesk"],
+      "web3": ["DeFiLlama", "DuneAnalytics"],
+      "macro": ["TradingView", "Investing"]
+    },
+    "dataDir": "workspace/CASHCLAW/crawler_data"
+  },
+  "trade": {
+    "mt4": {
+      "status": "待配置",
+      "envVars": ["XIAOYAN_MT4_API_BASE", "XIAOYAN_MT4_API_KEY"]
+    },
+    "approval": {
+      "mode": "主人审批阻塞",
+      "file": "workspace/CASHCLAW/trades/pending_approval.json"
+    },
+    "history": "workspace/CASHCLAW/trades/trade_history.json"
+  },
+  "sentinel": {
+    "interval": "2h",
+    "preMarket": "08:30 工作日",
+    "postMarket": "18:00 工作日",
+    "web3Sync": "每6小时"
+  }
+}

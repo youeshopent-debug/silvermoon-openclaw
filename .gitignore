@@ -1,0 +1,94 @@
+# === 银月钱庄 .gitignore ===
+# 保留所有 .md 配置文件（SOUL.md, AGENTS_SOUL 等）
+
+# --- 依赖 ---
+node_modules/
+vendor/
+.pnpm-store/
+
+# --- 运行时生成 ---
+logs/
+*.log
+tmp/
+active_tasks/
+completions/
+tasks/
+memory/
+workspace/
+workspace-dev/
+canvas/
+devices/
+docs/
+flows/
+identity/
+scripts/
+skills/
+tools/
+user_data/
+
+# --- 缓存 ---
+__pycache__/
+*.pyc
+.qwen/
+.playwright-cli/
+.rtk/cache/
+.agents/
+
+# --- IDE/编辑器 ---
+.vscode/
+.claude/
+.trae/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- 环境变量与密钥 ---
+.env
+.env.*
+*.pem
+*.key
+id_rsa
+*.cred
+secrets/
+
+# --- 操作系统 ---
+Thumbs.db
+.DS_Store
+Desktop.ini
+
+# --- 构建产物 ---
+dist/
+build/
+*.tsbuildinfo
+
+# --- Git hooks (模板) ---
+.githooks/
+
+# --- 临时/测试文件 ---
+*.vbs
+*.ps1
+*.bat
+*.pid
+*.RND
+gw-err.txt
+gw-out.txt
+_tmp_*
+_test_*
+kimi_full_test.py
+workflow_engine.py
+tmp_*.json
+update-check.json
+skills-lock.json
+long_term_memory.json
+emergency_restore.bat
+*_plan.md
+*.bak
+*corrupt*
+openrelay.exe
+*.tar.gz
+cookie.txt
+
+# --- 子项目已有独立 Git ---
+openclaw-control-center/
+deer-flow/

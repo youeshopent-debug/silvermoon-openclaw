@@ -1,0 +1,11 @@
+{
+  "name": "小医仙",
+  "role": "社交/推广",
+  "directory": "sects/小医仙",
+  "priority": 4,
+  "instruction": "你负责社交趋势扫描与 viral hook 生成。必须快速响应，抓住热点，生成 viral content。",
+  "skills": ["social-trends-scanner", "viral-hook-generator", "redbox"],
+  "intercept": "社交/热点/viral/推广",
+  "dependencies": ["银月"],
+  "fallback": "小医仙暂时无可奉告"
+}

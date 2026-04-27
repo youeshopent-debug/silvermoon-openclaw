@@ -1,0 +1,103 @@
+volumes:
+  pentagi-data:
+    driver: local
+  pentagi-ssl:
+    driver: local
+  pentagi-postgres-data:
+    driver: local
+
+networks:
+  pentagi-network:
+    driver: bridge
+    name: pentagi-network
+
+services:
+  pentagi:
+    image: ${PENTAGI_IMAGE:-vxcontrol/pentagi:latest}
+    restart: unless-stopped
+    container_name: pentagi
+    hostname: pentagi
+    expose:
+      - 8443/tcp
+    ports:
+      - ${PENTAGI_LISTEN_IP:-127.0.0.1}:${PENTAGI_LISTEN_PORT:-8443}:8443
+    depends_on:
+      pgvector:
+        condition: service_healthy
+    environment:
+      - DEBUG=${DEBUG:-false}
+      - CORS_ORIGINS=${CORS_ORIGINS:-}
+      - COOKIE_SIGNING_SALT=${COOKIE_SIGNING_SALT:-}
+      - INSTALLATION_ID=${INSTALLATION_ID:-}
+      - LICENSE_KEY=${LICENSE_KEY:-}
+      - ASK_USER=${ASK_USER:-false}
+      - LLM_SERVER_URL=${LLM_SERVER_URL:-}
+      - LLM_SERVER_KEY=${LLM_SERVER_KEY:-}
+      - LLM_SERVER_MODEL=${LLM_SERVER_MODEL:-}
+      - LLM_SERVER_PROVIDER=${LLM_SERVER_PROVIDER:-}
+      - LLM_SERVER_CONFIG_PATH=${LLM_SERVER_CONFIG_PATH:-}
+      - LLM_SERVER_LEGACY_REASONING=${LLM_SERVER_LEGACY_REASONING:-}
+      - LLM_SERVER_PRESERVE_REASONING=${LLM_SERVER_PRESERVE_REASONING:-}
+      - OLLAMA_SERVER_URL=${OLLAMA_SERVER_URL:-}
+      - OLLAMA_SERVER_API_KEY=${OLLAMA_SERVER_API_KEY:-}
+      - OLLAMA_SERVER_MODEL=${OLLAMA_SERVER_MODEL:-}
+      - OLLAMA_SERVER_CONFIG_PATH=${OLLAMA_SERVER_CONFIG_PATH:-}
+      - OLLAMA_SERVER_PULL_MODELS_ENABLED=${OLLAMA_SERVER_PULL_MODELS_ENABLED:-}
+      - OLLAMA_SERVER_LOAD_MODELS_ENABLED=${OLLAMA_SERVER_LOAD_MODELS_ENABLED:-}
+      - EMBEDDING_PROVIDER=${EMBEDDING_PROVIDER:-openai}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-text-embedding-3-small}
+      - EMBEDDING_KEY=${EMBEDDING_KEY:-}
+      - PROXY_URL=${PROXY_URL:-}
+      - EXTERNAL_SSL_INSECURE=${EXTERNAL_SSL_INSECURE:-true}
+      - PUBLIC_URL=${PUBLIC_URL:-}
+      - SERVER_PORT=${SERVER_PORT:-8443}
+      - SERVER_HOST=${SERVER_HOST:-0.0.0.0}
+      - SERVER_USE_SSL=${SERVER_USE_SSL:-false}
+      - DATABASE_URL=postgres://${PENTAGI_POSTGRES_USER:-postgres}:${PENTAGI_POSTGRES_PASSWORD:-postgres}@pgvector:5432/${PENTAGI_POSTGRES_DB:-pentagidb}?sslmode=disable
+      - DUCKDUCKGO_ENABLED=${DUCKDUCKGO_ENABLED:-true}
+      - SPLOITUS_ENABLED=${SPLOITUS_ENABLED:-true}
+      - DOCKER_HOST=${DOCKER_HOST:-unix:///var/run/docker.sock}
+      - DOCKER_INSIDE=${DOCKER_INSIDE:-false}
+      - DOCKER_DEFAULT_IMAGE=${DOCKER_DEFAULT_IMAGE:-}
+      - DOCKER_DEFAULT_IMAGE_FOR_PENTEST=${DOCKER_DEFAULT_IMAGE_FOR_PENTEST:-}
+      - MAX_GENERAL_AGENT_TOOL_CALLS=${MAX_GENERAL_AGENT_TOOL_CALLS:-100}
+      - MAX_LIMITED_AGENT_TOOL_CALLS=${MAX_LIMITED_AGENT_TOOL_CALLS:-20}
+    logging:
+      options:
+        max-size: 50m
+        max-file: "3"
+    volumes:
+      - ${PENTAGI_DATA_DIR:-pentagi-data}:/opt/pentagi/data
+      - ${PENTAGI_SSL_DIR:-pentagi-ssl}:/opt/pentagi/ssl
+      - ${PENTAGI_DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock
+    user: root:root
+    networks:
+      - pentagi-network
+
+  pgvector:
+    image: vxcontrol/pgvector:latest
+    restart: unless-stopped
+    container_name: pgvector
+    hostname: pgvector
+    expose:
+      - 5432/tcp
+    ports:
+      - ${PGVECTOR_LISTEN_IP:-127.0.0.1}:${PGVECTOR_LISTEN_PORT:-5432}:5432
+    environment:
+      POSTGRES_USER: ${PENTAGI_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${PENTAGI_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${PENTAGI_POSTGRES_DB:-pentagidb}
+    logging:
+      options:
+        max-size: 50m
+        max-file: "3"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    volumes:
+      - pentagi-postgres-data:/var/lib/postgresql/data
+    networks:
+      - pentagi-network

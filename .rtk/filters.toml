@@ -1,0 +1,545 @@
+schema_version = 1
+
+# ═══════════════════════════════════════════════════════════════
+# 银月钱庄 · RTK 极致省 Token 过滤规则
+# 目标：OpenClaw 全体 Agent 达到 90-98% Token 节省
+# 设计原理：
+#   1. strip_ansi → 去掉所有控制字符（ANSI 颜色/光标）
+#   2. replace → 压缩 JSON 键名、时间戳、路径前缀
+#   3. match_output → 对已知模式短路返回摘要
+#   4. strip_lines_matching → 干掉所有噪音行
+#   5. truncate_lines_at → 每行截断到 80 字符
+#   6. head/tail_lines → 只保留头尾关键行
+#   7. max_lines → 绝对行数上限
+#   8. on_empty → 空结果时返回简洁消息
+# ═══════════════════════════════════════════════════════════════
+
+# ── 1. Git 状态：只保留变更摘要 ──
+[filters.git-status]
+description = "Git status → 仅保留变更文件列表，去掉冗余提示"
+match_command = "^git\\s+status"
+strip_ansi = true
+replace = [
+  { pattern = "^\\s*", replacement = "" },
+  { pattern = "modified:\\s+", replacement = "M " },
+  { pattern = "new file:\\s+", replacement = "A " },
+  { pattern = "deleted:\\s+", replacement = "D " },
+  { pattern = "renamed:\\s+", replacement = "R " },
+]
+strip_lines_matching = [
+  "^$",
+  "^On branch",
+  "^Your branch",
+  "^\\s*\\(use",
+  "^\\s*no changes added",
+  "^nothing added",
+  "^Changes not staged",
+  "^Changes to be committed",
+  "^Untracked files",
+  "^\\s*$",
+]
+head_lines = 30
+max_lines = 30
+on_empty = "git: clean"
+
+# ── 2. Git diff：只保留文件头和变更行 ──
+[filters.git-diff]
+description = "Git diff → 仅保留 @@ 头和 +/- 行，去掉上下文"
+match_command = "^git\\s+diff"
+strip_ansi = true
+strip_lines_matching = [
+  "^diff --git",
+  "^index ",
+  "^--- ",
+  "^\\+\\+\\+ ",
+  "^@@ ",
+  "^$",
+  "^\\s",
+]
+keep_lines_matching = [
+  "^[+-][^+-]",
+]
+head_lines = 50
+max_lines = 50
+on_empty = "diff: no changes"
+
+# ── 3. Git log：一行一个提交 ──
+[filters.git-log]
+description = "Git log → 每提交一行，只保留 hash+标题"
+match_command = "^git\\s+log"
+strip_ansi = true
+replace = [
+  { pattern = "^commit\\s+([a-f0-9]+)", replacement = "$1" },
+  { pattern = "^Author:\\s+", replacement = "" },
+  { pattern = "^Date:\\s+", replacement = "" },
+  { pattern = "^\\s{4}", replacement = "  " },
+]
+strip_lines_matching = [
+  "^$",
+  "^Merge:",
+]
+head_lines = 20
+max_lines = 20
+on_empty = "log: empty"
+
+# ── 4. npm test / vitest / jest：只保留失败和摘要 ──
+[filters.test-output]
+description = "测试输出 → 只保留 FAIL/PASS 摘要和错误栈最后 3 行"
+match_command = "^(npx\\s+)?(vitest|jest|playwright|mocha|ava)(\\s+run)?(\\s|$)"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\u001b\\[",
+  "^\\s+●",
+  "^\\s+✓",
+  "^\\s+√",
+  "^(stdout|stderr)",
+  "^(PASS|FAIL)\\s+",
+  "^Tests:\\s+",
+  "^Test Files:\\s+",
+  "^\\s+at\\s+",
+  "^\\s+->\\s+",
+  "^(RERUN|START|BENCH)",
+  "^\\s{2,}",
+]
+keep_lines_matching = [
+  "FAIL",
+  "Error:",
+  "AssertionError",
+  "expected",
+  "received",
+  "Snapshot",
+  "Tests\\s+",
+  "Test Files\\s+",
+  "Duration",
+]
+head_lines = 15
+tail_lines = 10
+max_lines = 25
+on_empty = "tests: all passed"
+
+# ── 5. npm run build / tsc / next build：只保留错误 ──
+[filters.build-output]
+description = "构建输出 → 只保留 ERROR/WARNING 和最终状态"
+match_command = "^(npx\\s+)?(tsc|next\\s+build|vite\\s+build|webpack|rollup|esbuild)(\\s|$)"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\u001b\\[",
+  "^(info|debug|verbose)",
+  "^(Browserslist|caniuse)",
+  "^(webpack|vite|rollup|esbuild)\\s+",
+  "^(assets|chunk|entrypoint)",
+  "^(\\s{2,})",
+]
+keep_lines_matching = [
+  "ERROR",
+  "WARNING",
+  "Error:",
+  "error TS",
+  "Failed",
+  "success",
+  "ready",
+  "compiled",
+  "build complete",
+  "Duration",
+]
+head_lines = 20
+max_lines = 20
+on_empty = "build: ok"
+
+# ── 6. ls：紧凑格式 ──
+[filters.ls-compact]
+description = "ls → 只显示文件名和大小，去掉权限/用户/组/日期"
+match_command = "^ls(\\s|$)"
+strip_ansi = true
+strip_lines_matching = [
+  "^total ",
+  "^$",
+  "^\\.DS_Store",
+  "^\\.git",
+  "^\\.gitignore",
+  "^\\.env",
+  "^\\.npmrc",
+  "^\\.yarnrc",
+  "^\\.editorconfig",
+  "^\\.prettierrc",
+  "^\\.eslintrc",
+  "^\\.dockerignore",
+  "^\\.github",
+  "^\\.vscode",
+  "^\\.idea",
+  "^node_modules",
+  "^dist",
+  "^build",
+  "^coverage",
+  "^\\.next",
+]
+truncate_lines_at = 80
+head_lines = 25
+max_lines = 25
+on_empty = "(empty)"
+
+# ── 7. ps：只保留关键进程 ──
+[filters.ps-compact]
+description = "ps → 只保留银月相关进程和资源占用"
+match_command = "^ps(\\s|$)"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^  PID",
+]
+keep_lines_matching = [
+  "node",
+  "ollama",
+  "rtk",
+  "discord",
+  "chrome",
+  "firefox",
+  "PID",
+]
+truncate_lines_at = 100
+max_lines = 15
+on_empty = "ps: no matching processes"
+
+# ── 8. curl：只保留响应状态和 body 前 10 行 ──
+[filters.curl-compact]
+description = "curl → 只保留 HTTP 状态码和响应体前 10 行"
+match_command = "^curl\\s+"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\\*\\s+",
+  "^<\\s+",
+  "^\\}\\s*$",
+  "^\\[\\s*$",
+]
+head_lines = 15
+tail_lines = 5
+max_lines = 20
+on_empty = "curl: empty response"
+
+# ── 9. ollama run：去掉 spinner，只保留回复 ──
+[filters.ollama-response]
+description = "Ollama → 去掉 spinner/光标控制，只保留模型回复"
+match_command = "^ollama\\s+run\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏\\s]*$",
+  "^\\s*$",
+  "^\\[?\\d{2}:\\d{2}:\\d{2}\\]",
+  "^pulling manifest",
+  "^pulling ",
+  "^verifying sha256",
+  "^writing manifest",
+  "^removing any unused layers",
+  "^success$",
+]
+max_lines = 50
+on_empty = "ollama: no response"
+
+# ── 10. node 脚本：只保留 console.log 输出和错误 ──
+[filters.node-output]
+description = "Node.js → 只保留 stdout 和 stderr，去掉运行时噪音"
+match_command = "^node\\s+"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\\(node:\\d+\\)",
+  "^\\[HPM\\]",
+  "^WebSocket\\s+",
+  "^Listening on",
+  "^Server running",
+  "^\\s+at\\s+",
+  "^internal/",
+  "^node:internal",
+]
+truncate_lines_at = 120
+head_lines = 30
+tail_lines = 10
+max_lines = 40
+on_empty = "node: ok (no output)"
+
+# ── 11. docker ps：紧凑格式 ──
+[filters.docker-ps]
+description = "docker ps → 只保留容器名和状态"
+match_command = "^docker\\s+ps"
+strip_ansi = true
+strip_lines_matching = [
+  "^CONTAINER ID",
+  "^$",
+]
+replace = [
+  { pattern = "^([a-f0-9]{12})\\s+", replacement = "" },
+  { pattern = "\\s+\"?([a-zA-Z0-9_.-]+)\"?\\s+(Up|Exited|Created|Paused)\\s+.*$", replacement = " [$2]" },
+]
+max_lines = 20
+on_empty = "docker: no running containers"
+
+# ── 12. docker logs：只保留最后 N 行 ──
+[filters.docker-logs]
+description = "docker logs → 只保留最后 20 行"
+match_command = "^docker\\s+logs"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+]
+tail_lines = 20
+max_lines = 20
+on_empty = "logs: empty"
+
+# ── 13. grep/rg：只保留文件名和匹配行 ──
+[filters.grep-compact]
+description = "grep/rg → 紧凑格式，截断长行"
+match_command = "^(rg|grep)\\s+"
+strip_ansi = true
+replace = [
+  { pattern = "^([^:]+):(\\d+):", replacement = "$1:$2 " },
+]
+truncate_lines_at = 100
+head_lines = 20
+max_lines = 20
+on_empty = "grep: no matches"
+
+# ── 14. find：只保留文件路径 ──
+[filters.find-compact]
+description = "find → 只保留路径，去掉权限信息"
+match_command = "^find\\s+"
+strip_ansi = true
+strip_lines_matching = [
+  "Permission denied",
+  "^\\s*$",
+]
+head_lines = 30
+max_lines = 30
+on_empty = "find: no results"
+
+# ── 15. pip list：只保留包名和版本 ──
+[filters.pip-list]
+description = "pip list → 只保留包名:版本"
+match_command = "^pip\\s+list"
+strip_ansi = true
+strip_lines_matching = [
+  "^Package\\s+Version",
+  "^-+",
+  "^$",
+]
+replace = [
+  { pattern = "^([a-zA-Z0-9_-]+)\\s+(\\S+)", replacement = "$1:$2" },
+]
+head_lines = 20
+max_lines = 20
+on_empty = "pip: no packages"
+
+# ── 16. df：只保留使用率 ──
+[filters.df-compact]
+description = "df → 只保留挂载点和使用率"
+match_command = "^df(\\s|$)"
+strip_ansi = true
+strip_lines_matching = [
+  "^Filesystem",
+  "^$",
+  "^tmpfs",
+  "^devtmpfs",
+  "^overlay",
+  "^shm",
+  "^udev",
+]
+replace = [
+  { pattern = "^\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+(\\S+)\\s+(\\S+)", replacement = "$2 $1" },
+]
+max_lines = 10
+on_empty = "df: no data"
+
+# ── 17. du：只保留总大小 ──
+[filters.du-compact]
+description = "du → 只保留总大小"
+match_command = "^du\\b"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+]
+tail_lines = 5
+max_lines = 5
+on_empty = "du: empty"
+
+# ── 18. env：只保留关键环境变量 ──
+[filters.env-compact]
+description = "env → 只保留银月/OpenClaw 相关变量"
+match_command = "^env(\\s|$)"
+strip_ansi = true
+keep_lines_matching = [
+  "OPENCLAW",
+  "SILVERMOON",
+  "YINYUE",
+  "DISCORD",
+  "OLLAMA",
+  "NODE_ENV",
+  "PATH",
+  "HOME",
+  "USER",
+  "SHELL",
+  "TERM",
+  "LANG",
+  "LC_",
+  "HTTP_PROXY",
+  "HTTPS_PROXY",
+  "http_proxy",
+  "https_proxy",
+  "ALL_PROXY",
+  "all_proxy",
+  "NO_PROXY",
+  "no_proxy",
+]
+max_lines = 20
+on_empty = "env: no matching vars"
+
+# ── 19. wc：紧凑格式 ──
+[filters.wc-compact]
+description = "wc → 紧凑格式 L W B"
+match_command = "^wc(\\s|$)"
+strip_ansi = true
+replace = [
+  { pattern = "^\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)\\s+(.+)", replacement = "$4: $1L $2W $3B" },
+  { pattern = "^\\s*(\\d+)\\s+(\\d+)\\s+(\\d+)", replacement = "$1L $2W $3B" },
+]
+max_lines = 10
+on_empty = "wc: empty"
+
+# ── 20. tree：只保留目录结构，去掉文件 ──
+[filters.tree-compact]
+description = "tree → 只保留目录，去掉文件列表"
+match_command = "^tree(\\s|$)"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\\d+ directories",
+  "^\\d+ files",
+]
+keep_lines_matching = [
+  "├──",
+  "└──",
+  ".",
+  "/$",
+]
+head_lines = 30
+max_lines = 30
+on_empty = "tree: empty"
+
+# ── 21. cargo build：只保留错误和最终状态 ──
+[filters.cargo-build]
+description = "cargo build → 只保留 error/warning 和编译结果"
+match_command = "^cargo\\s+build"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\\s+Compiling",
+  "^\\s+Finished",
+  "^\\s+Fresh",
+  "^\\s+Downloading",
+  "^\\s+Updating",
+  "^\\s+Locking",
+  "^\\s+Checking",
+  "^\\s+Documenting",
+]
+keep_lines_matching = [
+  "error",
+  "warning",
+  "Error",
+  "Warning",
+  "aborting",
+  "could not compile",
+]
+head_lines = 20
+max_lines = 20
+on_empty = "build: ok"
+
+# ── 22. cargo test：只保留测试结果摘要 ──
+[filters.cargo-test]
+description = "cargo test → 只保留 test result 行"
+match_command = "^cargo\\s+test"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\\s+Compiling",
+  "^\\s+Finished",
+  "^\\s+Running",
+  "^\\s+Downloading",
+  "^test\\s+",
+  "^\\s+at\\s+",
+  "^\\s+src/",
+  "^\\s+.",
+]
+keep_lines_matching = [
+  "test result",
+  "FAILED",
+  "error",
+  "Error",
+  "panicked",
+  "assertion failed",
+]
+head_lines = 15
+tail_lines = 10
+max_lines = 25
+on_empty = "tests: all passed"
+
+# ── 23. pytest：只保留失败和摘要 ──
+[filters.pytest-output]
+description = "pytest → 只保留 FAILED 和 short test summary"
+match_command = "^pytest\\s+"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\\s+.*PASSED",
+  "^\\s+.*PASSED",
+  "^\\s+.*SKIPPED",
+  "^\\s+.*SKIPPED",
+  "^\\.+$",
+  "^=+",
+  "^-+",
+  "^platform ",
+  "^rootdir",
+  "^plugins",
+  "^collected",
+]
+keep_lines_matching = [
+  "FAILED",
+  "ERROR",
+  "error",
+  "short test summary",
+  "passed",
+  "failed",
+  "error",
+]
+head_lines = 15
+tail_lines = 10
+max_lines = 25
+on_empty = "pytest: all passed"
+
+# ── 24. npx：去掉 npx 前缀噪音 ──
+[filters.npx-compact]
+description = "npx → 去掉 'Need to install' 等噪音"
+match_command = "^npx\\s+"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^Need to install",
+  "^npm ",
+  "^\\s+at\\s+",
+  "^(node:",
+]
+max_lines = 50
+on_empty = "npx: ok"
+
+# ── 25. 通用兜底：任何命令都走的基础过滤 ──
+[filters.generic-fallback]
+description = "通用兜底 → 去掉 ANSI/空行/路径噪音，截断长行"
+match_command = ".*"
+strip_ansi = true
+strip_lines_matching = [
+  "^\\s*$",
+  "^\u001b\\[",
+]
+truncate_lines_at = 150
+max_lines = 60
+on_empty = "(no output)"

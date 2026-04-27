@@ -1,0 +1,35 @@
+{
+  "agent:main:main": {
+    "sessionId": "5a41c648-8897-49e3-bbca-a9e4c2b30a04",
+    "updatedAt": 1776036345990,
+    "systemSent": true,
+    "abortedLastRun": false,
+    "authProfileOverride": "ollama:default",
+    "authProfileOverrideSource": "auto",
+    "authProfileOverrideCompactionCount": 0,
+    "chatType": "direct",
+    "deliveryContext": {
+      "channel": "webchat"
+    },
+    "lastChannel": "webchat",
+    "origin": {
+      "label": "openclaw-tui",
+      "provider": "webchat",
+      "surface": "webchat",
+      "chatType": "direct"
+    },
+    "sessionFile": "C:\\Users\\User\\.openclaw\\agents\\main\\sessions\\5a41c648-8897-49e3-bbca-a9e4c2b30a04.jsonl",
+    "compactionCount": 0,
+    "skillsSnapshot": {
+      "prompt": "",
+      "skills": [],
+      "skillFilter": [
+        "telegram"
+      ],
+      "resolvedSkills": [],
+      "version": 0
+    },
+    "status": "running",
+    "startedAt": 1776036345925
+  }
+}

@@ -1,0 +1,44 @@
+# 银月钱庄 · RTK 项目级极限压缩配置
+# 优先级高于全局配置，全体 Agent 自动继承
+
+[display]
+colors = false
+emoji = false
+max_width = 60
+
+[limits]
+grep_max_results = 30
+grep_max_per_file = 5
+status_max_files = 5
+status_max_untracked = 3
+passthrough_max_chars = 300
+
+[filters]
+ignore_dirs = [
+    ".git", "node_modules", "target", "__pycache__",
+    ".venv", "vendor", ".next", "dist", "build",
+    "coverage", ".nyc_output", "workspace", "user_data",
+    ".openclaw-workspaces", "backup", "logs", "temp",
+    ".cache", ".npm", ".pnpm-store", ".cargo",
+]
+ignore_files = [
+    "*.lock", "*.min.js", "*.min.css", "*.map",
+    "*.log", "*.sqlite", "*.sqlite3", "*.db",
+    "*.wasm", "*.svg", "*.png", "*.jpg", "*.ico",
+    "package-lock.json", "yarn.lock", "pnpm-lock.yaml",
+    "Cargo.lock", "Gemfile.lock", "poetry.lock",
+]
+
+[hooks]
+exclude_commands = [
+    "cd", "mkdir", "rmdir", "rm", "cp", "mv",
+    "touch", "echo", "printf", "code", "explorer",
+    "start", "cls", "clear",
+]
+
+[tracking]
+enabled = true
+history_days = 7
+
+[telemetry]
+enabled = false
