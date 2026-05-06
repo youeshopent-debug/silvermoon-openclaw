@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: {
+            'bg-deep': '#0A0A0F',
+            'accent': '#00D4FF',
+            'accent-dim': '#00B8E0'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0F; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 300px; -webkit-font-smoothing: antialiased; }
+    .container { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .row { display: flex; gap: 12px; align-items: center; }
+    .btn-primary {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 24px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      background: #00D4FF;
+      color: #000;
+    }
+    .btn-primary:hover {
+      background: #00B8E0;
+      box-shadow: 0 0 20px rgba(0,212,255,0.35);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <button class="btn-primary">Primary Default</button>
+      <button class="btn-primary" style="background:#00B8E0;box-shadow:0 0 20px rgba(0,212,255,0.35);">Primary Hover</button>
+    </div>
+    <button class="btn-primary" disabled>Primary Disabled</button>
+  </div>
+</body>
+</html>

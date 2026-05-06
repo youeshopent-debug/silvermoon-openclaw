@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0F; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 200px; -webkit-font-smoothing: antialiased; }
+    .container { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .btn-text {
+      font-family: 'Inter', sans-serif;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      transition: color 0.2s ease;
+      padding: 4px 8px;
+    }
+    .btn-text:hover {
+      color: #F1F1F7;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <button class="btn-text">Text Button (Default)</button>
+    <button class="btn-text" style="color:#F1F1F7;">Text Button (Hover)</button>
+  </div>
+</body>
+</html>

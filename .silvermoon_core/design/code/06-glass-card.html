@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=384">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: {
+            'bg-deep': '#0A0A0F',
+            'bg-card': '#12121A',
+            'accent': '#00D4FF',
+            'accent-subtle': 'rgba(0,212,255,0.12)',
+            'text-primary': '#F1F1F7',
+            'text-secondary': 'rgba(255,255,255,0.65)',
+            'text-muted': 'rgba(255,255,255,0.40)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0F; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 280px; -webkit-font-smoothing: antialiased; }
+    .glass-card {
+      width: 320px;
+      background: #12121A;
+      border: 1px solid rgba(255,255,255,0.06);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+    }
+    .glass-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5), 0 0 20px rgba(0,212,255,0.08);
+    }
+  </style>
+</head>
+<body>
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+    <div class="glass-card">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(0,212,255,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+        <div style="width:20px;height:20px;border-radius:4px;border:2px solid #00D4FF;"></div>
+      </div>
+      <div style="color:#F1F1F7;font-size:16px;font-weight:600;margin-bottom:8px;">Glass Card Title</div>
+      <div style="color:rgba(255,255,255,0.65);font-size:13px;line-height:1.5;margin-bottom:20px;">This is a glass card component with backdrop blur and hover elevation effect.</div>
+      <div style="display:flex;gap:8px;">
+        <span style="color:#00D4FF;font-size:11px;background:rgba(0,212,255,0.12);padding:2px 8px;border-radius:9999px;">Badge 1</span>
+        <span style="color:rgba(255,255,255,0.40);font-size:11px;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:9999px;">Badge 2</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

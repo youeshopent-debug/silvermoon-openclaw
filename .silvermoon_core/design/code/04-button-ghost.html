@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: {
+            'bg-deep': '#0A0A0F',
+            'text-primary': '#F1F1F7'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0F; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 300px; -webkit-font-smoothing: antialiased; }
+    .container { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .row { display: flex; gap: 12px; align-items: center; }
+    .btn-ghost {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 10px 24px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: transparent;
+      color: #F1F1F7;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.06);
+      border-color: rgba(255,255,255,0.16);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <button class="btn-ghost">Ghost Default</button>
+      <button class="btn-ghost" style="background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.16);">Ghost Hover</button>
+    </div>
+  </div>
+</body>
+</html>

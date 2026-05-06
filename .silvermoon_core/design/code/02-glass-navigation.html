@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1920">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: {
+            'bg-deep': '#0A0A0F',
+            'accent': '#00D4FF',
+            'accent-dim': '#00B8E0',
+            'accent-glow': 'rgba(0,212,255,0.35)',
+            'text-primary': '#F1F1F7',
+            'text-secondary': 'rgba(255,255,255,0.65)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0A0A0F; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+    nav {
+      width: 1920px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(10,10,15,0.8);
+      backdrop-filter: blur(48px);
+      -webkit-backdrop-filter: blur(48px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 32px;
+    }
+    .logo { font-size: 20px; font-weight: 700; letter-spacing: -0.5px; color: #F1F1F7; text-decoration: none; }
+    .logo span { color: #00D4FF; }
+    .links { display: flex; gap: 32px; }
+    .links a { color: rgba(255,255,255,0.65); font-size: 14px; font-weight: 500; text-decoration: none; transition: color 0.2s; }
+    .links a:hover { color: #F1F1F7; }
+    .cta {
+      background: #00D4FF;
+      color: #000;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .cta:hover {
+      background: #00B8E0;
+      box-shadow: 0 0 20px rgba(0,212,255,0.35);
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#" class="logo">Silver<span>Moon</span> Bank</a>
+    <div class="links">
+      <a href="#">Dashboard</a>
+      <a href="#">Transactions</a>
+      <a href="#">Analytics</a>
+      <a href="#">Settings</a>
+    </div>
+    <button class="cta">Connect Wallet</button>
+  </nav>
+</body>
+</html>

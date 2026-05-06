@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1440">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'sans-serif'] },
+          colors: {
+            'bg-deep': '#0A0A0F',
+            'bg-card': '#12121A',
+            'bg-elevated': '#1A1A26',
+            'accent': '#00D4FF',
+            'accent-dim': '#00B8E0',
+            'accent-subtle': 'rgba(0,212,255,0.12)',
+            'accent-glow': 'rgba(0,212,255,0.35)',
+            'text-primary': '#F1F1F7',
+            'text-secondary': 'rgba(255,255,255,0.65)',
+            'text-muted': 'rgba(255,255,255,0.40)',
+            'border-subtle': 'rgba(255,255,255,0.06)',
+            'border-default': 'rgba(255,255,255,0.10)',
+            'border-hover': 'rgba(255,255,255,0.16)'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0A0A0F;
+      font-family: 'Inter', sans-serif;
+      color: #F1F1F7;
+      padding: 48px;
+      width: 1440px;
+    }
+    ::-webkit-scrollbar { display: none; }
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 24px;
+      color: #F1F1F7;
+    }
+    .grid-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.40);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div style="margin-bottom: 48px;">
+    <span style="color:#00D4FF;font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:1px;">SilverMoon Bank</span>
+    <h1 style="font-size:32px;font-weight:700;letter-spacing:-1px;margin-top:4px;">Design System Panorama</h1>
+    <p style="color:rgba(255,255,255,0.50);font-size:13px;margin-top:4px;">Dark theme · Inter · 4px base grid · v1.0</p>
+  </div>
+
+  <!-- 1. Color Palette -->
+  <div style="margin-bottom: 48px;">
+    <div class="section-title">Color Palette</div>
+    <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:12px;">
+      <div style="background:#0A0A0F;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;text-align:center;">
+        <div style="width:100%;height:48px;background:#0A0A0F;border-radius:6px;margin-bottom:8px;"></div>
+        <div style="font-size:11px;font-weight:600;">bg-deep</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.40);">#0A0A0F</div>
+      </div>
+      <div style="background:#12121A;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;text-align:center;">
+        <div style="width:100%;height:48px;background:#12121A;border-radius:6px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.06);"></div>
+        <div style="font-size:11px;font-weight:600;">bg-card</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.40);">#12121A</div>
+      </div>
+      <div style="background:#1A1A26;border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px;text-align:center;">
+        <div style="width:100%;height:48px;background:#1A1A26;border-radius:6px;margin-bottom:8px;"></div>
+        <div style="font-size:11px;font-weight:600;">bg-elevated</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.40);">#1A1A26</div>
+      </div>
+      <div style="background:rgba(0,212,255,0.12);border:1px solid rgba(0,212,255,0.2);border-radius:8px;padding:16px;text-align:center;">
+        <div style="width:100%;height:48px;background:rgba(0,212,255,0.12);border-radius:6px;margin-bottom:8px;"></div>
+        <div style="font-size:11px;font-weight:600;">accent-subtle</div>
+        <div style="font-size:10px;color:rgba(255,255,255,0.40);">rgba(0,212,255,0.12)</div>
+      </div>
+      <div style="background:#00D4FF;border:1px solid #00D4FF;border-radius:8px;padding:16px;text-align:center;">
+        <div style="width:100%;height:48px;background:#00D4FF;border-radius:6px;margin-bottom:8px;"></div>
+        <div style="font-size:11px;font-weight:600;color:#000;">accent</div>
+        <div style="font-size:10px;color:rgba(0,0,0,0.60);">#00D4FF</div>
+      </div>
+      <div style="background:#00B8E0;border:1px solid #00B8E0;border-radius:8px;padding:16px;text-align:center;">
+        <div style="width:100%;height:48px;background:#00B8E0;border-radius:6px;margin-bottom:8px;"></div>
+        <div style="font-size:11px;font-weight:600;color:#000;">accent-dim</div>
+        <div style="font-size:10px;color:rgba(0,0,0,0.60);">#00B8E0</div>
+      </div>
+      <div style="background:#F1F1F7;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:16px;text-align:center;">
+        <div style="width:100%;height:48px;background:#F1F1F7;border-radius:6px;margin-bottom:8px;"></div>
+        <div style="font-size:11px;font-weight:600;color:#000;">text-primary</div>
+        <div style="font-size:10px;color:rgba(0,0,0,0.60);">#F1F1F7</div>
+      </div>
+      <div style="background:rgba(255,255,255,0.65);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:16px;text-align:center;">
+        <div style="width:100%;height:48px;background:rgba(255,255,255,0.65);border-radius:6px;margin-bottom:8px;"></div>
+        <div style="font-size:11px;font-weight:600;color:#000;">text-secondary</div>
+        <div style="font-size:10px;color:rgba(0,0,0,0.60);">rgba(255,255,255,0.65)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Typography Scale -->
+  <div style="margin-bottom: 48px;">
+    <div class="section-title">Typography Scale</div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div style="display:flex;align-items:baseline;gap:24px;">
+        <span style="font-size:10px;color:rgba(255,255,255,0.30);min-width:60px;">32px/700</span>
+        <span style="font-size:32px;font-weight:700;letter-spacing:-0.5px;">Display — SilverMoon Bank</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:24px;">
+        <span style="font-size:10px;color:rgba(255,255,255,0.30);min-width:60px;">22px/600</span>
+        <span style="font-size:22px;font-weight:600;">Heading — Connect Wallet</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:24px;">
+        <span style="font-size:10px;color:rgba(255,255,255,0.30);min-width:60px;">16px/500</span>
+        <span style="font-size:16px;font-weight:500;">Subhead — Dashboard Overview</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:24px;">
+        <span style="font-size:10px;color:rgba(255,255,255,0.30);min-width:60px;">14px/400</span>
+        <span style="font-size:14px;font-weight:400;color:rgba(255,255,255,0.65);">Body — Your transactions are securely encrypted end-to-end.</span>
+      </div>
+      <div style="display:flex;align-items:baseline;gap:24px;">
+        <span style="font-size:10px;color:rgba(255,255,255,0.30);min-width:60px;">12px/400</span>
+        <span style="font-size:12px;font-weight:400;color:rgba(255,255,255,0.40);">Caption — Last updated 2 mins ago</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Spacing Grid -->
+  <div style="margin-bottom: 48px;">
+    <div class="section-title">Spacing Grid (4px base)</div>
+    <div style="display:flex;gap:8px;align-items:flex-end;">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="width:4px;height:4px;background:#00D4FF;border-radius:2px;"></div>
+        <span style="font-size:10px;color:rgba(255,255,255,0.40);">4px</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="width:8px;height:8px;background:#00D4FF;border-radius:2px;"></div>
+        <span style="font-size:10px;color:rgba(255,255,255,0.40);">8px</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="width:12px;height:12px;background:#00D4FF;border-radius:2px;"></div>
+        <span style="font-size:10px;color:rgba(255,255,255,0.40);">12px</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="width:16px;height:16px;background:#00D4FF;border-radius:2px;"></div>
+        <span style="font-size:10px;color:rgba(255,255,255,0.40);">16px</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="width:20px;height:20px;background:#00B8E0;border-radius:2px;"></div>
+        <span style="font-size:10px;color:rgba(255,255,255,0.40);">20px</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="width:24px;height:24px;background:#00B8E0;border-radius:2px;"></div>
+        <span style="font-size:10px;color:rgba(255,255,255,0.40);">24px</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+        <div style="width:32px;height:32px;background:#00B8E0;border-radius:2px;"></div>
+        <span style="font-size:10px;color:rgba(255,255,255,0.40);">32px</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Shadows + Border Radius -->
+  <div style="margin-bottom: 48px;">
+    <div class="section-title">Shadows & Border Radius</div>
+    <div style="display:flex;gap:16px;margin-bottom:24px;">
+      <div style="width:120px;height:60px;background:#12121A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.40);box-shadow:0 1px 2px rgba(0,0,0,0.3);">shadow-sm</div>
+      <div style="width:120px;height:60px;background:#12121A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.40);box-shadow:0 4px 12px rgba(0,0,0,0.4);">shadow-md</div>
+      <div style="width:140px;height:60px;background:#12121A;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;color:rgba(255,255,255,0.60);box-shadow:0 8px 32px rgba(0,0,0,0.5),0 0 20px rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.12);">shadow-glow</div>
+    </div>
+    <div style="display:flex;gap:12px;">
+      <div style="width:40px;height:40px;background:#1A1A26;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.40);">4px</div>
+      <div style="width:40px;height:40px;background:#1A1A26;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.40);">8px</div>
+      <div style="width:40px;height:40px;background:#1A1A26;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.40);">12px</div>
+      <div style="width:40px;height:40px;background:#1A1A26;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.40);">24px</div>
+    </div>
+  </div>
+
+  <!-- 5. Component Preview Grid -->
+  <div>
+    <div class="section-title">Component Preview</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <!-- Primary Button -->
+      <div style="background:#12121A;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;">
+        <div class="grid-label">Button/Primary</div>
+        <div style="display:flex;gap:8px;">
+          <button style="background:#00D4FF;color:#000;border:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;">Default</button>
+          <button style="background:#00B8E0;color:#000;border:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;box-shadow:0 0 20px rgba(0,212,255,0.35);">Hover</button>
+          <button style="background:#00D4FF;color:#000;border:none;padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;opacity:0.5;cursor:not-allowed;">Disabled</button>
+        </div>
+      </div>
+      <!-- Ghost Button -->
+      <div style="background:#12121A;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;">
+        <div class="grid-label">Button/Ghost</div>
+        <div style="display:flex;gap:8px;">
+          <button style="background:transparent;color:#F1F1F7;border:1px solid rgba(255,255,255,0.10);padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;">Default</button>
+          <button style="background:rgba(255,255,255,0.06);color:#F1F1F7;border:1px solid rgba(255,255,255,0.16);padding:10px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;">Hover</button>
+        </div>
+      </div>
+      <!-- Glass Card -->
+      <div style="background:#12121A;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;">
+        <div class="grid-label">Glass Card</div>
+        <div style="background:#12121A;border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(24px);border-radius:12px;padding:16px;">
+          <div style="width:32px;height:32px;border-radius:8px;background:rgba(0,212,255,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:12px;">
+            <div style="width:14px;height:14px;border:2px solid #00D4FF;border-radius:3px;"></div>
+          </div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Card Title</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.50);margin-bottom:12px;">Glass card with blur effect</div>
+          <span style="color:#00D4FF;font-size:10px;background:rgba(0,212,255,0.12);padding:2px 8px;border-radius:9999px;">Badge</span>
+        </div>
+      </div>
+      <!-- Input -->
+      <div style="background:#12121A;border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:20px;">
+        <div class="grid-label">Input States</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <input style="background:#1A1A26;border:1px solid rgba(255,255,255,0.10);border-radius:6px;padding:8px 12px;font-size:13px;color:#F1F1F7;outline:none;" placeholder="Default" />
+          <input style="background:#1A1A26;border:1px solid #00D4FF;border-radius:6px;padding:8px 12px;font-size:13px;color:#F1F1F7;outline:none;box-shadow:0 0 0 3px rgba(0,212,255,0.12);" placeholder="Focus" />
+          <input style="background:#1A1A26;border:1px solid #EF4444;border-radius:6px;padding:8px 12px;font-size:13px;color:#F1F1F7;outline:none;" placeholder="Error state" />
+          <input style="background:#1A1A26;border:1px solid #22C55E;border-radius:6px;padding:8px 12px;font-size:13px;color:#F1F1F7;outline:none;" placeholder="Success state" />
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
