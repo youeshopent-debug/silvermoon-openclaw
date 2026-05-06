@@ -1,0 +1,27 @@
+{
+  "stats": {
+    "totalConversations": 307,
+    "totalMessages": 164,
+    "totalTokens": 1150835,
+    "totalErrors": 0,
+    "happyMoments": 0,
+    "sadMoments": 0,
+    "helpfulReplies": 3,
+    "failedReplies": 0
+  },
+  "reflectionLog": [],
+  "learnedPatterns": [],
+  "adaptationHistory": [],
+  "personaState": {
+    "emotionalMemory": [],
+    "relationshipMemory": [],
+    "milestones": [
+      {
+        "text": "银月诞生了",
+        "at": "2026-04-27T05:33:56.144Z"
+      }
+    ],
+    "birthDate": "2026-04-27T05:33:56.144Z"
+  },
+  "savedAt": "2026-04-28T15:13:01.093Z"
+}

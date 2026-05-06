@@ -7,5 +7,11 @@
   "skills": ["task-router-core", "design-md", "narrator-ai-skill"],
   "intercept": null,
   "dependencies": ["李长寿", "韩立", "药老", "美杜莎", "墨影", "萧炎", "雅妃", "小医仙", "紫灵", "紫研"],
-  "fallback": "银月内阁暂时无可奉告"
+  "fallback": "银月内阁暂时无可奉告",
+  "shared_memory": {
+    "enabled": true,
+    "wings": ["general", "task", "decision", "code", "insight", "handoff", "reflection"],
+    "can_read": true,
+    "can_write": true
+  }
 }

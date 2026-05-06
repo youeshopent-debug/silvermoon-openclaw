@@ -25,6 +25,7 @@ const { buildSilvermoonSystemPrompt, buildWorkCard } = require('./lib/persona-si
 const { routeWithLLM } = require('./lib/brain-router');
 const { executeTool } = require('./lib/tools');
 const { callGeminiText } = require('./lib/gemini-client');
+const { startDispatchConsumer } = require('./lib/dispatch-consumer');
 const { renderModelDownReply } = require('./lib/model-down-reply');
 const { parseEnvText } = require('./lib/env-parse');
 const { tryIntentIntercept } = require('./lib/intent');
@@ -4622,6 +4623,41 @@ function summarizeToolResult(name, r) {
     const lines = items.map((x) => `- ${String(x.title || '').trim()} | ${String(x.url || '').trim()}`).filter(Boolean);
     return lines.length ? `tool=${n}：query=${String(r.query || '')}\n${lines.join('\n')}`.trim() : '';
   }
+  if (n === 'githubSearch') {
+    if (!r.ok || !Array.isArray(r.results) || !r.results.length) return '';
+    const lines = r.results.map((x) =>
+      `- ⭐${x.stars || 0} ${x.name}${x.language ? ' [' + x.language + ']' : ''}\n  ${x.description || '(无描述)'}\n  ${x.url}`
+    );
+    return `tool=${n}：query=${String(r.query || '')}（共 ${r.total || 0} 条）\n${lines.join('\n')}`.trim();
+  }
+  if (n === 'discoverAgent') {
+    if (!r.ok || !r.found) {
+      const all = Array.isArray(r.allAgents) ? r.allAgents.join(', ') : '';
+      return `tool=${n}：未找到「${r.searchName || ''}」。现有子代理：${all || '无'}`.trim();
+    }
+    const skills = Array.isArray(r.skills) ? r.skills.join(', ') : '';
+    const deps = Array.isArray(r.dependencies) ? r.dependencies.join(', ') : '';
+    const parts = [`【${r.name || ''}】`, `角色：${r.role || '未知'}`];
+    if (r.priority) parts.push(`优先级：${r.priority}`);
+    if (skills) parts.push(`技能：${skills}`);
+    if (deps) parts.push(`依赖：${deps}`);
+    return `tool=${n}：${parts.join(' | ')}`.trim();
+  }
+  if (n === 'listAllAgents') {
+    if (!r.ok || !Array.isArray(r.agents) || !r.agents.length) return `tool=${n}：无子代理`.trim();
+    const lines = r.agents.map((a) => `- ${a.name}（${a.role}）${Array.isArray(a.skills) && a.skills.length ? '：' + a.skills.join(', ') : ''}`);
+    return `tool=${n}：共 ${r.count || 0} 个子代理\n${lines.join('\n')}`.trim();
+  }
+  if (n === 'dispatchTask') {
+    if (!r.ok) return `tool=${n}：派发失败 — ${r.reason || ''} ${r.searchName ? '（找不到：' + r.searchName + '）' : ''}`.trim();
+    return `tool=${n}：${r.message || '已派发'} 优先级：${r.entry?.priority || 'medium'}`.trim();
+  }
+  if (n === 'getDispatchHistory') {
+    if (!r.ok) return `tool=${n}：查询失败`.trim();
+    if (!r.count) return `tool=${n}：暂无派发记录`.trim();
+    const items = (r.entries || []).map(e => `- [${e.stage || 'queued'}] ${e.target} → ${e.task}（${e.priority}）at ${e.consumedAt || e.at || ''}`);
+    return `tool=${n}：最近 ${r.count} 条记录\n${items.join('\n')}`.trim();
+  }
   if (n === 'proposeExec') {
     return `tool=${n}：需要审批（将转为待批计划）`.trim();
   }
@@ -4647,7 +4683,7 @@ async function askSilvermoonAutonomyD({ userText, extraInstruction, channelId, r
   const persona = buildSilvermoonSystemPrompt({ mode: 'work' });
   const toolGuide = [
     '你要做复杂任务与工具调用。先输出严格 JSON（不要多余文字）。',
-    '格式：{"toolCalls":[{"name":"webSearch|tailErrors|readFileSafe|proposeExec","args":{...}}], "final":""}',
+    '格式：{"toolCalls":[{"name":"webSearch|githubSearch|discoverAgent|listAllAgents|dispatchTask|getDispatchHistory|tailErrors|readFileSafe|proposeExec","args":{...}}], "final":""}',
     '如果不需要工具，toolCalls 设为空数组，final 填写最终回复。',
     '禁止任何表格。工作态用单列垂直卡片流。',
   ].join('\n');
@@ -4739,7 +4775,7 @@ async function askSilvermoonAutonomyD({ userText, extraInstruction, channelId, r
   const finalPrompt = [
     '你已获得工具证据。现在只输出最终回复（不要 JSON）。',
     '要求：纯中文；禁止任何表格；工作态用单列垂直卡片流；给 Plan A/B/C；不要复读。',
-    '严禁出现“工具不可用/无法直接提供/无法获取”等废话。',
+    '诚实优先。如果工具返回空结果或出错，直接告知用户实情，建议替代方案。严禁编造虚假数据。',
     '只在用户明确请求帮助且信息确实不足时才提问，日常对话绝对不要追问。',
     `用户输入：${txt}`,
     hasEvidence ? '工具证据：' : '工具证据： （空）',
@@ -7519,6 +7555,7 @@ function initCronJobs() {
   scheduleEveryHours(t2, 4, runHanLiJobIntel, true);
   scheduleEveryHours(t3, 24, () => { void runAutoDream(); }, false);
   STATE.memory.nextAutoDreamAt = STATE.cron.nextRuns[t3] || STATE.memory.nextAutoDreamAt;
+  startDispatchConsumer(STATE);
   setInterval(() => writeHeartbeat('心跳'), 60 * 1000);
 }
 

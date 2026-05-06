@@ -7,5 +7,11 @@
   "skills": ["vision-enhancer", "ui-layout-analyzer", "design-md"],
   "intercept": null,
   "dependencies": ["药老", "墨影", "银月"],
-  "fallback": "美杜莎暂时无可奉告"
+  "fallback": "美杜莎暂时无可奉告",
+  "shared_memory": {
+    "enabled": true,
+    "wings": ["general", "task", "decision", "handoff"],
+    "can_read": true,
+    "can_write": true
+  }
 }

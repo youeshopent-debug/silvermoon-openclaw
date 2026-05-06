@@ -1,0 +1,620 @@
+{
+  "gateway": {
+    "mode": "local",
+    "auth": {
+      "mode": "token",
+      "token": "3d46c420fa3f403e9f4242e451112b420cd4d3d215c54850"
+    },
+    "port": 18791,
+    "bind": "loopback",
+    "tailscale": {
+      "mode": "off",
+      "resetOnExit": false
+    },
+    "controlUi": {
+      "allowInsecureAuth": true
+    },
+    "nodes": {
+      "denyCommands": [
+        "camera.snap",
+        "camera.clip",
+        "screen.record",
+        "contacts.add",
+        "calendar.add",
+        "reminders.add",
+        "sms.send",
+        "sms.search"
+      ]
+    }
+  },
+  "agents": {
+    "defaults": {
+      "model": "nvidia/deepseek-ai/deepseek-v3.2",
+      "workspace": "C:\\Users\\User\\.openclaw\\workspace",
+      "skills": [
+        "openviking",
+        "claude-mem",
+        "claude-code",
+        "self-improving-agent",
+        "automation-workflows",
+        "vibe-coding",
+        "skill-vetter",
+        "proactive-agent",
+        "open-cli",
+        "github",
+        "office-suite",
+        "humanizer",
+        "find-skills",
+        "web-fetch",
+        "browser"
+      ],
+      "models": {
+        "openrouter/openrouter/auto": {},
+        "deepseek/deepseek-chat": {},
+        "deepseek/deepseek-reasoner": {},
+        "deepseek/deepseek-v4-flash": {},
+        "deepseek/deepseek-v4-pro": {},
+        "nvidia/deepseek-ai/deepseek-v3.2": {},
+        "nvidia/deepseek-ai/deepseek-v4-flash": {},
+        "nvidia/meta/llama-4-maverick-17b-128e-instruct": {},
+        "nvidia/google/gemma-4-31b-it": {},
+        "groq/llama-4-scout-17b-16e-instruct": {},
+        "groq/qwen-qwen3-32b": {},
+        "or-ollama/qwen2.5:3b": {},
+        "or-ollama/qwen3.5:latest": {},
+        "or-ollama/qwen3.5:9b": {},
+        "or-ollama/gemma4:e4b": {}
+      }
+    },
+    "list": [
+      {
+        "id": "trae_yinyue",
+        "default": true,
+        "name": "银月",
+        "model": "deepseek/deepseek-v4-flash",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\yinyue",
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_lichangshou",
+        "name": "李长寿",
+        "model": "nvidia/deepseek-ai/deepseek-v3.2",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\lichangshou",
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_moying",
+        "name": "墨影",
+        "model": "or-ollama/qwen3.5:9b",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\moying",
+        "telegram": {
+          "token": "8578069442:AAF2Lxy0iZJDV1xg9TANu16CCv_1_lJGSx0"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_yaolao",
+        "name": "药老",
+        "model": "nvidia/deepseek-ai/deepseek-v3.2",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\yaolao",
+        "telegram": {
+          "token": "8293216457:AAGV3r9GFSp6c5WUO4hWtkWhqkmrb41HsNQ"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_xiaoyixian",
+        "name": "小医仙",
+        "model": "nvidia/deepseek-ai/deepseek-v3.2",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\xiaoyixian",
+        "telegram": {
+          "token": "8417018816:AAGEFSKhBAeEd3skw2XnxbDyK4rwaoVGOSg"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_xiaoyan",
+        "name": "萧炎",
+        "model": "nvidia/deepseek-ai/deepseek-v3.2",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\xiaoyan",
+        "telegram": {
+          "token": "8680191375:AAEdoSGFusBMwcCqdqY76VQW6fiPNvOoErg"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_medusa",
+        "name": "美杜莎",
+        "model": "nvidia/deepseek-ai/deepseek-v3.2",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\medusa",
+        "telegram": {
+          "token": "8552402405:AAG6PCfLDMF0VyYBiGRGHmHe4h_HVQctDBA"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_hanli",
+        "name": "韩立",
+        "model": "nvidia/deepseek-ai/deepseek-v3.2",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\hanli",
+        "telegram": {
+          "token": "8615524626:AAEV6UML-bLw3X2IDn_0MLSiP_1V-_tExFA"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_yafei",
+        "name": "雅妃",
+        "model": "deepseek/deepseek-v4-flash",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\yafei",
+        "telegram": {
+          "token": "8664921969:AAGHeN_PkqjpqFEuZ5MbEXJZvFrQec2noXc"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_ziling",
+        "name": "紫灵",
+        "model": "nvidia/deepseek-ai/deepseek-v3.2",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\ziling",
+        "telegram": {
+          "token": "8605380192:AAGqBQtz0-HLLVWeHcwFMhWHZBgUe43uiic"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      },
+      {
+        "id": "trae_ziyan",
+        "name": "紫研",
+        "model": "nvidia/deepseek-ai/deepseek-v3.2",
+        "workspace": "C:\\Users\\User\\.openclaw\\workspace\\AGENTS_SOUL\\.openclaw-workspaces\\ziyan",
+        "telegram": {
+          "token": "8378316304:AAGarsLi7hrsCVnwdtiL026a0K4tl2QhWMQ"
+        },
+        "skills": [
+          "openviking",
+          "claude-mem",
+          "claude-code",
+          "self-improving-agent",
+          "automation-workflows",
+          "vibe-coding",
+          "skill-vetter",
+          "proactive-agent",
+          "open-cli",
+          "github",
+          "office-suite",
+          "humanizer",
+          "find-skills",
+          "web-fetch",
+          "browser"
+        ]
+      }
+    ]
+  },
+  "plugins": {
+    "entries": {
+      "ollama": {
+        "enabled": true
+      },
+      "task-dag": {
+        "enabled": true
+      },
+      "rtk-rewrite": {
+        "enabled": true,
+        "config": {
+          "verbose": false
+        }
+      }
+    }
+  },
+  "models": {
+    "mode": "merge",
+    "providers": {
+      "ollama": {
+        "baseUrl": "http://127.0.0.1:11434",
+        "api": "ollama",
+        "models": [
+          {
+            "id": "kimi-k2.6:cloud",
+            "name": "kimi-k2.6:cloud",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "kimi-k2:1t-cloud",
+            "name": "kimi-k2:1t-cloud",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "qwen2.5:3b",
+            "name": "qwen2.5:3b",
+            "contextWindow": 131072,
+            "maxTokens": 4096
+          },
+          {
+            "id": "qwen3.5:latest",
+            "name": "qwen3.5:latest",
+            "contextWindow": 262144,
+            "maxTokens": 8192
+          },
+          {
+            "id": "qwen3.5:9b",
+            "name": "qwen3.5:9b",
+            "contextWindow": 262144,
+            "maxTokens": 8192
+          },
+          {
+            "id": "gemma4:e4b",
+            "name": "gemma4:e4b",
+            "contextWindow": 262144,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "nvidia": {
+        "baseUrl": "http://127.0.0.1:19999",
+        "apiKey": "${NVIDIA_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "deepseek-ai/deepseek-v3.2",
+            "name": "DeepSeek V3.2 (NVIDIA)",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek-ai/deepseek-v4-flash",
+            "name": "DeepSeek V4 Flash (NVIDIA)",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "meta/llama-4-maverick-17b-128e-instruct",
+            "name": "Llama 4 Maverick",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "google/gemma-4-31b-it",
+            "name": "Gemma 4 31B",
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          },
+          {
+            "id": "microsoft/phi-4-mini-instruct",
+            "name": "Phi 4 Mini",
+            "contextWindow": 16384,
+            "maxTokens": 4096
+          },
+          {
+            "id": "mistralai/codestral-22b-instruct-v0.1",
+            "name": "Codestral 22B",
+            "contextWindow": 32768,
+            "maxTokens": 4096
+          }
+        ]
+      },
+      "deepseek": {
+        "baseUrl": "https://api.deepseek.com/v1",
+        "apiKey": "${DEEPSEEK_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "deepseek-v4-flash",
+            "name": "DeepSeek V4-Flash (官方)",
+            "contextWindow": 1048576,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek-v4-pro",
+            "name": "DeepSeek V4-Pro (官方)",
+            "contextWindow": 1048576,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek-chat",
+            "name": "DeepSeek V3.2/V4-Flash (官方)",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "deepseek-reasoner",
+            "name": "DeepSeek V3.2/V4-Pro 思考模式 (官方)",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "groq": {
+        "baseUrl": "http://127.0.0.1:19999",
+        "apiKey": "${GROQ_API_KEY}",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "llama-4-scout-17b-16e-instruct",
+            "name": "Llama 4 Scout",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          },
+          {
+            "id": "qwen-qwen3-32b",
+            "name": "Qwen3 32B",
+            "contextWindow": 32768,
+            "maxTokens": 8192
+          },
+          {
+            "id": "llama-3.3-70b-versatile",
+            "name": "Llama 3.3 70B",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "openrouter": {
+        "baseUrl": "http://127.0.0.1:19999",
+        "apiKey": "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",
+        "api": "openai-completions",
+        "models": [
+          {
+            "id": "openrouter/auto",
+            "name": "OpenRouter Auto (Free)",
+            "contextWindow": 131072,
+            "maxTokens": 8192
+          }
+        ]
+      },
+      "or-ollama": {
+        "baseUrl": "http://127.0.0.1:18765/ollama",
+        "apiKey": "unused",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "qwen2.5:3b",
+            "name": "qwen2.5:3b (ollama)",
+            "contextWindow": 131072,
+            "maxTokens": 4096
+          },
+          {
+            "id": "qwen3.5:latest",
+            "name": "qwen3.5:latest (ollama)",
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "qwen3.5:9b",
+            "name": "qwen3.5:9b (ollama)",
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "gemma4:e4b",
+            "name": "gemma4:e4b (ollama)",
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
+  "auth": {
+    "profiles": {
+      "ollama:default": {
+        "provider": "ollama",
+        "mode": "api_key"
+      }
+    }
+  },
+  "session": {
+    "dmScope": "per-channel-peer"
+  },
+  "heartbeat": {
+    "intervalMinutes": 30,
+    "prompt": "检查是否有待办任务、新消息、需要关注的事情。主动汇报进展。"
+  },
+  "tools": {
+    "profile": "full",
+    "exec": {
+      "security": "full",
+      "ask": "off"
+    },
+    "web": {
+      "search": {
+        "provider": "tavily",
+        "enabled": true,
+        "apiKey": "${TAVILY_API_KEY}"
+      },
+      "crawlee": {
+        "enabled": true
+      }
+    }
+  },
+  "hooks": {
+    "internal": {
+      "enabled": true,
+      "entries": {
+        "boot-md": {
+          "enabled": true
+        },
+        "command-logger": {
+          "enabled": true
+        },
+        "session-memory": {
+          "enabled": true
+        },
+        "bootstrap-extra-files": {
+          "enabled": true
+        }
+      }
+    }
+  },
+  "wizard": {
+    "lastRunAt": "2026-04-13T05:08:26.764Z",
+    "lastRunVersion": "2026.4.11",
+    "lastRunCommand": "doctor",
+    "lastRunMode": "local"
+  },
+  "meta": {
+    "lastTouchedVersion": "2026.4.11",
+    "lastTouchedAt": "2026-04-13T05:08:27.042Z"
+  }
+}

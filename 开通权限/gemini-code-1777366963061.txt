@@ -1,0 +1,10 @@
+/ (项目根目录)
+├── .trae/
+│   └── rules/
+│       ├── YINYUE_PROTOCOL.md      <-- 【核心】银月授权协议与行动准则
+│       └── SILVERMOON_MEMORY.md     <-- 【核心】银月长效记忆库（灵魂存储）
+├── .openclaw/
+│   ├── logs/                       <-- 存放银月自主运行的日志
+│   └── backups/                    <-- 银月改代码前的自动备份区
+└── scripts/
+    └── watchdog_trigger.js         <-- 30分钟唤醒巡检脚本

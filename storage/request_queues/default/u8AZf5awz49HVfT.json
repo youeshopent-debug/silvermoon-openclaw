@@ -1,0 +1,9 @@
+{
+	"id": "u8AZf5awz49HVfT",
+	"json": "{\"id\":\"u8AZf5awz49HVfT\",\"url\":\"https://www.google.com/search?q=site%3Aaliexpress.com%20C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js%20OR%20site%3A1688.com%20C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js&num=10\",\"loadedUrl\":\"https://www.google.com/search?q=site%3Aaliexpress.com%20C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js%20OR%20site%3A1688.com%20C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js&num=10&sei=G_b5aa3aH-GPseMP7Lq-wAI\",\"uniqueKey\":\"https://www.google.com/search?num=10&q=site%3Aaliexpress.com+C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js+OR+site%3A1688.com+C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js\",\"method\":\"GET\",\"noRetry\":false,\"retryCount\":0,\"errorMessages\":[],\"headers\":{},\"userData\":{\"__crawlee\":{\"state\":4}},\"handledAt\":\"2026-05-05T13:52:33.723Z\"}",
+	"method": "GET",
+	"orderNo": null,
+	"retryCount": 0,
+	"uniqueKey": "https://www.google.com/search?num=10&q=site%3Aaliexpress.com+C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js+OR+site%3A1688.com+C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js",
+	"url": "https://www.google.com/search?q=site%3Aaliexpress.com%20C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js%20OR%20site%3A1688.com%20C%3A%5CUsers%5CUser%5C.openclaw%5Cscripts%5Cfulfillment-pipeline.js&num=10"
+}

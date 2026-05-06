@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIGenie Vision | AI Translation Glasses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            200: '#a5f3fc',
+                            300: '#67e8f9',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            700: '#0e7490',
+                            800: '#155e75',
+                            900: '#164e63',
+                            950: '#083344',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-panel-solid {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .text-gradient {
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .product-glow {
+            box-shadow: 0 0 80px rgba(6, 182, 212, 0.15), 0 0 40px rgba(6, 182, 212, 0.1);
+        }
+        .spec-item {
+            @apply flex items-center gap-3 py-3 border-b border-white/5;
+        }
+        .star {
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-300 font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Announcement Bar -->
+    <div class="bg-gradient-to-r from-brand-600 to-brand-700 text-white text-xs md:text-sm font-medium text-center py-2.5 px-4 tracking-wide">
+        🚀 Launch Special — Free Worldwide Shipping + 30-Day Money-Back Guarantee
+    </div>
+
+    <!-- ===== HERO SECTION ===== -->
+    <section class="relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-brand-950/40 via-slate-950 to-slate-950 pointer-events-none"></div>
+        <div class="absolute top-20 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-brand-500/10 rounded-full blur-[150px] pointer-events-none"></div>
+
+        <div class="max-w-6xl mx-auto px-6 pt-12 pb-20 md:pt-20 md:pb-32 relative z-10">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <!-- Left: Product Image -->
+                <div class="relative">
+                    <div class="aspect-[4/3] rounded-2xl product-glow overflow-hidden relative">
+                        <div class="absolute inset-0 bg-gradient-to-br from-brand-500/10 to-transparent"></div>
+                        <div class="w-full h-full flex items-center justify-center bg-slate-900/80">
+                            <div class="text-center p-8">
+                                <div class="w-56 h-56 mx-auto relative mb-4">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-brand-400/20 to-blue-500/20 rounded-full blur-3xl"></div>
+                                    <img src="https://ae-pic-a1.aliexpress-media.com/kf/S9957aad5196c404bbae29db0392ef0b24.jpg" alt="AI Translation Glasses" class="w-full h-full object-contain rounded-xl">
+                                </div>
+                                <p class="text-sm text-slate-500">AIGenie Vision X1 · AI Translation Glasses</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Thumbnail strip -->
+                    <div class="flex gap-3 mt-4 justify-center">
+                        <div class="w-16 h-16 rounded-lg overflow-hidden border border-brand-500/30">
+                            <img src="https://ae-pic-a1.aliexpress-media.com/kf/S9957aad5196c404bbae29db0392ef0b24.jpg" alt="Front view" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-16 h-16 rounded-lg overflow-hidden border border-white/10">
+                            <img src="https://ae-pic-a1.aliexpress-media.com/kf/S5efe9a37755e44cfa878e2e714900709h.jpg" alt="Side view" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-16 h-16 rounded-lg overflow-hidden border border-white/10">
+                            <img src="https://ae-pic-a1.aliexpress-media.com/kf/S635cc24d976a471db3e92aec474347a0o.jpg" alt="Wearing view" class="w-full h-full object-cover">
+                        </div>
+                        <div class="w-16 h-16 rounded-lg overflow-hidden border border-white/10">
+                            <img src="https://ae-pic-a1.aliexpress-media.com/kf/S5efe9a37755e44cfa878e2e714900709h.jpg" alt="AR display" class="w-full h-full object-cover">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Product Info -->
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-brand-400 font-medium text-sm tracking-widest uppercase mb-2">AIGenie Vision X1</p>
+                        <h1 class="font-display text-4xl md:text-5xl font-extrabold text-white leading-tight">
+                            AI Translation Glasses
+                        </h1>
+                        <p class="text-xl text-slate-400 mt-2">Real-time subtitles. 100+ languages. 0.5s latency.</p>
+                    </div>
+
+                    <!-- Price -->
+                    <div class="flex items-baseline gap-3">
+                        <span class="font-display text-4xl font-bold text-white">$549</span>
+                        <span class="text-lg text-slate-500 line-through">$699</span>
+                        <span class="text-sm bg-brand-600/20 text-brand-400 px-3 py-1 rounded-full font-medium">Launch Sale</span>
+                    </div>
+
+                    <!-- Rating -->
+                    <div class="flex items-center gap-3">
+                        <div class="flex text-lg star">
+                            <span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span><span>&#9733;</span>
+                        </div>
+                        <span class="text-slate-400">4.8/5.0</span>
+                        <span class="text-slate-600">(33 reviews)</span>
+                    </div>
+
+                    <!-- Key Specs -->
+                    <div class="grid grid-cols-2 gap-4 py-4">
+                        <div class="glass-panel rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold text-white">100+</p>
+                            <p class="text-xs text-slate-400 mt-1">Languages</p>
+                        </div>
+                        <div class="glass-panel rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold text-white">0.5s</p>
+                            <p class="text-xs text-slate-400 mt-1">Latency</p>
+                        </div>
+                        <div class="glass-panel rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold text-white">49g</p>
+                            <p class="text-xs text-slate-400 mt-1">Weight</p>
+                        </div>
+                        <div class="glass-panel rounded-xl p-4 text-center">
+                            <p class="text-2xl font-bold text-white">8h</p>
+                            <p class="text-xs text-slate-400 mt-1">Battery</p>
+                        </div>
+                    </div>
+
+                    <!-- CTA -->
+                    <a href="/products/ai-smart-translation-glasses" class="block w-full py-4 bg-white text-slate-950 font-display font-bold text-lg rounded-full hover:bg-brand-50 transition-all duration-300 shadow-[0_0_40px_rgba(6,182,212,0.3)] hover:shadow-[0_0_60px_rgba(6,182,212,0.5)] transform hover:-translate-y-0.5 text-center">
+                        Add to Cart — $129.99
+                    </a>
+
+                    <!-- Trust -->
+                    <div class="flex items-center justify-center gap-6 text-xs text-slate-500">
+                        <span>🔒 Secure Checkout</span>
+                        <span>🚚 Free Shipping</span>
+                        <span>🔄 30-Day Returns</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FEATURES SECTION ===== -->
+    <section class="py-20 relative">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-brand-950/10 to-slate-950 pointer-events-none"></div>
+        <div class="max-w-5xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-4">
+                    Why <span class="bg-gradient-to-r from-cyan-400 to-blue-500 text-gradient">AIGenie Vision X1</span>?
+                </h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Built for real conversations. Not a gimmick — a genuine communication breakthrough.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="glass-panel p-8 rounded-2xl hover:bg-white/[0.05] transition-all duration-300">
+                    <div class="w-12 h-12 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold text-white mb-2">Instant Clarity</h3>
+                    <p class="text-slate-400 leading-relaxed">0.5s ultra-low latency. Conversations flow naturally without awkward pauses. No more "sorry, can you repeat that?"</p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl hover:bg-white/[0.05] transition-all duration-300">
+                    <div class="w-12 h-12 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold text-white mb-2">Global Ready</h3>
+                    <p class="text-slate-400 leading-relaxed">Supports 100+ languages and dialects. From Tokyo to Paris, from São Paulo to Seoul — you are completely covered.</p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl hover:bg-white/[0.05] transition-all duration-300">
+                    <div class="w-12 h-12 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold text-white mb-2">Discreet & Stylish</h3>
+                    <p class="text-slate-400 leading-relaxed">Looks like premium eyewear, works like your personal interpreter. 49g ultra-light frame, comfortable for all-day wear.</p>
+                </div>
+
+                <div class="glass-panel p-8 rounded-2xl hover:bg-white/[0.05] transition-all duration-300">
+                    <div class="w-12 h-12 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 mb-5">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                    </div>
+                    <h3 class="font-display text-xl font-semibold text-white mb-2">All-Day Power</h3>
+                    <p class="text-slate-400 leading-relaxed">8 hours of continuous translation on a single charge. Up to 2 weeks with the charging case. Never miss a word.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== HOW IT WORKS ===== -->
+    <section class="py-20 border-t border-white/5">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-4">How It Works</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Three simple steps to break language barriers.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 mx-auto mb-5 text-2xl font-bold">1</div>
+                    <h3 class="font-display text-lg font-semibold text-white mb-2">Wear & Connect</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Put on the glasses and pair via Bluetooth. The 4-microphone array captures voices with 360° spatial accuracy.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 mx-auto mb-5 text-2xl font-bold">2</div>
+                    <h3 class="font-display text-lg font-semibold text-white mb-2">Speak Naturally</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Talk in your native language. The AI engine translates in real-time — subtitles appear in your field of view.</p>
+                </div>
+                <div class="text-center">
+                    <div class="w-16 h-16 rounded-full bg-brand-500/20 flex items-center justify-center text-brand-400 mx-auto mb-5 text-2xl font-bold">3</div>
+                    <h3 class="font-display text-lg font-semibold text-white mb-2">Connect Globally</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed">Understand and be understood. 100+ languages, 98% accuracy. Conversations flow like magic.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TECH SPECS ===== -->
+    <section class="py-20 border-t border-white/5">
+        <div class="max-w-4xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-4">Technical Specifications</h2>
+            </div>
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <table class="w-full text-sm">
+                    <tbody>
+                        <tr class="border-b border-white/5"><td class="py-4 px-6 text-slate-400 font-medium">Translation Accuracy</td><td class="py-4 px-6 text-white">Up to 98%</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-4 px-6 text-slate-400 font-medium">Latency</td><td class="py-4 px-6 text-white">&lt; 500ms</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-4 px-6 text-slate-400 font-medium">Languages Supported</td><td class="py-4 px-6 text-white">100+ languages & dialects</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-4 px-6 text-slate-400 font-medium">Battery Life</td><td class="py-4 px-6 text-white">8 hours continuous / 2 weeks with case</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-4 px-6 text-slate-400 font-medium">Weight</td><td class="py-4 px-6 text-white">49g</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-4 px-6 text-slate-400 font-medium">Microphone Array</td><td class="py-4 px-6 text-white">4-mic 360° spatial sound sensing</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-4 px-6 text-slate-400 font-medium">Display</td><td class="py-4 px-6 text-white">Optical AR head-up display</td></tr>
+                        <tr class="border-b border-white/5"><td class="py-4 px-6 text-slate-400 font-medium">Connectivity</td><td class="py-4 px-6 text-white">Bluetooth 5.3, Wi-Fi 6</td></tr>
+                        <tr><td class="py-4 px-6 text-slate-400 font-medium">Warranty</td><td class="py-4 px-6 text-white">1 Year Limited Warranty</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== REVIEWS ===== -->
+    <section class="py-20 border-t border-white/5">
+        <div class="max-w-5xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="font-display text-3xl md:text-4xl font-bold text-white mb-4">What Our Customers Say</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="flex text-lg star mb-3">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-4">"Game changer for my international business meetings. The real-time subtitles are incredibly accurate."</p>
+                    <p class="text-white font-medium text-sm">— David Chen</p>
+                    <p class="text-slate-500 text-xs">Verified Buyer</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="flex text-lg star mb-3">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-4">"Traveled through 6 countries last month. These glasses made every conversation effortless. Worth every penny."</p>
+                    <p class="text-white font-medium text-sm">— Sarah Mitchell</p>
+                    <p class="text-slate-500 text-xs">Verified Buyer</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="flex text-lg star mb-3">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
+                    <p class="text-slate-300 text-sm leading-relaxed mb-4">"Lightweight, stylish, and the battery lasts all day. The AR display is crisp even in bright sunlight."</p>
+                    <p class="text-white font-medium text-sm">— James Park</p>
+                    <p class="text-slate-500 text-xs">Verified Buyer</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FINAL CTA ===== -->
+    <section class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-b from-brand-950/30 via-slate-950 to-slate-950 pointer-events-none"></div>
+        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-brand-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div class="max-w-3xl mx-auto px-6 text-center relative z-10">
+            <h2 class="font-display text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                Ready to Break<br>
+                <span class="bg-gradient-to-r from-cyan-400 to-blue-500 text-gradient">Language Barriers</span>?
+            </h2>
+            <p class="text-lg text-slate-400 mb-8 max-w-xl mx-auto">Join 10,000+ global citizens who communicate without limits. Free shipping. 30-day money-back guarantee.</p>
+            <a href="/products/ai-smart-translation-glasses" class="inline-block px-10 py-4 bg-white text-slate-950 font-display font-bold text-lg rounded-full hover:bg-brand-50 transition-all duration-300 shadow-[0_0_40px_rgba(6,182,212,0.3)] hover:shadow-[0_0_60px_rgba(6,182,212,0.5)] transform hover:-translate-y-0.5">
+                Order Now — $129.99
+            </a>
+            <p class="text-xs text-slate-600 mt-4">🔒 Secure checkout via Stripe & PayPal</p>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="border-t border-white/10 py-10">
+        <div class="max-w-5xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500">
+            <p>&copy; 2026 AIGenie Vision. All rights reserved.</p>
+            <div class="flex gap-6">
+                <a href="/policies/terms-of-service" class="hover:text-white transition-colors">Terms</a>
+                <a href="/policies/privacy-policy" class="hover:text-white transition-colors">Privacy</a>
+                <a href="/policies/refund-policy" class="hover:text-white transition-colors">Refunds</a>
+                <a href="/pages/contact" class="hover:text-white transition-colors">Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Mobile Sticky CTA -->
+    <div class="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-slate-950/80 backdrop-blur-lg border-t border-white/10 z-50">
+        <a href="/products/ai-smart-translation-glasses" class="block w-full py-3.5 bg-white text-slate-950 font-display font-bold rounded-xl shadow-lg text-center">
+            Add to Cart — $129.99
+        </a>
+    </div>
+
+</body>
+</html>

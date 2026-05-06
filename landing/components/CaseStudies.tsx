@@ -1,56 +1,51 @@
-import Image from "next/image";
-import { Section } from "./Section";
-
-const cases = [
-  {
-    title: "Discord Automation: Ops Dashboard + Scheduled Briefs",
-    image: "/assets/ops_control.png",
-    points: [
-      "Local ops control panel with periodic refresh",
-      "Daily dedupe marker prevents double posting",
-      "Archived outputs for evidence-based verification",
-    ],
-  },
-  {
-    title: "Webhook Pipeline: Verify + Dedupe + Local Ledger",
-    image: "/assets/stripe_ledger.png",
-    points: [
-      "Signature verification with constant-time compare",
-      "Idempotency window with reboot recovery",
-      "Write-ahead JSONL ledger + error/event diagnostics",
-    ],
-  },
-];
+import { homeContent } from "../content/home";
+import { t } from "../lib/labels";
 
 export function CaseStudies() {
+  const { caseStudies } = homeContent;
+
   return (
-    <Section kicker="Proof" title="Case studies">
-      <div className="grid gap-6">
-        {cases.map((c) => (
-          <div key={c.title} className="rounded-xl border border-zinc-200 bg-white p-5">
-            <div className="grid gap-5 md:grid-cols-[320px_1fr] md:items-start">
-              <div className="overflow-hidden rounded-lg border border-zinc-200">
-                <Image
-                  src={c.image}
-                  alt={c.title}
-                  width={1200}
-                  height={720}
-                  className="h-auto w-full"
-                />
+    <section className="mx-auto w-full max-w-5xl px-5 py-20 sm:py-24">
+      <div className="text-center">
+        <div className="text-xs font-semibold tracking-widest uppercase text-accent">
+          {caseStudies.kicker}
+        </div>
+        <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight text-text-primary">
+          {caseStudies.title}
+        </h2>
+      </div>
+      <div className="mt-10 grid gap-6 sm:grid-cols-2">
+        {caseStudies.cases.map((c) => (
+          <div
+            key={c.titleKey}
+            className="group overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] transition-all duration-300 hover:border-white/[0.10]"
+          >
+            <div className="relative aspect-video w-full overflow-hidden bg-bg-elevated">
+              <img
+                src={c.image}
+                alt={t(c.titleKey)}
+                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-bg-deep/60 to-transparent" />
+            </div>
+            <div className="p-5 sm:p-6">
+              <div className="text-base font-semibold text-text-primary">
+                {t(c.titleKey)}
               </div>
-              <div>
-                <div className="text-lg font-semibold text-zinc-900">{c.title}</div>
-                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-6 text-zinc-600">
-                  {c.points.map((p) => (
-                    <li key={p}>{p}</li>
-                  ))}
-                </ul>
-              </div>
+              <ul className="mt-3 space-y-1.5">
+                {c.points.map((pt) => (
+                  <li
+                    key={pt}
+                    className="text-sm leading-6 text-text-secondary before:mr-2 before:text-accent before:content-['→']"
+                  >
+                    {pt}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         ))}
       </div>
-    </Section>
+    </section>
   );
 }
-

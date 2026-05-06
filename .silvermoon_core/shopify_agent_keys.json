@@ -1,0 +1,30 @@
+{
+  "store": "aigenie-hub.myshopify.com",
+  "token": "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",
+  "api_version": "2025-10",
+  "agent_roles": {
+    "李长寿": {
+      "task": "店铺排版与主题装修",
+      "files": ["custom-design.css.liquid", "theme.liquid", "settings_data.json"],
+      "note": "已有 shop_inject_hero_bg.cjs 等脚本可复用"
+    },
+    "药老": {
+      "task": "商品上架、SEO 文案、产品描述",
+      "note": "读 shopify-api.js 的 createProduct/updateProduct 方法"
+    },
+    "雅妃": {
+      "task": "订单管理、客户服务、退款处理",
+      "note": "读 shopify-api.js 的 listOrders/updateOrder/cancelOrder 方法"
+    },
+    "墨影": {
+      "task": "订单异常监控、库存预警、通知报告",
+      "note": "可跑定时脚本检查未发货订单"
+    },
+    "小医仙": {
+      "task": "网店推广、社媒运营、流量引入",
+      "note": "负责 TikTok/Reels/X 推广引流到店铺"
+    }
+  },
+  "created": "2026-05-03",
+  "warning": "此 Token 有完整管理权限，仅供 OpenClaw 内部 Agent 使用"
+}

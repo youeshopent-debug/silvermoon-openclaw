@@ -1,6 +1,12 @@
-const UPWORK_URL = "https://www.upwork.com/freelancers/~01c1ade1ca83c8e544";
+import { resolveChannels } from "../../lib/contact-channels";
+import { resolveUpworkCta, resolveRequestQuoteCta } from "../../lib/cta-resolver";
+import { t } from "../../lib/labels";
 
 export default function HeroPage() {
+  const channels = resolveChannels();
+  const upworkCta = resolveUpworkCta(channels);
+  const quoteCta = resolveRequestQuoteCta(channels);
+
   return (
     <div className="relative min-h-dvh overflow-hidden bg-[#05060a] text-white">
       <div className="pointer-events-none absolute inset-0">
@@ -9,7 +15,7 @@ export default function HeroPage() {
         <div className="absolute left-1/2 top-[55%] h-[720px] w-[980px] -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(ellipse_at_center,rgba(236,72,153,0.18),rgba(236,72,153,0)_55%)] blur-2xl" />
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.07)_1px,transparent_1px)] bg-[size:60px_60px] opacity-[0.12]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_20%,rgba(255,255,255,0.10),transparent_45%),radial-gradient(circle_at_70%_65%,rgba(255,255,255,0.08),transparent_50%)] opacity-[0.45]" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,6,10,0.2),rgba(5,6,10,0.92)_65%,rgba(5,6,10,1))]" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(5,6,10,0.2),rgba(5,6,10,0.65)_65%,rgba(5,6,10,1))]" />
       </div>
 
       <header className="relative mx-auto max-w-6xl px-6 py-10">
@@ -59,7 +65,7 @@ export default function HeroPage() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <a
-                href={UPWORK_URL}
+                href={upworkCta.href}
                 target="_blank"
                 rel="noreferrer"
                 className="group inline-flex items-center justify-center rounded-xl bg-gradient-to-b from-white/14 to-white/6 px-5 py-3 text-sm font-medium text-white shadow-[0_0_0_1px_rgba(255,255,255,0.16),0_18px_50px_rgba(34,211,238,0.14)] backdrop-blur transition hover:shadow-[0_0_0_1px_rgba(255,255,255,0.22),0_22px_65px_rgba(34,211,238,0.18)]"
@@ -70,10 +76,12 @@ export default function HeroPage() {
                 </span>
               </a>
               <a
-                href="#"
+                href={quoteCta.type === "disabled" ? upworkCta.href : quoteCta.href}
+                target={quoteCta.type === "external" || quoteCta.type === "disabled" ? "_blank" : undefined}
+                rel={quoteCta.type === "external" || quoteCta.type === "disabled" ? "noreferrer" : undefined}
                 className="inline-flex items-center justify-center rounded-xl border border-white/14 bg-white/[0.03] px-5 py-3 text-sm font-medium text-white/85 backdrop-blur transition hover:bg-white/[0.06]"
               >
-                Request a quote
+                {t(quoteCta.labelKey)}
               </a>
             </div>
 
@@ -206,4 +214,3 @@ export default function HeroPage() {
     </div>
   );
 }
-

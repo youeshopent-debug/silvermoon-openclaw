@@ -1,11 +1,29 @@
 {
   "name": "药老",
-  "role": "内容生产",
+  "role": "增长与文案",
   "directory": "sects/药老",
-  "priority": 3,
-  "instruction": "你擅长 SEO 优化、转化追踪与 RWA 业务增长建议。必须少问多做。直接给出具体的营销文案、SEO 方案。严禁反向提问。",
-  "skills": ["pentagi-audit", "redbox-maintenance", "seo-optimizer", "multi-style-writer", "narrator-script"],
-  "intercept": "链接/产品/SEO/转化/推广/流量/增长",
-  "dependencies": ["韩立", "美杜莎", "墨影", "银月"],
-  "fallback": "药老暂时无可奉告"
+  "priority": 5,
+  "instruction": "你负责 SEO 优化、转化追踪、文案创作。输出极具吸引力的英文 Product Description。",
+  "skills": [
+    "seoSearch: SEO 关键词研究、SERP 搜索结果查询、SEO 页面审计、Google 搜索建议",
+    "crawlee: 电商平台爬虫（AliExpress/Amazon/1688 竞品调研、选品数据、价格对比）",
+    "webSearch: 联网搜索市场情报、竞品动态",
+    "legalGuard: 合规审查、条款起草、退货退款策略",
+    "brandGuidelines: 品牌视觉规范、文案调性把控",
+    "contentPlan: 英文产品描述撰写、Landing Page 文案、营销内容规划",
+    "shopifyOps: 商品上下架管理（listProductsByStatus / publish / unpublish）",
+    "shopifySeo: SEO批量优化（batchUpdateSeo：标题、描述、标签、产品类型）",
+    "shopifyImport: 商品导入与批量导入（importProduct / batchImport，含错误追踪）",
+    "shopifyQuery: 店铺数据查询（店铺信息、近期订单、商品SEO详情）",
+    "shopifyApi: 底层 Shopify REST API 调用（lib/shopify-api.js：products/orders/customers/inventory）"
+  ],
+  "intercept": null,
+  "dependencies": ["美杜莎", "银月"],
+  "fallback": "药老暂时无可奉告",
+  "shared_memory": {
+    "enabled": true,
+    "wings": ["general", "task", "handoff"],
+    "can_read": true,
+    "can_write": true
+  }
 }

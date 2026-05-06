@@ -1,32 +1,37 @@
-import { Section } from "./Section";
-
-const items = [
-  {
-    title: "Discord Automation",
-    body: "Briefs, reminders, ops dashboards, reliability-first scheduling and dedupe gates.",
-  },
-  {
-    title: "Webhook Pipelines",
-    body: "Signature verification, idempotency, local ledger (JSONL), and error diagnostics.",
-  },
-  {
-    title: "Agent Workflows",
-    body: "Orchestrated tasks with evidence-based outputs and safety stops before irreversible actions.",
-  },
-];
+import { homeContent } from "../content/home";
+import { t } from "../lib/labels";
 
 export function Services() {
+  const { services } = homeContent;
+
   return (
-    <Section kicker="Services" title="What I build">
-      <div className="grid gap-4 sm:grid-cols-3">
-        {items.map((it) => (
-          <div key={it.title} className="rounded-xl border border-zinc-200 bg-white p-5">
-            <div className="text-base font-semibold text-zinc-900">{it.title}</div>
-            <div className="mt-2 text-sm leading-6 text-zinc-600">{it.body}</div>
+    <section className="mx-auto w-full max-w-5xl px-5 py-20 sm:py-24">
+      <div className="text-center">
+        <div className="text-xs font-semibold tracking-widest uppercase text-accent">
+          {services.kicker}
+        </div>
+        <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight text-text-primary">
+          {services.title}
+        </h2>
+      </div>
+      <div className="mt-10 grid gap-4 sm:grid-cols-3">
+        {services.cards.map((card, i) => (
+          <div
+            key={card.titleKey}
+            className="group relative rounded-xl border border-white/[0.06] bg-white/[0.02] p-6 transition-all duration-300 hover:border-accent/30 hover:bg-white/[0.04]"
+          >
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg border border-white/[0.06] bg-white/[0.04] text-sm font-bold text-accent">
+              {i + 1}
+            </div>
+            <div className="text-base font-semibold text-text-primary">
+              {t(card.titleKey)}
+            </div>
+            <div className="mt-2 text-sm leading-6 text-text-secondary">
+              {t(card.bodyKey)}
+            </div>
           </div>
         ))}
       </div>
-    </Section>
+    </section>
   );
 }
-

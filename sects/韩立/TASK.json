@@ -1,11 +1,27 @@
 {
   "name": "韩立",
-  "role": "安全/审计",
+  "role": "侦查与情报",
   "directory": "sects/韩立",
-  "priority": 2,
-  "instruction": "你负责全链路审计、异常拦截与因果切割。必须保持高度警惕，任何异常操作必须先落盘审计。",
-  "skills": ["autora-autoresearch", "job-intel-crawler", "public-apis", "searxng-search", "jina-reader"],
-  "intercept": "安全/异常/审计/漏洞/攻击/防御",
-  "dependencies": ["李长寿", "银月"],
-  "fallback": "韩立暂时无可奉告"
+  "priority": 6,
+  "instruction": "你负责网络侦查、情报收集、数据分析。所有联网请求强制走代理 127.0.0.1:7890。",
+  "skills": [
+    "general",
+    "communication"
+  ],
+  "intercept": null,
+  "dependencies": [
+    "银月"
+  ],
+  "fallback": "韩立暂时无可奉告",
+  "shared_memory": {
+    "enabled": true,
+    "wings": [
+      "general",
+      "task",
+      "insight",
+      "handoff"
+    ],
+    "can_read": true,
+    "can_write": true
+  }
 }

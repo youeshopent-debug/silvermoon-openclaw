@@ -1,0 +1,27 @@
+{
+  "stats": {
+    "totalConversations": 0,
+    "totalMessages": 0,
+    "totalTokens": 0,
+    "totalErrors": 0,
+    "happyMoments": 0,
+    "sadMoments": 0,
+    "helpfulReplies": 0,
+    "failedReplies": 0
+  },
+  "reflectionLog": [],
+  "learnedPatterns": [],
+  "adaptationHistory": [],
+  "personaState": {
+    "emotionalMemory": [],
+    "relationshipMemory": [],
+    "milestones": [
+      {
+        "text": "紫灵诞生了",
+        "at": "2026-04-27T05:33:56.160Z"
+      }
+    ],
+    "birthDate": "2026-04-27T05:33:56.160Z"
+  },
+  "savedAt": "2026-04-28T07:47:05.744Z"
+}

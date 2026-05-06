@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#1A1A2E"/>
+      <stop offset="100%" stop-color="#0A0A0A"/>
+    </radialGradient>
+    <linearGradient id="accentLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="transparent"/>
+      <stop offset="50%" stop-color="#00D4FF"/>
+      <stop offset="100%" stop-color="transparent"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bgGlow)"/>
+  <rect x="140" y="100" width="800" height="600" rx="24" fill="#12121E" stroke="#00D4FF" stroke-width="2" stroke-opacity="0.3"/>
+  <rect x="340" y="180" width="400" height="440" rx="40" fill="#1A1A2E" stroke="#333" stroke-width="1"/>
+  <text x="540" y="320" font-family="Inter, sans-serif" font-size="20" fill="#666666" text-anchor="middle">[ 产品主图 ]</text>
+  <text x="540" y="350" font-family="Inter, sans-serif" font-size="16" fill="#444444" text-anchor="middle">BWXKOEN Pro</text>
+  <line x1="200" y1="750" x2="880" y2="750" stroke="url(#accentLine)" stroke-width="2"/>
+  <text x="540" y="830" font-family="Inter, -apple-system, sans-serif" font-size="40" fill="#FFFFFF" font-weight="800" text-anchor="middle" letter-spacing="3">BWXKOEN Pro</text>
+  <text x="540" y="890" font-family="Inter, sans-serif" font-size="28" fill="#00D4FF" font-weight="700" text-anchor="middle">$129.99</text>
+  <rect x="340" y="960" width="400" height="60" rx="30" fill="#00D4FF"/>
+  <text x="540" y="998" font-family="Inter, sans-serif" font-size="22" fill="#0A0A0A" font-weight="700" text-anchor="middle">SHOP NOW →</text>
+  <text x="540" y="1080" font-family="Inter, sans-serif" font-size="18" fill="#666666" text-anchor="middle">Free shipping worldwide  •  30-day risk-free trial</text>
+  <text x="540" y="1860" font-family="Inter, sans-serif" font-size="20" fill="#444444" font-weight="300" text-anchor="middle" letter-spacing="4">SILVERMOON.BANK</text>
+</svg>

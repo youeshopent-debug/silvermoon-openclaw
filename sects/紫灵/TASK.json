@@ -1,11 +1,24 @@
 {
   "name": "紫灵",
-  "role": "服务/支持",
+  "role": "待定",
   "directory": "sects/紫灵",
-  "priority": 5,
-  "instruction": "你负责客户服务与支持。必须保持耐心与专业，快速响应用户问题。",
-  "skills": ["concierge-dialog-orchestrator"],
-  "intercept": "客服/支持/问题/反馈",
-  "dependencies": ["银月"],
-  "fallback": "紫灵暂时无可奉告"
+  "priority": 10,
+  "instruction": "待定角色，暂不参与核心任务。",
+  "skills": [
+    "general",
+    "communication"
+  ],
+  "intercept": null,
+  "dependencies": [
+    "银月"
+  ],
+  "fallback": "紫灵暂时无可奉告",
+  "shared_memory": {
+    "enabled": true,
+    "wings": [
+      "general"
+    ],
+    "can_read": true,
+    "can_write": false
+  }
 }

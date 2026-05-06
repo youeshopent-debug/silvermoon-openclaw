@@ -1,0 +1,9 @@
+"agents": {
+  "defaults": {
+    "model": "nvidia/deepseek-ai/deepseek-v3.2",
+    "workspace": "C:\\Users\\User\\.openclaw\\workspace",
+    "compaction": {
+      "mode": "safeguard"
+    }
+  }
+}

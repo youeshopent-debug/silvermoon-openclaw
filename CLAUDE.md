@@ -22,22 +22,6 @@
 
 **例外**（不使用 RTK）：`cd`、`mkdir`、`rm`、`cp`、`mv`、`echo`、`curl`、`node script.js`、`python script.py`
 
-## 项目结构
-
-```
-openclaw/
-├── main.js                 # 银月网关主入口（端口 18791）
-├── openclaw.json           # 全局配置
-├── lib/                    # 核心模块（50+ 文件）
-├── sects/                  # 33 个 Agent 宗门配置
-├── tests/                  # 测试套件
-├── landing/                # Next.js 官网落地页
-├── plugins/                # 插件系统
-│   ├── rtk/                # Rewrite Token Kit
-│   └── agency-agents/      # Agent 扩展
-└── silvermoon_local/       # 本地配置副本
-```
-
 ## 开发规范
 
 1. **先规划后编码** — 复杂改动先生成 plan.md

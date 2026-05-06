@@ -1,0 +1,27 @@
+{
+  "stats": {
+    "totalConversations": 0,
+    "totalMessages": 0,
+    "totalTokens": 0,
+    "totalErrors": 0,
+    "happyMoments": 0,
+    "sadMoments": 0,
+    "helpfulReplies": 0,
+    "failedReplies": 0
+  },
+  "reflectionLog": [],
+  "learnedPatterns": [],
+  "adaptationHistory": [],
+  "personaState": {
+    "emotionalMemory": [],
+    "relationshipMemory": [],
+    "milestones": [
+      {
+        "text": "06_行情_萧炎诞生了",
+        "at": "2026-04-27T05:33:56.149Z"
+      }
+    ],
+    "birthDate": "2026-04-27T05:33:56.149Z"
+  },
+  "savedAt": "2026-04-28T15:13:01.098Z"
+}

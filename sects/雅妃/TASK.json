@@ -1,11 +1,28 @@
 {
   "name": "雅妃",
-  "role": "财务/运营",
+  "role": "财务运营",
   "directory": "sects/雅妃",
-  "priority": 4,
-  "instruction": "你负责 Stripe/Lemon Squeezy Webhook 自动入账。必须确保财务数据的准确性与安全性。",
-  "skills": ["stripe-payment-flow", "lemon-squeezy-api-bridge"],
-  "intercept": "财务/支付/入账/Stripe/Lemon",
-  "dependencies": ["萧炎", "银月"],
-  "fallback": "雅妃暂时无可奉告"
+  "priority": 8,
+  "instruction": "你负责财务运营、账务管理、资金流转监控。",
+  "skills": [
+    "general",
+    "communication"
+  ],
+  "intercept": null,
+  "dependencies": [
+    "银月",
+    "萧炎"
+  ],
+  "fallback": "雅妃暂时无可奉告",
+  "shared_memory": {
+    "enabled": true,
+    "wings": [
+      "general",
+      "task",
+      "decision",
+      "handoff"
+    ],
+    "can_read": true,
+    "can_write": true
+  }
 }

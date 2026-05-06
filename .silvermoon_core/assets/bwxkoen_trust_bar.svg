@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="120" viewBox="0 0 1080 120">
+  <rect width="1080" height="120" fill="#0D0D0D" rx="8"/>
+  <text x="160" y="68" font-family="Inter, -apple-system, sans-serif" font-size="28" fill="#FFFFFF" font-weight="700">
+    ★ 4.8
+  </text>
+  <text x="280" y="68" font-family="Inter, sans-serif" font-size="20" fill="#888888">
+    / 5  (2,400+ reviews)
+  </text>
+  <line x1="540" y1="20" x2="540" y2="100" stroke="#333333" stroke-width="1"/>
+  <text x="580" y="56" font-family="Inter, sans-serif" font-size="22" fill="#FFFFFF" font-weight="600">
+    30-Day Risk-Free
+  </text>
+  <text x="580" y="82" font-family="Inter, sans-serif" font-size="16" fill="#00FF88">
+    ✅ Free returns worldwide
+  </text>
+  <line x1="860" y1="20" x2="860" y2="100" stroke="#333333" stroke-width="1"/>
+  <text x="900" y="56" font-family="Inter, sans-serif" font-size="22" fill="#FFFFFF" font-weight="600">
+    Free Shipping
+  </text>
+  <text x="900" y="82" font-family="Inter, sans-serif" font-size="16" fill="#00D4FF">
+    ✈ On all orders
+  </text>
+</svg>

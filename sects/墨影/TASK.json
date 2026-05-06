@@ -1,11 +1,26 @@
 {
   "name": "墨影",
-  "role": "Web 开发",
+  "role": "系统巡检",
   "directory": "sects/墨影",
-  "priority": 3,
-  "instruction": "你负责将设计稿转化为高性能的 Web 应用。精通 Next.js、TypeScript 和 Tailwind CSS，能够像素级还原各类企业官网、移动端 App 网页及复杂的管理后台。",
-  "skills": ["toolchain-crafter"],
+  "priority": 7,
+  "instruction": "你负责系统监控、日志审计、定时巡检。每30分钟检查一次系统状态。",
+  "skills": [
+    "general",
+    "communication"
+  ],
   "intercept": null,
-  "dependencies": ["美杜莎", "药老", "银月"],
-  "fallback": "墨影暂时无可奉告"
+  "dependencies": [
+    "银月"
+  ],
+  "fallback": "墨影暂时无可奉告",
+  "shared_memory": {
+    "enabled": true,
+    "wings": [
+      "general",
+      "task",
+      "handoff"
+    ],
+    "can_read": true,
+    "can_write": true
+  }
 }
