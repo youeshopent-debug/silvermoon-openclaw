@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><title>银月钱庄 · 自动化流水线管道图</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a12;font-family:'Segoe UI',system-ui;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px}
+.container{max-width:1100px;width:100%}
+.card{background:#12121e;border:1px solid #2a2a3e;border-radius:16px;padding:30px;margin-bottom:20px}
+h1{color:#00d4ff;font-size:22px;margin-bottom:6px;text-align:center}
+.sub{color:#8888aa;font-size:13px;text-align:center;margin-bottom:24px}
+.pipeline{width:100%;max-width:900px;margin:0 auto 24px}
+.stage{fill:#1a1a2e;stroke:#333366;stroke-width:2;rx:10;ry:10;transition:all .2s}
+.stage:hover{filter:drop-shadow(0 0 12px rgba(0,212,255,.3))}
+.stage-label{font-size:12px;font-weight:700;fill:#e0e0f0;text-anchor:middle}
+.stage-desc{font-size:9px;fill:#8888aa;text-anchor:middle}
+.arrow{stroke:#5555aa;stroke-width:2;fill:none;marker-end:url(#arrow)}
+.arrow-label{font-size:9px;fill:#7777aa;text-anchor:middle}
+.circle-dot{fill:#00d4ff;opacity:.6}
+.trigger-box{fill:#1a2a1e;stroke:#33aa55;stroke-width:1.5;rx:6;ry:6;stroke-dasharray:4,3}
+.trigger-text{font-size:10px;fill:#66dd88;text-anchor:middle}
+.end-box{fill:#2a1a1e;stroke:#aa3355;stroke-width:1.5;rx:6;ry:6}
+.end-text{font-size:10px;fill:#dd6688;text-anchor:middle}
+.feedback{stroke:#aa6633;stroke-width:1.5;fill:none;stroke-dasharray:6,4;marker-end:url(#feedback-arrow)}
+.legend{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:20px;font-size:12px;color:#999}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:10px;height:10px;border-radius:50%}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-card{background:#16162a;border:1px solid #2a2a3e;border-radius:10px;padding:14px}
+.info-card h3{font-size:11px;color:#00d4ff;margin-bottom:4px}
+.info-card p{font-size:10px;color:#999;line-height:1.5}
+.info-card .tag{display:inline-block;background:#1a3a4a;color:#00d4ff;font-size:9px;padding:1px 6px;border-radius:4px;margin-top:4px}
+.status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:4px}
+</style></head>
+<body>
+<div class="container">
+<div class="card">
+<h1>银月钱庄 · 5大任务自动化流水线</h1>
+<div class="sub">从「研究 → 内容 → 合规 → 分发 → 装修」全自动闭环</div>
+
+<svg class="pipeline" viewBox="0 0 850 480">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10Z" fill="#5555aa"/></marker>
+    <marker id="feedback-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10Z" fill="#aa6633"/></marker>
+  </defs>
+  <rect x="0" y="0" width="850" height="480" fill="none"/>
+
+  <!-- Trigger -->
+  <rect class="trigger-box" x="340" y="10" width="140" height="28"/>
+  <text class="trigger-text" x="410" y="29">CRON 定时触发（每日）</text>
+  <line class="arrow" x1="410" y1="38" x2="410" y2="60"/>
+
+  <!-- Stage 1: 药老 -->
+  <rect class="stage" x="310" y="64" width="200" height="56"/>
+  <text class="stage-label" x="410" y="86">1 药老 · 趋势研究 + 文案</text>
+  <text class="stage-desc" x="410" y="100">crawlee爬趋势 AI写产品描述</text>
+  <text class="stage-desc" x="410" y="112">输出: product-content.json</text>
+  <line class="arrow" x1="410" y1="120" x2="410" y2="148"/>
+
+  <rect x="30" y="138" width="230" height="56" class="stage" style="fill:#1a2a1a;stroke:#33aa55"/>
+  <text x="145" y="156" style="font-size:10px;fill:#88dd88;text-anchor:middle">crawlee AI趋势爬取</text>
+  <text x="145" y="170" style="font-size:9px;fill:#669966;text-anchor:middle">06:00  科技新闻  热门话题</text>
+  <text x="145" y="184" style="font-size:9px;fill:#669966;text-anchor:middle"> 生成选品建议报告</text>
+
+  <rect x="590" y="138" width="230" height="56" class="stage" style="fill:#1a2a1a;stroke:#33aa55"/>
+  <text x="705" y="156" style="font-size:10px;fill:#88dd88;text-anchor:middle">AI 文案生成</text>
+  <text x="705" y="170" style="font-size:9px;fill:#669966;text-anchor:middle">SEO优化 + 3模板(简约/故事/极客)</text>
+  <text x="705" y="184" style="font-size:9px;fill:#669966;text-anchor:middle"> 输出到 product-content.json</text>
+
+  <line class="arrow" x1="260" y1="166" x2="302" y2="166"/>
+  <line class="arrow" x1="520" y1="166" x2="582" y2="166"/>
+
+  <!-- Arrow S1 S2 -->
+  <line class="arrow" x1="410" y1="194" x2="410" y2="220"/>
+
+  <!-- Stage 2: 海波东 -->
+  <rect class="stage" x="310" y="224" width="200" height="56"/>
+  <text class="stage-label" x="410" y="246">2 海波东 · 合规审计</text>
+  <text class="stage-desc" x="410" y="260">审核文案 检查合规 签发批准</text>
+  <text class="stage-desc" x="410" y="272">输出: approved / flagged</text>
+
+  <!-- Flagged feedback loop -->
+  <path class="feedback" d="M310,252 L260,252 L260,92 L302,92"/>
+  <text x="250" y="200" style="font-size:8px;fill:#aa6633;text-anchor:end">不合规  退回药老重写</text>
+
+  <!-- Arrow S2 S3 -->
+  <line class="arrow" x1="410" y1="280" x2="410" y2="310"/>
+
+  <!-- Stage 3: 小医仙 -->
+  <rect class="stage" x="310" y="314" width="200" height="56"/>
+  <text class="stage-label" x="410" y="336">3 小医仙 · 短视频脚本</text>
+  <text class="stage-desc" x="410" y="350">文案 TikTok/Shorts脚本 分镜</text>
+  <text class="stage-desc" x="410" y="362">输出: script-queue.json</text>
+
+  <rect x="30" y="388" width="230" height="56" class="stage" style="fill:#1a1a2a;stroke:#5555aa"/>
+  <text x="145" y="406" style="font-size:10px;fill:#aaaaff;text-anchor:middle">TikTok / Shorts 分镜脚本</text>
+  <text x="145" y="420" style="font-size:9px;fill:#7777aa;text-anchor:middle">前3秒Hook + 产品特写 + CTA</text>
+  <text x="145" y="434" style="font-size:9px;fill:#7777aa;text-anchor:middle"> script-queue.json 排队</text>
+
+  <rect x="590" y="388" width="230" height="56" class="stage" style="fill:#1a1a1a;stroke:#7777aa"/>
+  <text x="705" y="406" style="font-size:10px;fill:#ccccff;text-anchor:middle">FlashShow 数字人渲染</text>
+  <text x="705" y="420" style="font-size:9px;fill:#8888aa;text-anchor:middle">紫妍接管  配音+合成</text>
+  <text x="705" y="434" style="font-size:9px;fill:#8888aa;text-anchor:middle"> 成品视频 + 自动发布</text>
+
+  <line class="arrow" x1="260" y1="416" x2="302" y2="416"/>
+  <line class="arrow" x1="520" y1="416" x2="582" y2="416"/>
+
+  <!-- Arrow S3 end -->
+  <line class="arrow" x1="410" y1="370" x2="410" y2="382"/>
+  <line class="arrow" x1="410" y1="444" x2="410" y2="460"/>
+
+  <!-- End -->
+  <rect class="end-box" x="340" y="452" width="140" height="24"/>
+  <text class="end-text" x="410" y="468">成品归档 + 通知主人</text>
+</svg>
+
+<div class="info-grid">
+  <div class="info-card">
+    <h3>1 药老 · 趋势研究 + 文案</h3>
+    <p><span class="status-dot" style="background:#66dd88"></span>状态：脚本已就绪 (yaolao-ai-trend-pipeline.js)</p>
+    <p>CRON：每日 08:30 自动爬取+生成报告</p>
+    <p>输出：AI趋势报告 + 选品建议  邮箱/Telegram</p>
+    <p>待完善： 自动生成 product-description 并推送到 Shopify</p>
+    <span class="tag">流水线第一环</span>
+  </div>
+  <div class="info-card">
+    <h3>2 海波东 · 合规审计</h3>
+    <p><span class="status-dot" style="background:#ffaa44"></span>状态：Agent 已创建，脚本待完善</p>
+    <p>职责：审计文案合规性、检测敏感词/侵权风险</p>
+    <p>待开发： 合规检查中间件  自动批准/打回流程</p>
+    <span class="tag">需编写合规检查脚本</span>
+  </div>
+  <div class="info-card">
+    <h3>3 小医仙 · 短视频脚本</h3>
+    <p><span class="status-dot" style="background:#ffaa44"></span>状态：CRON 已注册 (10:00 + 14:00)</p>
+    <p>职责：将文案转化为 TikTok/Shorts 分镜脚本</p>
+    <p>待开发： 脚本生成管线  对接 FlashShow 渲染参数</p>
+    <span class="tag">需编写脚本生成器</span>
+  </div>
+  <div class="info-card">
+    <h3>4 李长寿+银月 · 自动化基建</h3>
+    <p><span class="status-dot" style="background:#ffaa44"></span>状态：部分就绪，需整合</p>
+    <p>已就绪：邮箱自愈、CRON系统、Stripe webhook</p>
+    <p>待开发： 整链编排器  异常告警  自动降级</p>
+    <span class="tag">管道骨架</span>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#66dd88"></div>已就绪</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#ffaa44"></div>需开发</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#dd6688"></div>待定</div>
+  <div class="legend-item"><span style="color:#aa6633">--- 虚线 ---</span> 反馈回路</div>
+</div>
+
+</div><!-- /card -->
+</div><!-- /container -->
+</body></html>

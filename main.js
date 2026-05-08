@@ -268,6 +268,9 @@ const chromeBridge = require('./lib/chrome-cdp-bridge');
 const xiaoyanTradeGuard = require('./lib/xiaoyan-trade-guard');
 const xiaoyanCrawler = require('./lib/xiaoyan-crawler');
 const shopifyDiagnostic = require('./lib/shopify-diagnostic');
+const yaolaoTrendPipeline = require('./scripts/yaolao-ai-trend-pipeline');
+const haibodongCompliance = require('./scripts/haibodong-compliance-check');
+const ziyanRenderPipeline = require('./scripts/ziyan-render-pipeline');
 const pendingShopifyOps = new Map(); // channelId → { type, data, timestamp }
 const { sanitize } = require('./lib/sanitizer');
 const cron = require('./lib/cron');
@@ -508,6 +511,7 @@ const MEMORY_SQLITE_PATH = CONFIG.paths.memorySqlite;
 const memory = createMemory({ dbPath: MEMORY_SQLITE_PATH });
 const evidenceDeduper = createEvidenceDeduper({ size: 3 });
 const USER_PROFILE_PATH = path.join(WORKSPACE_DIR, 'USER.md');
+const USER_PROFILE_JSON_PATH = path.join(USER_DATA_DIR, 'profile.json');
 const JARVIS_WAKE_WORDS = CONFIG.business.wakeWords;
 const OLLAMA_TIMEOUT_MS = CONFIG.limits.ollamaTimeout;
 const CLOUD_TIMEOUT_MS = CONFIG.limits.cloudTimeout;
@@ -792,6 +796,31 @@ function saveOwnerContext() {
     };
     writeFileSafe(OWNER_CONTEXT_PATH, JSON.stringify(payload, null, 2) + '\n');
   } catch {}
+}
+
+function loadUserProfile() {
+  try {
+    if (!fs.existsSync(USER_PROFILE_JSON_PATH)) {
+      const def = { location: '斗湖', lat: 4.244, lon: 117.891, updatedAt: new Date().toISOString() };
+      ensureDir(USER_DATA_DIR);
+      writeFileSafe(USER_PROFILE_JSON_PATH, JSON.stringify(def, null, 2) + '\n');
+      return def;
+    }
+    return JSON.parse(fs.readFileSync(USER_PROFILE_JSON_PATH, 'utf8'));
+  } catch {
+    return { location: '斗湖', lat: 4.244, lon: 117.891 };
+  }
+}
+
+function saveUserProfile(profile) {
+  try {
+    profile.updatedAt = new Date().toISOString();
+    ensureDir(USER_DATA_DIR);
+    writeFileSafe(USER_PROFILE_JSON_PATH, JSON.stringify(profile, null, 2) + '\n');
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function saveLangModeMap() {
@@ -2926,9 +2955,21 @@ function enforceVerifiedLocalLinks(text) {
 
 async function notifyOwner(text) {
   try {
+    const { sendEmail } = require('./lib/mailer');
     const client = STATE.discord.client;
     const ownerId = STATE.discord.ownerUserId;
     const channelId = STATE.discord.lastOwnerChannelId;
+
+    // ── Email 通道 ──
+    if (channelId && String(channelId).startsWith('email_')) {
+      const r = await sendEmail('银月钱庄通知', text.replace(/\n/g, '<br>'));
+      if (r.ok) {
+        pushShortMemory(channelId, 'assistant', text);
+        recordLongTermAssistant(channelId, text);
+        return true;
+      }
+      return false;
+    }
 
     // ── Telegram fallback：如果 channelId 是 tg_ 前缀，走 Telegram ──
     if (channelId && String(channelId).startsWith('tg_')) {
@@ -2983,6 +3024,35 @@ async function notifyOwner(text) {
       }
     }
     return true;
+  } catch {
+    return false;
+  }
+}
+
+/** 快捷发邮件给主人，不依赖 channelId */
+async function notifyOwnerEmail(subject, htmlBody) {
+  try {
+    const { sendEmail, verifyConnection, getEmailHealth, recreateTransporter } = require('./lib/mailer');
+    const health = getEmailHealth();
+    // 如果熔断开启或连续失败，先验证连接再发
+    if (health.circuitOpen || health.consecutiveFails > 2) {
+      const v = await verifyConnection();
+      if (!v.ok) {
+        // verify 失败 → 重建 transporter 重试一次
+        recreateTransporter();
+        const v2 = await verifyConnection();
+        if (!v2.ok) return false;
+      }
+    }
+    const r = await sendEmail(subject, htmlBody);
+    if (!r.ok && r.circuitOpen) {
+      // 熔断了 → 重建 transporter 等 30s 再试一次
+      await new Promise(r => setTimeout(r, 30000));
+      recreateTransporter();
+      const r2 = await sendEmail(subject, htmlBody);
+      return r2.ok;
+    }
+    return r.ok;
   } catch {
     return false;
   }
@@ -6353,9 +6423,9 @@ async function main() {
   const silvermoonEvolution = new SilvermoonEvolution({
     notifyOwner: async (msg) => {
       try {
-        if (!STATE.discord.ready) return;
-        const owner = await client.users.fetch(STATE.discord.ownerUserId);
-        await safeSend(owner, msg);
+        const tgChatId = STATE.discord.lastOwnerChannelId && String(STATE.discord.lastOwnerChannelId).startsWith('tg_')
+          ? String(STATE.discord.lastOwnerChannelId).replace(/^tg_/, '') : null;
+        if (tgChatId) await telegramBridge.sendTelegramMessage(tgChatId, msg);
       } catch {}
     },
   });
@@ -6390,14 +6460,13 @@ async function main() {
         '',
         `_银月于 ${timeStr} 自动推送_`,
       ].join('\n');
-      // 优先 Telegram，fallback Discord
+      // 纯 Telegram 发送（主人不用 Discord）
       const tgChatId = STATE.discord.lastOwnerChannelId && String(STATE.discord.lastOwnerChannelId).startsWith('tg_')
         ? String(STATE.discord.lastOwnerChannelId).replace(/^tg_/, '') : null;
       if (tgChatId) {
         await telegramBridge.sendTelegramMessage(tgChatId, brief);
       } else {
-        const owner = await client.users.fetch(STATE.discord.ownerUserId).catch(() => null);
-        if (owner) await safeSend(owner, brief);
+        logWarn('[银月早报] 未检测到 Telegram 频道，跳过推送');
       }
     } catch (err) {
       logError(`[银月早报] 推送失败: ${err.message}`);
@@ -6408,12 +6477,13 @@ async function main() {
     try {
       const now = getTzNow();
       const timeStr = formatTs(now);
+      const ymd = formatYmd(now);
       logInfo(`[银月夜报] 触发每日汇总 (${timeStr})`);
       const tgChatId = STATE.discord.lastOwnerChannelId && String(STATE.discord.lastOwnerChannelId).startsWith('tg_')
         ? String(STATE.discord.lastOwnerChannelId).replace(/^tg_/, '') : null;
       if (!tgChatId) {
-        const owner = await client.users.fetch(STATE.discord.ownerUserId).catch(() => null);
-        if (!owner) return;
+        logWarn('[银月夜报] 未检测到 Telegram 频道，跳过夜报');
+        return;
       }
 
       const metrics = silvermoonEvolution?.metrics || {};
@@ -6480,35 +6550,18 @@ async function main() {
         '',
         `_如需调整配置或聘请子代理，请回复指令_`,
       ].join('\n');
-      if (tgChatId) {
-        await telegramBridge.sendTelegramMessage(tgChatId, report);
-      } else {
-        await safeSend(owner, report);
-      }
+      await telegramBridge.sendTelegramMessage(tgChatId, report);
       writeHeartbeat('夜报:发送成功');
+      const nightMarker = path.join(CRON_DIR, `${ymd}_夜报.sent`);
+      writeFileSafe(nightMarker, `sentAt=${new Date().toISOString()}\nbodyLen=${report.length}`);
     } catch (err) {
       logError(`[银月夜报] 汇总失败: ${err.message}`);
       writeHeartbeat('夜报:发送失败');
     }
   }
 
-  function scheduleDailyAt(taskName, hh, mm, fn) {
-    const scheduleOnce = () => {
-      const next = computeNextDailyAt(hh, mm, OPENCLAW_TZ_OFFSET_MIN);
-      STATE.cron.nextRuns[taskName] = formatTs(next);
-      const ms = Math.max(500, next.getTime() - Date.now());
-      setTimeout(() => {
-        fn();
-        scheduleOnce();
-      }, ms);
-    };
-    scheduleOnce();
-  }
-
-  scheduleDailyAt('银月_早报', 8, 0, () => runSilverMoonMorningBrief({}));
-  scheduleDailyAt('银月_夜报', 23, 55, sendNightlyReport);
-  scheduleDailyAt('药老_Shopify巡检', 9, 0, () => runShopifyDiagnostic({}));
-  scheduleDailyAt('药老_Shopify巡检_晚', 21, 0, () => runShopifyDiagnostic({}));
+  // ═══ System A (scheduleDailyAt) 已整体迁移至 lib/cron.js — 2026-05-08 ═══
+  // 历史 registrations 已删除，避免与 cron.js / scheduler.js 三重复触发
 
   function tailLines(text, maxLines, maxChars) {
     const raw = String(text || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
@@ -6603,8 +6656,70 @@ async function main() {
     cron.registerByPath('github_release_watch', 'every 1d', 'scripts/github-release-watch.js', 'run', 'GitHub Release 看门狗（n8n 工作流模式原生实现）');
     cron.registerByPath('self_improving', 'every 6h', 'scripts/self-improving-agent.js', 'run', '自动审计 & 自我修复（Agent 配置/TASK/版本巡检，带 --fix 自愈）');
     cron.registerByPath('self_heal_core_skills', 'every 6h', 'scripts/self-heal-core-skills.js', 'main', '核心技能自愈管线（SKILL.md 元数据校验 + JS 实现自检，缺失自动再生）');
-    cron.register({ name: '银月_早报', schedule: '08:00', handler: async () => await runSilverMoonMorningBrief({}) });
     cron.register({ name: '药老_Shopify巡检', schedule: '09:00', handler: async () => await runShopifyDiagnostic({}) });
+    cron.register({ name: '药老_AI趋势', schedule: '08:30', handler: async () => {
+      try {
+        const r = await yaolaoTrendPipeline.run({ dryRun: false, force: false });
+        if (r.ok && !r.skipped) {
+          await notifyOwner(`📊 **药老 · AI科技趋势日报**\n- 抓取 ${r.storiesCount} 条热点\n- 关键词 ${r.keywordsCount} 条\n- 建议：${r.suggestions.join('、')}`);
+        }
+      } catch (e) { notifyOwner(`⚠️ **药老AI趋势异常**: ${e.message}`); }
+    } });
+    cron.register({ name: '海波东_合规审计', schedule: '08:45', handler: async () => {
+      try {
+        const r = await haibodongCompliance.run({ dryRun: false });
+        if (r.ok && !r.skipped) {
+          const { status, criticalCount, warnCount } = r.compliance;
+          if (status === 'fail') {
+            await notifyOwner(`🚨 **海波东 · 合规审计不通过**\n- 严重违规: ${criticalCount} 条\n- 警告: ${warnCount} 条\n- 已拦截下游任务`);
+          } else {
+            await notifyOwner(`✅ **海波东 · 合规审计通过**\n- 状态: ${status}\n- 警告: ${warnCount} 条\n- 已通知小医仙接单`);
+          }
+        }
+      } catch (e) { notifyOwner(`⚠️ **海波东合规审计异常**: ${e.message}`); }
+    } });
+    cron.register({ name: '小医仙_脚本生成', schedule: '10:00', handler: async () => {
+      try {
+        const shared = require('./scripts/pipeline-shared');
+        const reportPath = shared.latestTrendReport();
+        const reportDate = shared.today();
+        const stageOutput = shared.readStageOutput('小医仙');
+        if (stageOutput) {
+          // 已有今日脚本，不重复派单
+          return;
+        }
+        const dispatchedFile = shared.DISPATCH_FILE;
+        const fs = require('fs');
+        let alreadyDispatched = false;
+        if (fs.existsSync(dispatchedFile)) {
+          const raw = fs.readFileSync(dispatchedFile, 'utf-8');
+          alreadyDispatched = raw.split('\n').filter(Boolean)
+            .map(l => { try { return JSON.parse(l); } catch { return null; } })
+            .some(e => e && e.target === '小医仙' && e.at.startsWith(reportDate) && e.source === '海波东');
+        }
+        if (alreadyDispatched) return;
+
+        const trendSummary = reportPath && fs.existsSync(reportPath)
+          ? fs.readFileSync(reportPath, 'utf-8').split('\n').filter(l => l.startsWith('##') || l.startsWith('1.')).slice(0, 8).join('\n')
+          : '无趋势报告';
+        shared.writeDispatchEntry('小医仙',
+          `【脚本生成任务】\n趋势报告：${reportPath || '无'}\n\n趋势摘要：\n${trendSummary}\n\n请根据以上趋势生成今日 TikTok 短视频脚本，每个关键词产出 15-60 秒垂直分镜脚本。`,
+          'high', '银月');
+        await notifyOwner(`📝 **小医仙 · 脚本任务已派发**\n已根据趋势报告生成 TikTok 脚本编写任务`);
+      } catch (e) { notifyOwner(`⚠️ **小医仙脚本派发异常**: ${e.message}`); }
+    } });
+    cron.register({ name: '紫妍_渲染输出', schedule: '14:00', handler: async () => {
+      try {
+        const r = await ziyanRenderPipeline.run({ dryRun: false });
+        if (r.ok) {
+          if (r.hasScriptInput) {
+            await notifyOwner(`🎬 **紫妍 · 渲染参数已生成**\n- 场景数: ${r.render.scenes.length}\n- 总时长: ${r.render.totalDuration}s\n- 脚本来源: ${r.scriptSource}`);
+          } else {
+            await notifyOwner(`ℹ️ **紫妍 · 渲染跳过**\n今日无小医仙脚本输入，已生成占位渲染`);
+          }
+        }
+      } catch (e) { notifyOwner(`⚠️ **紫妍渲染异常**: ${e.message}`); }
+    } });
     cron.registerMemoryTasks();
     cron.startAll();
 
@@ -6665,6 +6780,56 @@ async function main() {
     restoreReminderTimers(client);
     void selfCheckConnectivity().then(() => writeHeartbeat('启动自检'));
     setInterval(() => { void selfCheckConnectivity(); }, 60000);
+
+    // ═══ 邮箱启动自检 ═══
+    setTimeout(async () => {
+      try {
+        const { verifyConnection, getEmailHealth, sendEmail } = require('./lib/mailer');
+        const v = await verifyConnection();
+        const health = getEmailHealth();
+        if (v.ok) {
+          logInfo('[mailer] 启动自检通过');
+          writeHeartbeat('邮箱自检通过');
+        } else {
+          logWarn(`[mailer] 启动自检失败: ${v.error}`);
+          writeHeartbeat('邮箱自检失败');
+          // 10 秒后重试一次
+          setTimeout(async () => {
+            const { verifyConnection } = require('./lib/mailer');
+            const retry = await verifyConnection();
+            if (retry.ok) logInfo('[mailer] 重试自检通过');
+            else logError(`[mailer] 重试自检仍失败: ${retry.error}`);
+          }, 10000);
+        }
+      } catch (e) { logWarn(`[mailer] 启动自检异常: ${e.message}`); }
+    }, 5000);
+
+    // ═══ 邮箱心跳（每 30 分钟发一封静默测试邮件） ═══
+    setInterval(async () => {
+      try {
+        const { sendEmail, getEmailHealth, recreateTransporter } = require('./lib/mailer');
+        const h = getEmailHealth();
+        // 熔断中不发心跳
+        if (h.circuitOpen) {
+          logWarn('[mailer] 心跳跳过：熔断中');
+          return;
+        }
+        const r = await sendEmail('🔍 邮箱心跳', '<p style="color:#666">静默测试 — 系统自动发送</p>');
+        if (r.ok) {
+          logInfo('[mailer] 心跳 OK');
+        } else {
+          logWarn(`[mailer] 心跳失败: ${r.error}`);
+          recreateTransporter();
+          // 5 秒后重试
+          setTimeout(async () => {
+            const { sendEmail } = require('./lib/mailer');
+            const retry = await sendEmail('🔍 邮箱心跳(重试)', '<p style="color:#666">心跳重试 — 系统自动发送</p>');
+            if (retry.ok) logInfo('[mailer] 心跳重试通过');
+            else logError(`[mailer] 心跳重试仍失败: ${retry.error}`);
+          }, 5000);
+        }
+      } catch (e) { logWarn(`[mailer] 心跳异常: ${e.message}`); }
+    }, 30 * 60 * 1000);
     // 日志清理：每6小时清理一次超过50MB的日志文件
     setInterval(() => {
       try {
@@ -6694,9 +6859,17 @@ async function main() {
       const result = initScheduler({
         state: STATE,
         actions: {
-          prefetchMorningBrief: () => { logDebug('[CRON] 晨报预取'); return null; },
+          prefetchMorningBrief: async () => {
+            logDebug('[CRON] 晨报预取');
+            try { await runSilverMoonMorningBrief({}); }
+            catch (e) { logError('[CRON] 晨报失败:', e?.message); }
+          },
           wakeSilverMoon: () => { logDebug('[CRON] 唤醒银月'); return null; },
-          prefetchNightlyReport: () => { logDebug('[CRON] 夜报预取'); return null; },
+          prefetchNightlyReport: async () => {
+            logDebug('[CRON] 夜报预取');
+            try { await sendNightlyReport(); }
+            catch (e) { logError('[CRON] 夜报失败:', e?.message); }
+          },
           prefetchShadowWatchdog: () => { logDebug('[CRON] 魔影巡检'); return null; },
           prefetchHanLiJobs: () => { logDebug('[CRON] 韩立兼职'); return null; },
           prefetchAutoDream: () => { logDebug('[CRON] AutoDream'); return null; },
@@ -6720,6 +6893,7 @@ async function main() {
           },
           prefetchXiaoyanPostMarket: () => { logDebug('[CRON] 萧炎盘后'); return null; },
           prefetchXiaoyanWeb3: () => { logDebug('[CRON] 萧炎Web3'); return null; },
+          wakeXiaoyanSentinel: () => { logDebug('[CRON] 唤醒萧炎哨兵'); return null; },
           prefetchEcommerceReport: () => { logDebug('[CRON] 选品日报预取'); return null; },
           prefetchMoYingMorning: () => { logDebug('[CRON] 墨影早检预取'); return null; },
           prefetchMoYingAfternoon: () => { logDebug('[CRON] 墨影午检预取'); return null; },
@@ -6762,31 +6936,81 @@ async function main() {
                 console.error('[telegram-bridge] 视觉分析异常:', visErr?.message || visErr);
               }
             }
+            // ── Telegram 位置消息处理 ──
+            if (tgEvent.location) {
+              const { lat, lon } = tgEvent.location;
+              try {
+                const cityName = (await reverseGeocode(lat, lon)) || '当前位置';
+                const profile = loadUserProfile();
+                profile.location = cityName;
+                profile.lat = lat;
+                profile.lon = lon;
+                saveUserProfile(profile);
+                await telegramBridge.sendTelegramRemoveKeyboard(tgEvent.chatId,
+                  `📍 已收到您的位置！\n` +
+                  `识别到城市：${cityName}\n` +
+                  `已更新所在地天气坐标，明早早报和即时天气都会用这个位置～`, tgEvent.messageId);
+              } catch (locErr) {
+                console.error('[telegram] 位置处理异常:', locErr?.message || locErr);
+                await telegramBridge.sendTelegramRemoveKeyboard(tgEvent.chatId, '❌ 位置处理失败', tgEvent.messageId);
+              }
+              return;
+            }
             const agentName = '银月';
             const cid = `tg_${tgEvent.chatId}`;
             const userText = tgContent;
+
+            // 自动注册 Telegram Owner 通道
+            if (!STATE.discord.lastOwnerChannelId) {
+              STATE.discord.lastOwnerChannelId = cid;
+              STATE.discord.ownerUserId = String(tgEvent.chatId);
+              console.log(`[telegram] Owner 通道自动注册: ${cid}`);
+              saveOwnerContext();
+            }
+
+            // ── 早报专属路由（拦截 LLM 自作主张） ──
+            const tgBriefDedicated = /^(?:我的)?(?:早报|晨报|简报|brief)(?:\s*(?:呢|？|\?|啊|吧))?$/i.test(userText.trim());
+            if (tgBriefDedicated) {
+              try {
+                await telegramBridge.sendTelegramReply(tgEvent.chatId, '📣 正在生成早报，请稍候...', tgEvent.messageId);
+                const brief = await buildMorningBrief();
+                if (brief) {
+                  const maxLen = 4000;
+                  for (let i = 0; i < brief.length; i += maxLen) {
+                    await telegramBridge.sendTelegramReply(tgEvent.chatId, brief.slice(i, i + maxLen), tgEvent.messageId);
+                  }
+                }
+              } catch (briefErr) {
+                console.error('[telegram] 早报异常:', briefErr?.message || briefErr);
+                await telegramBridge.sendTelegramReply(tgEvent.chatId, '❌ 早报生成失败，请稍后重试', tgEvent.messageId);
+              }
+              return;
+            }
 
             const tgWeatherDedicated = /^(?:(?:查|查询|看|看看)?\s*)?(?:(?:今天|明天|后天|这周|下周|周末)\s*)?(?:天气|气温|温度|weather|forecast)/i.test(userText.trim()) && userText.trim().length < 80;
             if (tgWeatherDedicated) {
               try {
                 const weatherModule = require('./lib/weather');
-                const weatherData = await weatherModule.fetchWeatherFromMessage(userText);
+                // 用户没说城市时，用档案位置
+                const hasCity = Object.keys(weatherModule.CITY_MAP || {}).some(k => userText.includes(k));
+                const queryText = hasCity ? userText : `${userText} ${loadUserProfile().location || '斗湖'}`;
+                const weatherData = await weatherModule.fetchWeatherFromMessage(queryText);
                 let weatherReply = '';
                 if (weatherData && typeof weatherData === 'object' && !weatherData.error) {
                   const todayStr = new Date().toISOString().slice(0, 10);
                   const forecastLines = (weatherData.forecast || []).map(d => {
-                    const label = d.date === todayStr ? '📌 今天' :
-                                  d.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? '🌤️ 明天' :
-                                  `📆 ${d.date}`;
+                    const label = d.date === todayStr ? '[今天]' :
+                                  d.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? '[明天]' :
+                                  `[${d.date}]`;
                     const rain = d.rainChance && d.rainChance !== '-' ? ` ☔${d.rainChance}` : '';
-                    return `• ${label}: ${d.condition} ${d.minTemp}~${d.maxTemp}${rain}`;
+                    return `  ${label}: ${d.condition} ${d.minTemp}~${d.maxTemp}${rain}`;
                   }).join('\n');
                   const locationName = weatherData.displayCity || weatherData.city || '斗湖';
-                  weatherReply = `📅 ${locationName}天气预报\n` +
-                                `📍 位置: ${locationName} | 🌡️ 当前: ${weatherData.temp}\n` +
-                                `☁️ 状况: ${weatherData.condition}\n` +
-                                `💧 湿度: ${weatherData.humidity} | 🌬️ 风速: ${weatherData.wind || '-'}\n` +
-                                (forecastLines ? `\n📆 未来预报:\n${forecastLines}` : '');
+                  weatherReply = `[天气] ${locationName}\n` +
+                                `📍 ${locationName} | 🌡️ 当前: ${weatherData.temp}\n` +
+                                `☁️ ${weatherData.condition}\n` +
+                                `💧 ${weatherData.humidity} | 🌬️ ${weatherData.wind || '-'}\n` +
+                                (forecastLines ? `\n[预报]\n${forecastLines}` : '');
                 } else {
                   weatherReply = weatherData?.message || '❌ 抱歉，天气服务暂时无法响应，请稍后再试。';
                 }
@@ -6805,6 +7029,39 @@ async function main() {
                 await telegramBridge.sendTelegramReply(tgEvent.chatId, result, tgEvent.messageId);
               } catch (e) {
                 await telegramBridge.sendTelegramReply(tgEvent.chatId, `📸 正在截图...\n（截图引擎: ${e?.message?.slice(0,100) || '未知'}）`, tgEvent.messageId);
+              }
+              return;
+            }
+
+            // ── 位置设定命令 ──
+            const locRequest = /^(?:我的)?位置(?:\s*分享|\s*在哪|\s*在哪|分享位置|定位|location)?$/i.test(userText.trim());
+            if (locRequest) {
+              try {
+                await telegramBridge.sendTelegramLocationRequest(tgEvent.chatId, '📍 点下方按钮分享您的位置，我就能自动识别城市并更新天气～');
+              } catch (locErr) {
+                console.error('[telegram] 位置请求异常:', locErr?.message || locErr);
+                await telegramBridge.sendTelegramReply(tgEvent.chatId, '❌ 位置请求失败', tgEvent.messageId);
+              }
+              return;
+            }
+            const locMatch = userText.trim().match(/^(?:我的位置(?:在|是)|位置(?:设|改)(?:为|成)?)\s*(.+)/i);
+            if (locMatch) {
+              const cityName = locMatch[1].trim();
+              if (cityName) {
+                try {
+                  const coords = await resolveCityCoords(cityName);
+                  const profile = loadUserProfile();
+                  profile.location = cityName.startsWith('我的') || cityName.startsWith('我') ? '' : cityName;
+                  if (coords) { profile.lat = coords.lat; profile.lon = coords.lon; }
+                  saveUserProfile(profile);
+                  const confirmMsg = coords
+                    ? `✅ 位置已设为「${cityName}」\n明天早报和即时天气都会用这个位置～`
+                    : `✅ 位置已设为「${cityName}」\n（坐标未找到，天气可能不精确）`;
+                  await telegramBridge.sendTelegramReply(tgEvent.chatId, confirmMsg, tgEvent.messageId);
+                } catch (locErr) {
+                  console.error('[telegram] 位置设定异常:', locErr?.message || locErr);
+                  await telegramBridge.sendTelegramReply(tgEvent.chatId, '❌ 位置设定失败', tgEvent.messageId);
+                }
               }
               return;
             }
@@ -7175,20 +7432,20 @@ async function main() {
         if (weatherData && typeof weatherData === 'object' && !weatherData.error) {
           const todayStr = new Date().toISOString().slice(0, 10);
           const forecastLines = (weatherData.forecast || []).map(d => {
-            const label = d.date === todayStr ? '📌 今天' :
-                          d.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? '🌤️ 明天' :
-                          `📆 ${d.date}`;
+            const label = d.date === todayStr ? '[今天]' :
+                          d.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? '[明天]' :
+                          `[${d.date}]`;
             const rain = d.rainChance && d.rainChance !== '-' ? ` ☔${d.rainChance}` : '';
-            return `• ${label}: ${d.condition} ${d.minTemp}~${d.maxTemp}${rain}`;
+            return `  ${label}: ${d.condition} ${d.minTemp}~${d.maxTemp}${rain}`;
           }).join('\n');
           const locationName = weatherData.displayCity || weatherData.city || '斗湖';
-          finalReply = `📅 ${locationName}天气预报\n` +
-                       `📍 位置: ${locationName} | 🌡️ 当前: ${weatherData.temp}\n` +
-                       `☁️ 状况: ${weatherData.condition}\n` +
-                       `💧 湿度: ${weatherData.humidity} | 🌬️ 风速: ${weatherData.wind || '-'}` +
-                       (forecastLines ? `\n\n📆 未来预报:\n${forecastLines}` : '');
+          finalReply = `[天气] ${locationName}\n` +
+                       `📍 ${locationName} | 🌡️ 当前: ${weatherData.temp}\n` +
+                       `☁️ ${weatherData.condition}\n` +
+                       `💧 ${weatherData.humidity} | 🌬️ ${weatherData.wind || '-'}` +
+                       (forecastLines ? `\n\n[预报]\n${forecastLines}` : '');
         } else {
-          finalReply = weatherData?.message || '❌ 抱歉主人，天气阵法（wttr.in）暂时无法响应，请稍后再试，切莫强求。';
+          finalReply = weatherData?.message || '❌ 抱歉主人，天气阵法暂时无法响应，请稍后再试。';
         }
         await replyAndRemember(msg, finalReply);
         STATE.discord.inflightByChannel[cid] = false;
@@ -7550,6 +7807,14 @@ async function main() {
             const cid = `tg_${tgEvent.chatId}`;
             const userText = tgContent;
 
+            // 自动注册 Telegram Owner 通道
+            if (!STATE.discord.lastOwnerChannelId) {
+              STATE.discord.lastOwnerChannelId = cid;
+              STATE.discord.ownerUserId = String(tgEvent.chatId);
+              console.log(`[telegram] Owner 通道自动注册: ${cid}`);
+              saveOwnerContext();
+            }
+
             // ── 天气截断：仅拦截纯粹天气查询，不拦截上下文中提到天气 ──
             const tgWeatherDedicated = /^(?:(?:查|查询|看|看看)?\s*)?(?:(?:今天|明天|后天|这周|下周|周末)\s*)?(?:天气|气温|温度|weather|forecast)/i.test(userText.trim()) && userText.trim().length < 80;
             if (tgWeatherDedicated) {
@@ -7559,18 +7824,18 @@ async function main() {
               if (weatherData && typeof weatherData === 'object' && !weatherData.error) {
                 const todayStr = new Date().toISOString().slice(0, 10);
                 const forecastLines = (weatherData.forecast || []).map(d => {
-                  const label = d.date === todayStr ? '📌 今天' :
-                                d.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? '🌤️ 明天' :
-                                `📆 ${d.date}`;
+                  const label = d.date === todayStr ? '[今天]' :
+                                d.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? '[明天]' :
+                                `[${d.date}]`;
                   const rain = d.rainChance && d.rainChance !== '-' ? ` ☔${d.rainChance}` : '';
-                  return `• ${label}: ${d.condition} ${d.minTemp}~${d.maxTemp}${rain}`;
+                  return `  ${label}: ${d.condition} ${d.minTemp}~${d.maxTemp}${rain}`;
                 }).join('\n');
                 const locationName = weatherData.displayCity || weatherData.city || '斗湖';
-                weatherReply = `📅 ${locationName}天气预报\n` +
-                              `📍 位置: ${locationName} | 🌡️ 当前: ${weatherData.temp}\n` +
-                              `☁️ 状况: ${weatherData.condition}\n` +
-                              `💧 湿度: ${weatherData.humidity} | 🌬️ 风速: ${weatherData.wind || '-'}\n` +
-                              (forecastLines ? `\n📆 未来预报:\n${forecastLines}` : '');
+                weatherReply = `[天气] ${locationName}\n` +
+                              `📍 ${locationName} | 🌡️ 当前: ${weatherData.temp}\n` +
+                              `☁️ ${weatherData.condition}\n` +
+                              `💧 ${weatherData.humidity} | 🌬️ ${weatherData.wind || '-'}\n` +
+                              (forecastLines ? `\n[预报]\n${forecastLines}` : '');
               } else {
                 weatherReply = weatherData?.message || '❌ 抱歉，天气服务暂时无法响应，请稍后再试。';
               }
@@ -7778,18 +8043,18 @@ async function main() {
             if (weatherData && typeof weatherData === 'object' && !weatherData.error) {
               const todayStr = new Date().toISOString().slice(0, 10);
               const forecastLines = (weatherData.forecast || []).map(d => {
-                const label = d.date === todayStr ? '📌 今天' :
-                              d.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? '🌤️ 明天' :
-                              `📆 ${d.date}`;
+                const label = d.date === todayStr ? '[今天]' :
+                              d.date === new Date(Date.now() + 86400000).toISOString().slice(0, 10) ? '[明天]' :
+                              `[${d.date}]`;
                 const rain = d.rainChance && d.rainChance !== '-' ? ` ☔${d.rainChance}` : '';
-                return `• ${label}: ${d.condition} ${d.minTemp}~${d.maxTemp}${rain}`;
+                return `  ${label}: ${d.condition} ${d.minTemp}~${d.maxTemp}${rain}`;
               }).join('\n');
               const locationName = weatherData.displayCity || weatherData.city || '斗湖';
-              weatherReply = `📅 ${locationName}天气预报\n` +
-                            `📍 位置: ${locationName} | 🌡️ 当前: ${weatherData.temp}\n` +
-                            `☁️ 状况: ${weatherData.condition}\n` +
-                            `💧 湿度: ${weatherData.humidity} | 🌬️ 风速: ${weatherData.wind || '-'}\n` +
-                            (forecastLines ? `\n📆 未来预报:\n${forecastLines}` : '');
+              weatherReply = `[天气] ${locationName}\n` +
+                            `📍 ${locationName} | 🌡️ 当前: ${weatherData.temp}\n` +
+                            `☁️ ${weatherData.condition}\n` +
+                            `💧 ${weatherData.humidity} | 🌬️ ${weatherData.wind || '-'}\n` +
+                            (forecastLines ? `\n[预报]\n${forecastLines}` : '');
             } else {
               weatherReply = weatherData?.message || '❌ 抱歉，天气服务暂时无法响应，请稍后再试。';
             }
@@ -7863,6 +8128,29 @@ async function main() {
   } catch (e) {
     console.error('[agent-bot] 启动异常:', e?.message || e);
   }
+
+  // ── 启动时 IP 地理定位兜底 ──
+  (async () => {
+    try {
+      const profile = loadUserProfile();
+      if (!profile.location) {
+        const ipLoc = await ipGeolocate();
+        if (ipLoc) {
+          profile.location = ipLoc.city;
+          profile.lat = ipLoc.lat;
+          profile.lon = ipLoc.lon;
+          saveUserProfile(profile);
+          console.log(`[startup] IP 地理定位 → ${ipLoc.city} (${ipLoc.lat}, ${ipLoc.lon})`);
+        } else {
+          console.log('[startup] IP 地理定位不可用，跳过');
+        }
+      } else {
+        console.log(`[startup] 已有位置档案: ${profile.location}，跳过 IP 定位`);
+      }
+    } catch (e) {
+      console.error('[startup] IP 地理定位异常:', e?.message || e);
+    }
+  })();
 
   // ── 银月钱庄 · 任务链联动系统启动（Cron → 看门狗 → 墨影） ──
   try {
@@ -8784,19 +9072,6 @@ function computeNextDailyAt(hh, mm, offsetMin) {
   return new Date(tzNext.getTime() - offsetMs);
 }
 
-function scheduleDailyAt(taskName, hh, mm, fn) {
-  const scheduleOnce = () => {
-    const next = computeNextDailyAt(hh, mm, OPENCLAW_TZ_OFFSET_MIN);
-    STATE.cron.nextRuns[taskName] = formatTs(next);
-    const ms = Math.max(500, next.getTime() - Date.now());
-    setTimeout(() => {
-      fn();
-      scheduleOnce();
-    }, ms);
-  };
-  scheduleOnce();
-}
-
 const FETCH_IMPL = (typeof fetch === 'function') ? fetch : require('undici').fetch;
 
 async function fetchText(url) {
@@ -8989,14 +9264,60 @@ async function fetchStooqLatest(symbol) {
   return Number.isFinite(close) ? { date, close } : null;
 }
 
-async function getWeatherTawau() {
-  const url = 'https://api.open-meteo.com/v1/forecast?latitude=4.244&longitude=117.891&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=Asia%2FKuala_Lumpur';
+async function getWeatherByCoords(lat, lon) {
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=Asia%2FKuala_Lumpur`;
   const j = await fetchJson(url);
   const c = j?.current || {};
-  const t = c.temperature_2m;
-  const h = c.relative_humidity_2m;
-  const w = c.wind_speed_10m;
-  return { t, h, w };
+  return { t: c.temperature_2m, h: c.relative_humidity_2m, w: c.wind_speed_10m, code: c.weather_code };
+}
+
+const CITY_COORDS = {
+  '斗湖':{lat:4.244,lon:117.891},'tawau':{lat:4.244,lon:117.891},
+  '吉隆坡':{lat:3.139,lon:101.686},'kuala lumpur':{lat:3.139,lon:101.686},'kl':{lat:3.139,lon:101.686},
+  '峇株巴辖':{lat:1.849,lon:102.934},'batu pahat':{lat:1.849,lon:102.934},
+  '新山':{lat:1.492,lon:103.741},'johor bahru':{lat:1.492,lon:103.741},'jb':{lat:1.492,lon:103.741},
+  '亚庇':{lat:5.980,lon:116.073},'kota kinabalu':{lat:5.980,lon:116.073},'kk':{lat:5.980,lon:116.073},
+  '古晋':{lat:1.557,lon:110.343},'kuching':{lat:1.557,lon:110.343},
+  '槟城':{lat:5.416,lon:100.332},'penang':{lat:5.416,lon:100.332},
+  '新加坡':{lat:1.352,lon:103.819},'singapore':{lat:1.352,lon:103.819},
+};
+
+async function resolveCityCoords(cityName) {
+  const key = cityName.trim().toLowerCase();
+  if (CITY_COORDS[key]) return CITY_COORDS[key];
+  try {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityName)}&count=1&language=zh&format=json`;
+    const resp = await fetch(url);
+    const data = await resp.json();
+    if (data?.results?.[0]) return { lat: data.results[0].latitude, lon: data.results[0].longitude };
+  } catch {}
+  return null;
+}
+
+async function reverseGeocode(lat, lon) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&accept-language=zh&zoom=10`;
+    const resp = await fetch(url, { headers: { 'User-Agent': 'SilverMoonBank/1.0' } });
+    const data = await resp.json();
+    const addr = data?.address || {};
+    return addr.city || addr.town || addr.county || addr.state || '未知区域';
+  } catch { return null; }
+}
+
+async function ipGeolocate() {
+  try {
+    const url = 'http://ip-api.com/json/?fields=city,lat,lon,countryCode,query';
+    const resp = await fetch(url, { signal: AbortSignal.timeout(5000) });
+    const data = await resp.json();
+    if (data?.city && data?.lat && data?.lon) {
+      return { city: data.city, lat: data.lat, lon: data.lon };
+    }
+  } catch {}
+  return null;
+}
+
+async function getWeatherTawau() {
+  return getWeatherByCoords(4.244, 117.891);
 }
 
 async function pickHeadline(query, options) {
@@ -9362,7 +9683,7 @@ function buildAgentMorningTasksBlock(deliveriesByAgent) {
     '药老': '文案/脚本/长文输出（按派单）',
     '小医仙': '社媒线索/投放素材（按派单）',
     '紫灵': '对话编排/需求澄清（按派单）',
-    '紫研': '数字化/表格/数据整理（按派单）',
+    '紫妍': '数字人口播/短视频/多媒体（按派单）',
   };
   const names = Object.keys(tasks);
   const lines = [];
@@ -9455,7 +9776,7 @@ async function handleRemind(msg, content) {
 }
 
 function buildAgentSelfCheckBlock(deliveriesByAgent) {
-  const names = ['银月', '李长寿', '墨影', '美杜莎', '雅妃', '萧炎', '韩立', '药老', '小医仙', '紫灵', '紫研'];
+  const names = ['银月', '李长寿', '墨影', '美杜莎', '雅妃', '萧炎', '韩立', '药老', '小医仙', '紫灵', '紫妍'];
   const lines = [];
   lines.push('🪞 内阁自检（每人 1 句）');
   for (const n of names) {
@@ -9472,23 +9793,28 @@ function buildAgentSelfCheckBlock(deliveriesByAgent) {
 }
 
 async function buildMorningBrief() {
+  try {
   const tzNow = getTzNow();
   const ymd = formatYmd(tzNow);
   const fileName = `${ymd}_早报.md`;
   const briefCache = readJsonSafe(BRIEF_CACHE_PATH) || {};
+  const profile = loadUserProfile();
+  const city = profile.location || '斗湖';
+  const lat = profile.lat || 4.244;
+  const lon = profile.lon || 117.891;
 
   const parts = [];
-  parts.push('📣 银月情报局 | 斗湖早报');
+  parts.push(`📣 银月情报局 | ${city}早报`);
   parts.push(`（生成时间：${formatTs(tzNow)}）`);
   parts.push('');
 
-  const w = await getWeatherTawau().catch(() => null);
+  const w = await getWeatherByCoords(lat, lon).catch(() => null);
   const temp = typeof w?.t === 'number' ? `${formatNum(w.t, 1)}℃` : '未知';
   const hum = typeof w?.h === 'number' ? `${formatNum(w.h, 0)}%` : '未知';
-  parts.push('⛅ 斗湖天气与本地新闻');
+  parts.push(`⛅ ${city}天气与本地新闻`);
   parts.push(`🌡️ 气温：${temp} / 湿度：${hum}`);
   parts.push('⚠️ 警示：暂无（如遇强降雨/雷暴，请注意出行与用电安全）');
-  const localRaw = await pickHeadline('斗湖', { hl: 'zh-CN', gl: 'MY', ceid: 'MY:zh-Hans' });
+  const localRaw = await pickHeadline(city, { hl: 'zh-CN', gl: 'MY', ceid: 'MY:zh-Hans' });
   const local = await translateToChineseShort(localRaw || '');
   const localText = safeChineseOnly(local || '', false);
   if (localText) {
@@ -9619,6 +9945,12 @@ async function buildMorningBrief() {
   writeFileSafe(abs, body + '\n');
   writeFileSafe(BRIEF_CACHE_PATH, JSON.stringify(briefCache, null, 2) + '\n');
   return body;
+  } catch (e) {
+    logError(`[buildMorningBrief] 早报生成异常: ${e?.message || e}`);
+    const fallback = `📣 银月情报局 | 早报\n（生成时间：${formatTs(getTzNow())}）\n\n⚠️ 早报生成暂不可用，部分网络源可能超时。\n\n📄 简报归档：${fileName}`;
+    writeFileSafe(abs, fallback + '\n');
+    return fallback;
+  }
 }
 
 async function runSilverMoonMorningBrief(opts) {
@@ -9652,8 +9984,11 @@ async function runSilverMoonMorningBrief(opts) {
     writeFileSafe(marker, `sentAt=${new Date().toISOString()}\n`);
     writeHeartbeat('Cron:晨报');
     return { ok: true, skipped: false };
-  } catch {
+  } catch (e) {
     writeHeartbeat('Cron:晨报失败');
+    try {
+      await notifyOwner(`⚠️ 银月早报生成失败: ${e?.message || e}\n（不会影响下次调度，请检查网络连接）`);
+    } catch {}
     return { ok: false, skipped: false };
   }
 }
@@ -9800,7 +10135,7 @@ function loadAgentSkills(agentId) {
     '雅妃': '雅妃', 'yafei': '雅妃', 'trae_yafei': '雅妃',
     '萧炎': '萧炎', 'xiaoyan': '萧炎', 'trae_xiaoyan': '萧炎',
     '美杜莎': '美杜莎', 'medusa': '美杜莎', 'trae_medusa': '美杜莎',
-    '紫研': '紫研', 'ziyan': '紫研', 'trae_ziyan': '紫研', '紫妍': '紫研',
+    '紫妍': '紫妍', 'ziyan': '紫妍', 'trae_ziyan': '紫妍', '紫研': '紫妍',
     '紫灵': '紫灵', 'ziling': '紫灵', 'trae_ziling': '紫灵',
   };
   const name = nameMap[agentId];
@@ -9871,5 +10206,5 @@ if (require.main === module) {
     process.exit(1);
   });
 } else {
-  module.exports = { main, STATE };
+  module.exports = { main, STATE, notifyOwnerEmail };
 }
