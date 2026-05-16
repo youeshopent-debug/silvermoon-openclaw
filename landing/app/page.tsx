@@ -1,22 +1,33 @@
-import { Hero } from "../components/Hero";
-import { Section } from "../components/Section";
-import { Services } from "../components/Services";
-import { CaseStudies } from "../components/CaseStudies";
-import { Contact } from "../components/Contact";
-import { Footer } from "../components/Footer";
+'use client'
 
-export default function LandingPage() {
+import Nav from "@/components/Nav"
+import Hero from "@/components/Hero"
+import DeepCalmSection from "@/components/DeepCalmSection"
+import WorkingStyle from "@/components/WorkingStyle"
+import Services from "@/components/Services"
+import CaseStudies from "@/components/CaseStudies"
+import SubscribeSection from "@/components/SubscribeSection"
+import FAQ from "@/components/FAQ"
+import Contact from "@/components/Contact"
+import Footer from "@/components/Footer"
+import AudioPlayer from "@/components/AudioPlayer"
+
+export default function Home() {
   return (
-    <main className="min-h-dvh bg-bg-deep">
-      <Hero />
-      <Section id="services">
+    <>
+      <Nav />
+      <main>
+        <Hero />
+        <DeepCalmSection />
+        <WorkingStyle />
         <Services />
-      </Section>
-      <Section id="case-studies">
         <CaseStudies />
-      </Section>
-      <Contact />
+        <SubscribeSection />
+        <FAQ />
+        <Contact />
+      </main>
       <Footer />
-    </main>
-  );
+      <AudioPlayer />
+    </>
+  )
 }

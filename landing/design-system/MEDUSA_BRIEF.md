@@ -1,102 +1,139 @@
 # 美杜莎设计简报 — SilverMoon Bank Landing Page
 
+> ⚡ 大掌柜点名只要 **3 张 Figma Frame**，别的不做。精工细作，3张够用。
+
+---
+
 ## 品牌速览
 
 | 项目 | 内容 |
 |------|------|
 | 品牌 | SilverMoon Bank |
 | 定位 | AI Automation & Agent Orchestration |
-| 受众 | 全球开发者 / 技术创始人 / AI 极客 |
-| 调性 | 技术感 · 极简 · 可信高端 |
+| 受众 | 全球开发者 / 技术创始人 / AI 极客 + 心理健康用户 |
+| 调性 | 技术感 · 极简 · 可信高端 + 深夜温暖 |
 | 对标 | Vercel / Linear / Raycast 级别 |
 | 风格 | 暗色 Neo-Minimalism + Glassmorphism |
-| 主色 | #00D4FF（月光辉青蓝） |
-| 次色 | #818CF8（靛紫） |
+| 主色 | `#00D4FF`（月光辉青蓝） |
+| 次色 | `#818CF8`（靛紫） |
+| 深色背景 | `#0A0A0A`（最底层） / `#0D1117`（面板） / `#161B22`（卡片） |
+| 字体 | 标题 Geist Bold 700 / 正文 Inter Regular 400 |
+| 圆角 | 卡片 12px / 按钮 8px |
 
 ---
 
-## 需要设计的 Figma Frame
+## Frame 1 — Hero 首屏（最重要）
 
-请在 Figma 中创建以下 Frame（1920×1080 画板基础）：
+**尺寸**：1920×1080（桌面） + 375×812（移动端单独出）
 
-### 1. 全局组件
+**文案（直接写在 Figma 里）：**
 
-| Frame | 说明 | 尺寸参考 |
-|-------|------|---------|
-| Design System | 色板/字体/间距/阴影/圆角展示 | 任意 |
-| Nav | 暗色玻璃质感导航栏 | 1920×64 |
-| Button/Primary | 主按钮（默认/hover/disabled） | 自定 |
-| Button/Ghost | 次按钮（默认/hover） | 自定 |
-| Button/Text | 文字按钮 | 自定 |
-| Glass Card | 通用玻璃卡片（空状态） | 384×280 |
-| Badge | 标签组件 | 自定 |
-| Input | 输入框（默认/focus/error/success） | 384×44 |
+> **小标题（顶部 Badge）**：`✦ AI Automation Studio`
+>
+> **大标题**：`We Build AI Agents That Work While You Sleep.`
+>
+> **副标题**：`From mental health sanctuary to automation infrastructure — SilverMoon Bank engineers the tools that power the next generation of builders.`
+>
+> **CTA 按钮 × 2**：
+> - 主按钮（青色填充）：`See Our Work`
+> - 次按钮（ghost 带外发图标）：`Free AI Therapy →`
 
-### 2. 页面 Section
+**视觉要求：**
+- 背景：纯黑 `#0A0A0A`，顶部正中央有**大幅径向渐变光晕**（青蓝 → 靛紫 → 透明），参考 Linear.app 首页光效
+- 主按钮：`#00D4FF` 填充，白色文字，hover 带外发光
+- 次按钮：透明底 + 白色边框 + `#00D4FF` hover 文字
+- 导航栏在最顶部：Logo（银月弯钩图标/极简几何） + [Projects] [DeepCalm] [Contact] 三个链接
+- 不用视频背景，不用大图，**纯排版 + 光效** — 简约但有冲击力
+- 移动端：字体缩小两档，CTA 堆叠，光晕保持
 
-| Frame | 说明 | 布局提示 |
-|-------|------|---------|
-| Hero | 全屏首屏 | 径向渐变背景，居中布局，标题+副标题+CTA×2 |
-| Services | 服务网格 | 12列 Bento Grid，玻璃卡片，部分卡片跨列 |
-| Case Studies | 案例展示 | 并排双卡片，带标签Badge |
-| Stats Bar | 数据统计条 | 4列数字（Clients/Projects/Years/Countries） |
-| Process | 工作流程 | 3步水平时间线，每步图标+标题+描述 |
-| Testimonials | 客户评价 | 2-3列评价卡片，带头像 |
-| Contact | 联系表单 | 居中表单卡片，标题+副标题+输入框+按钮 |
-| Footer | 页脚 | 4列网格 + 版权条 |
+**参考方向：** Linear.app 首页的 Hero 光效排版 + Vercel 的暗色质感
 
 ---
 
-## 视觉参考
+## Frame 2 — DEEPCALM 专属区块
 
-- **背景**：纯黑 `#0A0A0A`，表面 `#0D1117`（类似 Vercel 暗色）
-- **卡片**：半透玻璃效果（`bg-white/[0.02]` + `backdrop-blur-2xl` + `border-white/[0.06]`）
-- **首屏**：正上方渐变光晕（cyan → violet → transparent）
-- **hover**：卡片轻微上浮 `-2px` + 阴影加深
-- **按钮**：cyan 纯色填充，hover 带发光
-- **图标**：lucide 风格，20px 描边
-- **字体**：标题 Geist（Bold 700），正文 Inter（Regular 400）
+**尺寸**：1920×600（桌面宽屏）
+
+**文案：**
+
+> **Badge**：`✦ Free · Forever`
+>
+> **大标题**：`AI Mental Health Sanctuary`
+>
+> **副标题**：`Free AI-powered emotional support & sleep science. No sign-up. No data stored. Just you and the moonlight.`
+>
+> **Feature 3 点**：
+> - `🧠 AI Counselor` — Cognitive restructuring in minutes
+> - `🌙 Sleep Calculator` — Wake up refreshed, not groggy
+> - `🔊 3D Soundscapes` — Immersive audio for deep focus
+>
+> **CTA**：`Enter the Sanctuary →`（一个柔和的按钮，不用青蓝，用靛紫 `#818CF8`）
+
+**视觉要求：**
+- 背景：比 Hero 稍亮一点的深色渐变（`#0D1117` → `#0A0A0A`）
+- 左侧放一个**月亮/星云抽象图形**（几何风格，不用写实）
+- 左侧图形区域：月牙 + 粒子点（示意星光）
+- 右侧：文字排版 + 3 个 feature 卡片
+- 整体氛围：温暖、安静、疗愈，与上半部分的技术感形成对比
+- 不写"AI"，写"Sanctuary"、"Calm"、"Rest"
+
+**参考方向：** Headspace 的暗色版 + 极简几何星月
 
 ---
 
-## 设计原则
+## Frame 3 — Glass Card 组件库
 
-1. **暗色是默认，不是主题** — 所有组件先在暗色上设计
-2. **少即是多** — 每个 Section 一个视觉焦点，不要堆砌
-3. **间距即呼吸** — 严格遵循 4px 网格，大间距（96px+）让内容呼吸
-4. **玻璃质感** — 卡片用 backdrop blur，不要纯色块
-5. **动效暗示** — 设计 hover 状态时标注期待动效（上浮/发光/渐入）
-6. **技术上可实现** — 所有效果必须在 Tailwind v4 能力范围内（避免 Figma 中有但 CSS 做不到的效果）
+**尺寸**：一个画板展示 4 种状态即可（竖排）
+
+**包含：**
+
+| # | 状态 | 内容 |
+|---|------|------|
+| 1 | **默认 (Default)** | 带 icon 圆形容器（左上），标题，描述文字，底部可选 Badge |
+| 2 | **Hover** | 卡片整体上浮 2px，边框亮起（`#00D4FF` 半透明光晕），阴影加深 |
+| 3 | **带图片** | 上半部 16:9 缩略图（用深灰色占位块），下半部文字 |
+| 4 | **多列布局示意** | 3 张卡片并列（Hero 下方 3 列 Service 卡片布局） |
+
+**尺寸**：单卡 384×280（参考）
+
+**视觉要求：**
+- 背景：`rgba(255,255,255,0.02)` + `backdrop-blur-xl`
+- 边框：`rgba(255,255,255,0.06)` → hover 时 `rgba(0,212,255,0.2)`
+- icon 容器：圆形，40×40px，`#00D4FF` 半透明背景 + 白色 icon
+- 标题：白色 18px Geist Medium
+- 描述：灰色 14px Inter Regular
+- 整体气质：玻璃质感，若隐若现
 
 ---
 
-## 输出要求
+## 交付要求
 
-1. 所有 Frame 用中文标注（方便我和李长寿沟通）
-2. 每个组件标注：组件名 → 状态 → 尺寸 → 色值
-3. 交付 Figma 分享链接（可查看）
-4. 标注 **「交给李长寿实现」**
+1. 所有 Frame 用 **中文标注组件名**（方便我跟李长寿沟通）
+2. 每个 Frame 标注：尺寸 / 色值 / 字体字号
+3. 出 Figma 分享链接（Anyone with link can view）
+4. 完成后标注 **「交给李长寿实现」**
+5. 大掌柜在等，别让他等太久 ⏳
 
 ---
 
-## 参考案例
+## 参考链接（打开后截图放 Figma 里参考）
 
-打开以下设计参考（打开后截图放 Figma 里）：
-
-- [Vercel 暗色模式](https://vercel.com) — 背景/间距/排版节奏
-- [Linear 首页](https://linear.app) — 卡片设计/光效
-- [Raycast 首页](https://raycast.com) — Hero 布局/CTA 设计
+- https://linear.app — Hero 光效排版
+- https://vercel.com — 暗色质感
+- https://www.headspace.com — 温暖疗愈调性（参考 DEEPCALM 区块）
 
 ---
 
 ## 协作流程
 
 ```
-美杜莎 Figma 设计
+美杜莎 Figma 出 3 张 Frame
     ↓
-李长寿 实现为 Next.js 组件（参考 MASTER.md）
+通知李长寿（在共享记忆写 handoff）
+    ↓
+李长寿 实现为 Next.js 组件
     ↓
 主人 验收
     ↓
-上线部署
+上线 Vercel
 ```

@@ -1,38 +1,30 @@
-import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { homeContent } from "../content/home";
-import { Nav } from "../components/Nav";
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
+import { LocaleProvider } from "@/lib/i18n"
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: homeContent.meta.title,
-  description: homeContent.meta.description,
-};
+  title: "🤖 AI Automation Agency | SilverMoon Bank 银月钱庄",
+  description: "Enterprise-grade AI automation, webhook pipelines, and multi-agent orchestration for modern businesses. AI 自动化工作流 · 多智能体编排 · Web3 网关",
+  keywords: ["AI Automation", "Multi-Agent", "Webhook", "Discord Bot", "SilverMoon", "银月钱庄"],
+  openGraph: {
+    title: "SilverMoon Bank | AI Automation Agency",
+    description: "Enterprise AI automation, webhook pipelines, and multi-agent orchestration.",
+    type: "website",
+  },
+  robots: { index: true, follow: true },
+}
 
-export const viewport: Viewport = {
-  themeColor: "#0A0A0A",
-};
-
-export default function LandingLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body>
-        <Nav />
-        {children}
+    <html lang="zh" className="scroll-smooth">
+      <body className={inter.className}>
+        <LocaleProvider>
+          {children}
+        </LocaleProvider>
       </body>
     </html>
-  );
+  )
 }

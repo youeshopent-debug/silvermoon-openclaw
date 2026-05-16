@@ -1,0 +1,17 @@
+fetch('http://localhost:3002').then(r=>r.text()).then(t => {
+  const hasEmoji = /[\u{1F300}-\u{1FAFF}]/u.test(t)
+  const hasAudio = t.includes('AudioPlayer') || t.includes('audioEngine')
+  const hasCounselor = t.includes('AiCounselor') || t.includes('counselor')
+  const hasSubscribe = t.includes('subscribe') || t.includes('Subscribe')
+  const hasSitemap = t.includes('sitemap') || t.includes('Sitemap')
+  const langAttr = t.match(/lang="(.*?)"/)?.[1]
+  console.log('=== PAGE CHECK ===')
+  console.log('LENGTH:', t.length)
+  console.log('LANG:', langAttr)
+  console.log('EMOJI:', hasEmoji)
+  console.log('AUDIO:', hasAudio)
+  console.log('COUNSELOR:', hasCounselor)
+  console.log('SUBSCRIBE:', hasSubscribe)
+  console.log('HAS_SILVERMOON:', t.includes('银月'))
+  console.log('SNIPPET:', t.substring(2000, 2800))
+}).catch(e => console.error('FAIL:', e.message))

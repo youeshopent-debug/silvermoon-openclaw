@@ -1,51 +1,41 @@
-import { homeContent } from "../content/home";
-import { t } from "../lib/labels";
+'use client'
 
-export function CaseStudies() {
-  const { caseStudies } = homeContent;
+import { useLocale } from "@/lib/i18n"
+
+const CASE_KEYS = [
+  { title: 'cases.discordOps', desc: 'cases.discordOps_desc', tag: 'Automation', icon: '🎯' },
+  { title: 'cases.webhookPipeline', desc: 'cases.webhookPipeline_desc', tag: 'Pipeline', icon: '🔗' },
+] as const
+
+export default function CaseStudies() {
+  const { t } = useLocale()
 
   return (
-    <section className="mx-auto w-full max-w-5xl px-5 py-20 sm:py-24">
-      <div className="text-center">
-        <div className="text-xs font-semibold tracking-widest uppercase text-accent">
-          {caseStudies.kicker}
-        </div>
-        <h2 className="mt-3 text-3xl sm:text-4xl font-semibold tracking-tight text-text-primary">
-          {caseStudies.title}
-        </h2>
-      </div>
-      <div className="mt-10 grid gap-6 sm:grid-cols-2">
-        {caseStudies.cases.map((c) => (
-          <div
-            key={c.titleKey}
-            className="group overflow-hidden rounded-xl border border-white/[0.06] bg-white/[0.02] transition-all duration-300 hover:border-white/[0.10]"
-          >
-            <div className="relative aspect-video w-full overflow-hidden bg-bg-elevated">
-              <img
-                src={c.image}
-                alt={t(c.titleKey)}
-                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-bg-deep/60 to-transparent" />
-            </div>
-            <div className="p-5 sm:p-6">
-              <div className="text-base font-semibold text-text-primary">
-                {t(c.titleKey)}
+    <section id="proof" className="py-24 px-4 bg-bg-surface/50">
+      <div className="max-w-6xl mx-auto">
+        <h2 className="text-3xl sm:text-4xl font-semibold text-center mb-4 tracking-tight">{t('cases.title')}</h2>
+        <p className="text-text-secondary text-center max-w-xl mx-auto mb-16">
+          {t('cases.title')}
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {CASE_KEYS.map((c) => (
+            <div
+              key={c.title}
+              className="rounded-xl border border-border-subtle bg-bg-card/60 backdrop-blur-xl p-8 group transition-all duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:shadow-md"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-3xl">{c.icon}</span>
+                <span className="text-xs font-medium text-accent bg-accent-subtle px-3 py-1 rounded-full">
+                  {c.tag}
+                </span>
               </div>
-              <ul className="mt-3 space-y-1.5">
-                {c.points.map((pt) => (
-                  <li
-                    key={pt}
-                    className="text-sm leading-6 text-text-secondary before:mr-2 before:text-accent before:content-['→']"
-                  >
-                    {pt}
-                  </li>
-                ))}
-              </ul>
+              <h3 className="text-xl font-semibold mb-3">{t(c.title as any)}</h3>
+              <p className="text-text-secondary leading-relaxed">{t(c.desc as any)}</p>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
-  );
+  )
 }
