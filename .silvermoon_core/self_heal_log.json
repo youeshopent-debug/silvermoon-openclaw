@@ -1,0 +1,550 @@
+{
+  "incidents": [
+    {
+      "id": "heal-mpcybiab-1",
+      "timestamp": "2026-05-19T18:13:26.483Z",
+      "error": "测试错误 #0",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcybiac-2",
+      "timestamp": "2026-05-19T18:13:26.484Z",
+      "error": "测试错误 #1",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcybiad-3",
+      "timestamp": "2026-05-19T18:13:26.485Z",
+      "error": "测试错误 #2",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcybiad-4",
+      "timestamp": "2026-05-19T18:13:26.485Z",
+      "error": "测试错误 #3",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcybiae-5",
+      "timestamp": "2026-05-19T18:13:26.486Z",
+      "error": "测试错误 #4",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcybiae-6",
+      "timestamp": "2026-05-19T18:13:26.486Z",
+      "error": "测试错误 #5",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcybiaf-7",
+      "timestamp": "2026-05-19T18:13:26.487Z",
+      "error": "测试错误 #6",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcybiah-8",
+      "timestamp": "2026-05-19T18:13:26.489Z",
+      "error": "网络连接超时",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_classify\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyg2kh-1",
+      "timestamp": "2026-05-19T18:16:59.393Z",
+      "error": "测试错误 #0",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyg2kj-2",
+      "timestamp": "2026-05-19T18:16:59.395Z",
+      "error": "测试错误 #1",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyg2kl-3",
+      "timestamp": "2026-05-19T18:16:59.397Z",
+      "error": "测试错误 #2",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyg2km-4",
+      "timestamp": "2026-05-19T18:16:59.398Z",
+      "error": "测试错误 #3",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyg2kn-5",
+      "timestamp": "2026-05-19T18:16:59.399Z",
+      "error": "测试错误 #4",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyg2kn-6",
+      "timestamp": "2026-05-19T18:16:59.399Z",
+      "error": "测试错误 #5",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyg2ko-7",
+      "timestamp": "2026-05-19T18:16:59.400Z",
+      "error": "测试错误 #6",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyg2kq-8",
+      "timestamp": "2026-05-19T18:16:59.402Z",
+      "error": "网络连接超时",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_classify\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyh2je-1",
+      "timestamp": "2026-05-19T18:17:46.010Z",
+      "error": "测试错误 #0",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyh2jf-2",
+      "timestamp": "2026-05-19T18:17:46.011Z",
+      "error": "测试错误 #1",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyh2jf-3",
+      "timestamp": "2026-05-19T18:17:46.012Z",
+      "error": "测试错误 #2",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyh2jg-4",
+      "timestamp": "2026-05-19T18:17:46.012Z",
+      "error": "测试错误 #3",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyh2jh-5",
+      "timestamp": "2026-05-19T18:17:46.013Z",
+      "error": "测试错误 #4",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyh2jh-6",
+      "timestamp": "2026-05-19T18:17:46.013Z",
+      "error": "测试错误 #5",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyh2ji-7",
+      "timestamp": "2026-05-19T18:17:46.014Z",
+      "error": "测试错误 #6",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyh2jk-8",
+      "timestamp": "2026-05-19T18:17:46.016Z",
+      "error": "网络连接超时",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_classify\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyhmwj-1",
+      "timestamp": "2026-05-19T18:18:12.403Z",
+      "error": "测试错误 #0",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyhmwk-2",
+      "timestamp": "2026-05-19T18:18:12.404Z",
+      "error": "测试错误 #1",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyhmwl-3",
+      "timestamp": "2026-05-19T18:18:12.405Z",
+      "error": "测试错误 #2",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyhmwl-4",
+      "timestamp": "2026-05-19T18:18:12.405Z",
+      "error": "测试错误 #3",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyhmwm-5",
+      "timestamp": "2026-05-19T18:18:12.406Z",
+      "error": "测试错误 #4",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyhmwn-6",
+      "timestamp": "2026-05-19T18:18:12.407Z",
+      "error": "测试错误 #5",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyhmwo-7",
+      "timestamp": "2026-05-19T18:18:12.408Z",
+      "error": "测试错误 #6",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_circuit\",\"tool\":\"test-tool\"}"
+    },
+    {
+      "id": "heal-mpcyhmwq-8",
+      "timestamp": "2026-05-19T18:18:12.410Z",
+      "error": "网络连接超时",
+      "classification": {
+        "type": "unknown",
+        "severity": "low",
+        "repair": "log_and_continue",
+        "description": "未分类错误"
+      },
+      "repair": {
+        "action": "log_and_continue",
+        "success": true,
+        "detail": "已记录错误，继续运行"
+      },
+      "context": "{\"context\":\"stress_test_classify\",\"tool\":\"test-tool\"}"
+    }
+  ],
+  "total_incidents": 32,
+  "last_incident_at": "2026-05-19T18:18:12.410Z"
+}

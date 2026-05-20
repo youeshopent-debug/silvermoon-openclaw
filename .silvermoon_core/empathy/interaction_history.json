@@ -1,0 +1,42 @@
+[
+  {
+    "timestamp": "2026-05-19T18:13:26.492Z",
+    "role": "user",
+    "emotion": "neutral",
+    "confidence": 0.5,
+    "textPreview": "压力测试用户偏好积累",
+    "meta": {
+      "channelId": "__stress_test__"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T18:16:59.407Z",
+    "role": "user",
+    "emotion": "neutral",
+    "confidence": 0.5,
+    "textPreview": "压力测试用户偏好积累",
+    "meta": {
+      "channelId": "__stress_test__"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T18:17:46.023Z",
+    "role": "user",
+    "emotion": "neutral",
+    "confidence": 0.5,
+    "textPreview": "压力测试用户偏好积累",
+    "meta": {
+      "channelId": "__stress_test__"
+    }
+  },
+  {
+    "timestamp": "2026-05-19T18:18:12.416Z",
+    "role": "user",
+    "emotion": "neutral",
+    "confidence": 0.5,
+    "textPreview": "压力测试用户偏好积累",
+    "meta": {
+      "channelId": "__stress_test__"
+    }
+  }
+]

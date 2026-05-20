@@ -9,8 +9,20 @@
     "https-proxy-agent": "^9.0.0",
     "node-cron": "^4.2.1",
     "node-telegram-bot-api": "^0.67.0",
+    "nodemailer": "^8.0.7",
+    "pdfkit": "^0.18.0",
     "playwright": "^1.59.1",
     "puppeteer": "^24.42.0",
     "undici": "^8.1.0"
+  },
+  "scripts": {
+    "start": "node main.js",
+    "dev": "node --watch main.js",
+    "test": "node scripts/run-tests.js",
+    "lint": "node scripts/lint-check.js",
+    "backup": "node scripts/auto-backup.js",
+    "logs:rotate": "node scripts/log-rotate.js",
+    "ci": "npm test && npm run lint",
+    "hooks:install": "node .githooks/setup-hooks.cjs"
   }
 }

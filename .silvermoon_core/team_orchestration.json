@@ -1,0 +1,76 @@
+{
+  "delegations": [
+    {
+      "id": "del-mpcyh2jk",
+      "timestamp": "2026-05-19T18:17:46.016Z",
+      "task": "{\"name\":\"压力测试任务\",\"priority\":\"high\"}",
+      "context": {},
+      "neededMembers": [
+        "lcs"
+      ],
+      "reasons": [
+        "显式指派给 李长寿"
+      ],
+      "status": "assigned",
+      "priority": "normal",
+      "deadline": null,
+      "assignee": "lcs",
+      "updatedAt": "2026-05-19T18:17:46.016Z"
+    },
+    {
+      "id": "del-mpcyh2jm",
+      "timestamp": "2026-05-19T18:17:46.018Z",
+      "task": "{\"name\":\"状态流转测试\"}",
+      "context": {},
+      "neededMembers": [
+        "mds"
+      ],
+      "reasons": [
+        "显式指派给 美杜莎"
+      ],
+      "status": "assigned",
+      "priority": "normal",
+      "deadline": null,
+      "assignee": "mds",
+      "updatedAt": "2026-05-19T18:17:46.018Z"
+    },
+    {
+      "id": "del-mpcyhmwq",
+      "timestamp": "2026-05-19T18:18:12.410Z",
+      "task": "{\"name\":\"压力测试任务\",\"priority\":\"high\"}",
+      "context": {},
+      "neededMembers": [
+        "lcs"
+      ],
+      "reasons": [
+        "显式指派给 李长寿"
+      ],
+      "status": "assigned",
+      "priority": "normal",
+      "deadline": null,
+      "assignee": "lcs",
+      "updatedAt": "2026-05-19T18:18:12.411Z"
+    },
+    {
+      "id": "del-mpcyhmws",
+      "timestamp": "2026-05-19T18:18:12.412Z",
+      "task": "{\"name\":\"状态流转测试\"}",
+      "context": {},
+      "neededMembers": [
+        "mds"
+      ],
+      "reasons": [
+        "显式指派给 美杜莎"
+      ],
+      "status": "in_progress",
+      "priority": "normal",
+      "deadline": null,
+      "assignee": "mds",
+      "updatedAt": "2026-05-19T18:18:12.413Z"
+    }
+  ],
+  "memberStatus": {
+    "lcs": "busy",
+    "mds": "busy"
+  }
+}

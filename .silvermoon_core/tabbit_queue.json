@@ -98,6 +98,24 @@
       "instruction": "Facebook popular pages global",
       "createdAt": "2026-05-05T22:57:53.792Z",
       "status": "pending"
+    },
+    {
+      "id": "mpbd9k81",
+      "type": "browse",
+      "url": "",
+      "query": "斗湖 2026年5月 天气 实时",
+      "instruction": "斗湖 2026年5月 天气 实时",
+      "createdAt": "2026-05-18T15:36:17.569Z",
+      "status": "pending"
+    },
+    {
+      "id": "mpcnnz5s",
+      "type": "browse",
+      "url": "",
+      "query": "在Chrome浏览器上搜索Facebook",
+      "instruction": "在Chrome浏览器上搜索Facebook",
+      "createdAt": "2026-05-19T13:15:12.448Z",
+      "status": "pending"
     }
   ],
   "results": []

@@ -1,6 +1,41 @@
 # 银月钱庄 · 任务看板
 
-## 当前任务：搜索 AliExpress/Alibaba 3 款产品的 ae-pic-a1 CDN 图片 URL
+## 当前任务：SilverMoon Bank Landing Page 视觉设计（3 张 Figma Frame）
+**状态：待美杜莎开工** | **设计师：美杜莎 (MDS)** | **日期：2026-05-16**
+
+### Context
+- DeepCalm Facebook(科技主题) 15s 分镜脚本 ×3：主卖点「上线日起90天免费 / 无订阅 / 无信用卡」，引流 deepcalm-ai.com/en（已在对话交付，待紫妍数字人合成）
+
+### Brief 文件
+`landing/design-system/MEDUSA_BRIEF.md` ✅ 已更新
+
+### 需要出图的 Frame
+| # | Frame | 尺寸 | 优先级 |
+|---|-------|------|--------|
+| 1 | Hero 首屏（含移动端） | 1920×1080 + 375×812 | ⭐ 最高 |
+| 2 | DEEPCALM AI Sanctuary 专属区块 | 1920×600 | ⭐ 高 |
+| 3 | Glass Card 组件库（4 状态） | 单画板 | ⭐ 高 |
+
+### 交付要求
+1. Figma 分享链接（Anyone with link can view）
+2. Frame 用中文标注组件名
+3. 完成后标注「交给李长寿实现」
+4. 大掌柜在等 ⏳
+
+### 交接
+美杜莎完成 Figma 设计后 → 通知李长寿 → 实现为 Next.js 组件 → 部署 Vercel
+
+---
+
+## 已完成：Facebook Page 资料文案（专业领域 + 添加说明）
+**状态：已完成** | **负责人：药老 (YL)** | **日期：2026-05-16**
+
+- 产出：中文 + 英文「专业领域(最多10)」与「添加说明(150字内)」
+- 归档：[facebook_page_profile_2026-05-16.md](file:///c:/Users/User/.openclaw/.silvermoon_core/marketing/facebook_page_profile_2026-05-16.md)
+
+---
+
+## 已完成：搜索 AliExpress/Alibaba 3 款产品的 ae-pic-a1 CDN 图片 URL
 **状态：已完成** | **分析师：萧炎 (XY)** | **日期：2026-05-07**
 
 ### 任务结果摘要

@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>银月钱庄 · 修炼洞府</title>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#0a0a0a;color:#c8b88a;font-family:'Microsoft YaHei','PingFang SC',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;overflow:hidden;
+}
+#game-container{border-radius:12px;overflow:hidden;box-shadow:0 0 40px rgba(100,80,40,0.3);margin-top:12px}
+#bottom-panels{width:1280px;max-width:95vw;display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+#status-panel{
+  flex:2;min-width:280px;background:rgba(20,18,14,0.92);border:1px solid rgba(200,184,138,0.2);
+  border-radius:8px;padding:10px 14px;height:100px;position:relative;overflow:hidden;
+}
+#control-panel{
+  flex:1;min-width:200px;background:rgba(20,18,14,0.92);border:1px solid rgba(200,184,138,0.2);
+  border-radius:8px;padding:10px 14px;height:100px;
+}
+#status-label{font-size:13px;color:#8b7d5e;margin-bottom:4px}
+#status-text{font-size:15px;color:#e8dcc8;line-height:1.5;min-height:22px}
+#status-text .cursor{display:inline-block;width:2px;height:16px;background:#e8dcc8;animation:blink .8s step-end infinite;margin-left:2px;vertical-align:middle}
+@keyframes blink{50%{opacity:0}}
+#state-badge{
+  display:inline-block;padding:2px 10px;border-radius:4px;font-size:12px;
+  background:rgba(200,184,138,0.15);color:#c8b88a;margin-bottom:6px;
+}
+#control-buttons{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+#control-buttons button{
+  padding:6px 14px;border:1px solid rgba(200,184,138,0.3);border-radius:4px;
+  background:rgba(200,184,138,0.08);color:#c8b88a;font-size:12px;cursor:pointer;
+  transition:all .2s;font-family:inherit;
+}
+#control-buttons button:hover{background:rgba(200,184,138,0.2);border-color:#c8b88a}
+#control-buttons button.active{background:rgba(200,184,138,0.25);border-color:#d4af37;color:#d4af37}
+#cultivator-level{font-size:11px;color:#6b5d3e;margin-top:4px}
+</style>
+</head>
+<body>
+
+<div id="game-container"></div>
+<div id="bottom-panels">
+  <div id="status-panel">
+    <div id="state-badge">闭关中</div>
+    <div id="status-label">当前状态</div>
+    <div id="status-text"><span class="cursor"></span></div>
+    <div id="cultivator-level">筑基期 · 灵力 1289/9999</div>
+  </div>
+  <div id="control-panel">
+    <div style="font-size:12px;color:#8b7d5e;margin-bottom:4px">指令</div>
+    <div id="control-buttons">
+      <button data-state="meditating">打坐</button>
+      <button data-state="alchemy">炼丹</button>
+      <button data-state="studying">悟道</button>
+      <button data-state="training">演武</button>
+      <button data-state="resting">休憩</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==============================
+// 修炼洞府 · Cultivation Dojo
+// 移植自 Star-Office-UI walking mechanics
+// ==============================
+
+// ---- Layout: 洞府五域 ----
+const LAYOUT = {
+  // 打坐台 (Meditation Platform)
+  meditation: { x: 460, y: 340, label: '打坐台' },
+  // 炼丹炉 (Alchemy Furnace)
+  alchemy:     { x: 780, y: 420, label: '炼丹炉' },
+  // 藏书阁 (Library)
+  studying:    { x: 640, y: 240, label: '藏书阁' },
+  // 演武场 (Training Grounds)
+  training:    { x: 350, y: 480, label: '演武场' },
+  // 灵泉 (Spirit Spring / Rest)
+  resting:     { x: 900, y: 300, label: '灵泉' },
+};
+
+const STATES = {
+  idle:       { name: '待命中',   area: 'resting' },
+  meditating: { name: '打坐修炼', area: 'meditation' },
+  alchemy:    { name: '炼丹制药', area: 'alchemy' },
+  studying:   { name: '悟道参玄', area: 'studying' },
+  training:   { name: '演武练功', area: 'training' },
+  resting:    { name: '灵泉休憩', area: 'resting' },
+};
+
+const BUBBLE_TEXTS = {
+  idle:       ['丹田温热，气息渐沉','万物皆为道','先调息，再出手'],
+  meditating: ['引气入体，周天运转','心神合一，道法自然','灵气汇聚于丹田'],
+  alchemy:    ['炉火正旺，药香四溢','控火候如控心念','丹成九转，金光隐现'],
+  studying:   ['翻看古籍，智慧渐生','一字一句皆天机','悟道不在多，在于透'],
+  training:   ['剑意纵横，气贯长虹','招式千遍，其义自见','以战养道'],
+  resting:    ['灵泉洗髓，身心通透','闭目养神，蓄势待发','天地灵气随呼吸流转'],
+};
+
+// ---- Phaser场景 ----
+let cultivator, nameText;
+let currentState = 'idle';
+let pendingState = null;
+let waypoints = [];
+// 移动参数（移植自 Star-Office-UI）
+const MOVE_SPEED = 1.4;
+let targetX = LAYOUT.resting.x;
+let targetY = LAYOUT.resting.y;
+
+let typewriterText = '';
+let typewriterTarget = '';
+let typewriterIndex = 0;
+
+const statusTextEl = document.getElementById('status-text');
+const stateBadgeEl = document.getElementById('state-badge');
+const stateLabelEl = document.getElementById('status-label');
+
+// ---- 场景类 ----
+class CultivationScene extends Phaser.Scene {
+  constructor() {
+    super({ key: 'CultivationScene' });
+  }
+
+  preload() {
+    // 无需外部资产，全部程序化绘制
+  }
+
+  create() {
+    const W = 1280, H = 720;
+
+    // --- 背景 ---
+    const bg = this.add.graphics();
+    // 洞府底色
+    bg.fillStyle(0x1a1814, 1);
+    bg.fillRect(0, 0, W, H);
+    // 地面纹理
+    bg.fillStyle(0x26231c, 1);
+    for (let y = 520; y < H; y += 8) {
+      bg.fillRect(0, y, W, 2);
+    }
+    bg.fillStyle(0x2a271f, 0.5);
+    bg.fillRect(0, 535, W, H - 535);
+
+    // --- 装饰石柱 ---
+    const pillarG = this.add.graphics();
+    const drawPillar = (x, y) => {
+      pillarG.fillStyle(0x3d3528, 1);
+      pillarG.fillRect(x, y, 28, 200);
+      pillarG.fillStyle(0x4a4030, 1);
+      pillarG.fillRect(x - 4, y - 6, 36, 12);
+      pillarG.fillRect(x - 4, y + 194, 36, 12);
+      pillarG.lineStyle(1, 0x5a4f3a, 0.3);
+      pillarG.strokeRect(x, y, 28, 200);
+    };
+    drawPillar(60, 340);
+    drawPillar(1192, 340);
+
+    // --- 绘制各区域 ---
+    this.drawArea('meditation', LAYOUT.meditation.x, LAYOUT.meditation.y, 0x4a6b8a, '⛩');
+    this.drawArea('alchemy', LAYOUT.alchemy.x, LAYOUT.alchemy.y, 0x8a4a3a, '🔥');
+    this.drawArea('studying', LAYOUT.studying.x, LAYOUT.studying.y, 0x5a7a5a, '📜');
+    this.drawArea('training', LAYOUT.training.x, LAYOUT.training.y, 0x6a5a3a, '⚔');
+    this.drawArea('resting', LAYOUT.resting.x, LAYOUT.resting.y, 0x3a6a7a, '💧');
+
+    // --- 绘制路径线（连接各域，风格化） ---
+    const pathG = this.add.graphics();
+    pathG.lineStyle(1, 0x5a4f3a, 0.15);
+    const pts = Object.values(LAYOUT);
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i + 1; j < pts.length; j++) {
+        pathG.lineBetween(pts[i].x, pts[i].y, pts[j].x, pts[j].y);
+      }
+    }
+
+    // --- 灵气粒子(装饰) ---
+    for (let i = 0; i < 16; i++) {
+      const px = Phaser.Math.Between(80, 1200);
+      const py = Phaser.Math.Between(80, 600);
+      const particle = this.add.circle(px, py, Phaser.Math.Between(1, 3), 0xaabb88, 0.3 + Math.random() * 0.3);
+      this.tweens.add({
+        targets: particle,
+        y: py - Phaser.Math.Between(20, 60),
+        alpha: 0,
+        duration: Phaser.Math.Between(2000, 4000),
+        repeat: -1,
+        delay: Phaser.Math.Between(0, 3000),
+        onRepeat: () => {
+          particle.x = Phaser.Math.Between(80, 1200);
+          particle.y = Phaser.Math.Between(80, 600);
+          particle.alpha = 0.3 + Math.random() * 0.3;
+        }
+      });
+    }
+
+    // --- 修炼者( cultivator ) ---
+    cultivator = this.add.container(LAYOUT.resting.x, LAYOUT.resting.y);
+    // 身体（道袍简化）
+    const body = this.add.ellipse(0, 0, 20, 26, 0xd4c8a8);
+    const head = this.add.circle(0, -18, 8, 0xe8dcc8);
+    const hair = this.add.circle(0, -22, 7, 0x2a2a2a);
+    // 发簪
+    const pin = this.add.rectangle(6, -24, 8, 2, 0x8a7a5a);
+    const pinDot = this.add.circle(10, -24, 2, 0xd4af37);
+    cultivator.add([body, head, hair, pin, pinDot]);
+    cultivator.setSize(20, 26);
+    cultivator.setDepth(10);
+
+    // --- 名称 ---
+    nameText = this.add.text(LAYOUT.resting.x, LAYOUT.resting.y - 36, '李长寿', {
+      fontSize: '11px', color: '#c8b88a', fontFamily: 'inherit'
+    }).setOrigin(0.5).setDepth(10);
+
+    // --- 洞府题字 ---
+    this.add.text(640, 30, '银月洞府', {
+      fontSize: '22px', color: '#c8b88a', fontFamily: 'inherit'
+    }).setOrigin(0.5).setAlpha(0.6);
+    this.add.text(640, 56, '—— 修炼者 · 李长寿 ——', {
+      fontSize: '11px', color: '#8b7d5e', fontFamily: 'inherit'
+    }).setOrigin(0.5).setAlpha(0.4);
+
+    // --- 初始化状态显示 ---
+    this.updateUI('idle');
+
+    // --- 按钮绑定 ---
+    document.querySelectorAll('#control-buttons button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const state = btn.dataset.state;
+        this.requestState(state);
+      });
+    });
+  }
+
+  drawArea(key, cx, cy, color, icon) {
+    const g = this.add.graphics();
+    const w = 120, h = 100;
+
+    // 底座
+    g.fillStyle(0x2a271f, 0.6);
+    g.fillRoundedRect(cx - w/2, cy - h/2, w, h, 8);
+    g.lineStyle(1, color, 0.4);
+    g.strokeRoundedRect(cx - w/2, cy - h/2, w, h, 8);
+
+    // 区域图标（用 emoji 近似）
+    this.add.text(cx, cy - 12, icon, {
+      fontSize: '26px'
+    }).setOrigin(0.5).setAlpha(0.7);
+
+    // 标签
+    this.add.text(cx, cy + 20, LAYOUT[key].label, {
+      fontSize: '10px', color: '#8b7d5e', fontFamily: 'inherit'
+    }).setOrigin(0.5).setAlpha(0.7);
+  }
+
+  requestState(state) {
+    if (state === currentState) return;
+    const info = STATES[state];
+    if (!info) return;
+
+    const area = LAYOUT[info.area];
+    if (!area) return;
+
+    // 高亮按钮
+    document.querySelectorAll('#control-buttons button').forEach(b => {
+      b.classList.toggle('active', b.dataset.state === state);
+    });
+
+    // 构建路径：规划经过中间点的路径（Star-Office-UI waypoints 机制）
+    waypoints = [];
+    const from = LAYOUT[STATES[currentState]?.area] || LAYOUT.resting;
+    // 如果垂直或水平间距较大，增加中间点以获得更自然的路径
+    const dx = area.x - from.x;
+    const dy = area.y - from.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist > 200) {
+      // 经过中心点附近
+      waypoints.push({ x: 640, y: (from.y + area.y) / 2 + Phaser.Math.Between(-30, 30) });
+    }
+
+    targetX = area.x;
+    targetY = area.y;
+    pendingState = state;
+
+    // 状态栏更新
+    this.updateUI(state, true);
+  }
+
+  updateUI(state, isPending = false) {
+    const info = STATES[state] || STATES.idle;
+    const prefix = isPending ? '前往·' : '';
+    stateBadgeEl.textContent = prefix + info.name;
+    stateLabelEl.textContent = isPending ? '移动中...' : '当前状态';
+
+    // 触发打字机
+    const texts = BUBBLE_TEXTS[state] || BUBBLE_TEXTS.idle;
+    const msg = texts[Math.floor(Math.random() * texts.length)];
+    typewriterTarget = '『' + msg + '』';
+    typewriterText = '';
+    typewriterIndex = 0;
+  }
+
+  update(time, delta) {
+    this.moveCultivator(time);
+    this.updateTypewriter();
+  }
+
+  // ---- 核心移动逻辑（移植自 Star-Office-UI game.js moveStar） ----
+  moveCultivator(time) {
+    if (!cultivator) return;
+
+    const dx = targetX - cultivator.x;
+    const dy = targetY - cultivator.y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    if (dist <= 3) {
+      // 到达当前目标
+      if (waypoints.length > 0) {
+        // 仍有中间点：继续前往下一站
+        const next = waypoints.shift();
+        targetX = next.x;
+        targetY = next.y;
+      } else {
+        // 最终到达：提交状态
+        if (pendingState) {
+          currentState = pendingState;
+          pendingState = null;
+          this.updateUI(currentState, false);
+        }
+        // 静止微动（呼吸感）
+        cultivator.y += Math.sin(time / 1200) * 0.3;
+        cultivator.x += Math.cos(time / 1500) * 0.2;
+        nameText.setPosition(cultivator.x, cultivator.y - 36);
+      }
+      return;
+    }
+
+    // ---- 移动插值（Star-Office-UI 核心算法） ----
+    const speed = MOVE_SPEED;
+    const moveX = (dx / dist) * speed;
+    const moveY = (dy / dist) * speed;
+    cultivator.x += moveX;
+    cultivator.y += moveY;
+
+    // ---- 行走抖动（wobble，移植自 Star-Office-UI） ----
+    const wobble = Math.sin(time / 200) * 0.8;
+    cultivator.y += wobble;
+
+    // 名称跟随
+    nameText.setPosition(cultivator.x, cultivator.y - 36);
+  }
+
+  // ---- 打字机效果（移植自 Star-Office-UI） ----
+  updateTypewriter() {
+    if (typewriterIndex < typewriterTarget.length) {
+      typewriterIndex += 0.5; // 每帧半个字，慢速
+      typewriterText = typewriterTarget.substring(0, Math.floor(typewriterIndex));
+      statusTextEl.innerHTML = typewriterText + '<span class="cursor"></span>';
+    } else {
+      statusTextEl.innerHTML = typewriterTarget + '<span class="cursor"></span>';
+    }
+  }
+}
+
+// ---- 初始化 Phaser ----
+const config = {
+  type: Phaser.AUTO,
+  width: 1280,
+  height: 720,
+  parent: 'game-container',
+  pixelArt: true,
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 1280,
+    height: 720,
+  },
+  scene: CultivationScene,
+  backgroundColor: '#0a0a0a',
+};
+
+const game = new Phaser.Game(config);
+
+// ---- 初始触发状态 ----
+setTimeout(() => {
+  const scene = game.scene.getScene('CultivationScene');
+  if (scene) scene.requestState('meditating');
+}, 1000);
+</script>
+</body>
+</html>

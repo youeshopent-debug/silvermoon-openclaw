@@ -11,7 +11,7 @@
   },
   "reflectionLog": [
     {
-      "at": "2026-05-08T11:51:35.282Z",
+      "at": "2026-05-20T08:04:38.556Z",
       "context": "",
       "stats": {
         "totalConversations": 0,
@@ -27,7 +27,7 @@
       "insight": null
     },
     {
-      "at": "2026-05-08T11:53:35.304Z",
+      "at": "2026-05-20T08:06:38.573Z",
       "context": "",
       "stats": {
         "totalConversations": 0,
@@ -43,7 +43,7 @@
       "insight": null
     },
     {
-      "at": "2026-05-08T11:55:35.322Z",
+      "at": "2026-05-20T08:08:38.579Z",
       "context": "",
       "stats": {
         "totalConversations": 0,
@@ -59,7 +59,7 @@
       "insight": null
     },
     {
-      "at": "2026-05-08T11:57:35.330Z",
+      "at": "2026-05-20T08:10:38.580Z",
       "context": "",
       "stats": {
         "totalConversations": 0,
@@ -75,55 +75,7 @@
       "insight": null
     },
     {
-      "at": "2026-05-08T11:59:35.343Z",
-      "context": "",
-      "stats": {
-        "totalConversations": 0,
-        "totalMessages": 0,
-        "totalTokens": 0,
-        "totalErrors": 0,
-        "happyMoments": 0,
-        "sadMoments": 0,
-        "helpfulReplies": 0,
-        "failedReplies": 0
-      },
-      "mood": "neutral",
-      "insight": null
-    },
-    {
-      "at": "2026-05-08T12:01:35.349Z",
-      "context": "",
-      "stats": {
-        "totalConversations": 0,
-        "totalMessages": 0,
-        "totalTokens": 0,
-        "totalErrors": 0,
-        "happyMoments": 0,
-        "sadMoments": 0,
-        "helpfulReplies": 0,
-        "failedReplies": 0
-      },
-      "mood": "neutral",
-      "insight": null
-    },
-    {
-      "at": "2026-05-08T12:03:35.361Z",
-      "context": "",
-      "stats": {
-        "totalConversations": 0,
-        "totalMessages": 0,
-        "totalTokens": 0,
-        "totalErrors": 0,
-        "happyMoments": 0,
-        "sadMoments": 0,
-        "helpfulReplies": 0,
-        "failedReplies": 0
-      },
-      "mood": "neutral",
-      "insight": null
-    },
-    {
-      "at": "2026-05-08T12:05:35.378Z",
+      "at": "2026-05-20T08:12:38.597Z",
       "context": "",
       "stats": {
         "totalConversations": 0,
@@ -147,5 +99,5 @@
     "milestones": [],
     "birthDate": null
   },
-  "savedAt": "2026-05-08T12:05:35.378Z"
+  "savedAt": "2026-05-20T08:12:38.597Z"
 }

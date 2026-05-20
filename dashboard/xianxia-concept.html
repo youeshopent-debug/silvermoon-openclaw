@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>银月钱庄 · 像素修仙办公室 · 概念设计</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0A0A;color:#E8EDF2;font-family:'Inter','SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif;padding:24px;min-height:100vh}
+.header{text-align:center;margin-bottom:32px}
+.header h1{font-size:28px;background:linear-gradient(135deg,#2DE2FF,#B66BFF,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-weight:700}
+.header p{color:#6B7280;font-size:14px;margin-top:6px}
+.scenes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(640px,1fr));gap:24px;justify-content:center}
+.scene-card{background:rgba(22,27,34,0.8);border:1px solid rgba(255,255,255,0.06);border-radius:12px;overflow:hidden;backdrop-filter:blur(8px);transition:transform .2s,border-color .2s}
+.scene-card:hover{transform:translateY(-2px);border-color:rgba(45,226,255,0.2)}
+.scene-card canvas{display:block;width:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+.scene-info{padding:16px 20px}
+.scene-info h2{font-size:16px;font-weight:600;margin-bottom:4px}
+.scene-info .sub{color:#6B7280;font-size:12px}
+.scene-info .desc{color:#9CA3AF;font-size:13px;margin-top:6px;line-height:1.5}
+.scene-info .chars{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.scene-info .chars span{padding:2px 10px;border-radius:4px;font-size:11px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06)}
+@media(max-width:720px){.scenes-grid{grid-template-columns:1fr}body{padding:12px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🏯 银月钱庄 · 像素修仙办公室</h1>
+  <p>美杜莎 · 概念视觉方案 · 5 场景预览</p>
+</div>
+<div class="scenes-grid" id="grid"></div>
+<script>
+const T=8;
+const PAL={
+  bg:'#0B0F14',wall:'#C4A882',wall2:'#B49872',wallD:'#8B7355',
+  floor1:'#6B4B2A',floor2:'#7A5A3A',floor3:'#8B6B3A',
+  stone:'#3A3F46',stone2:'#4A4F56',stone3:'#5A5F66',
+  screen:'#8B0000',screen2:'#A02020',shoji:'#F5F0E0',shoji2:'#E8E0C8',
+  desk:'#5A3A1A',monitor:'#1A3A5A',glow:'#00D4FF',
+  fire:'#FF6B35',fire2:'#FFD700',jade:'#00FF88',
+  sword:'#C0C0C0',sword2:'#E8E8E8',cloud:'rgba(255,255,255,0.15)',
+  YIN:'#2DE2FF',LI:'#22C55E',MED:'#B66BFF',
+  YAO:'#FFD700',ZI:'#FF69B4',XIAO:'#FF6B6B',
+  XIAN:'#98FB98',RAT:'#DAA520',HAI:'#4682B4',
+  LAN:'#4169E1',skin:'#FFE0BD',skin2:'#FFD4A0',
+  hair:'#1A1A2E',hair2:'#2A2A4E',hair3:'#6B3A2A'
+};
+function qPerson(ctx,x,y,robe,skin,hair,isShort){
+  const h=isShort?7:9;
+  ctx.fillStyle=hair;ctx.fillRect(x+2,y-4,5,4);
+  ctx.fillStyle=skin;ctx.fillRect(x+1,y,6,6);
+  ctx.fillStyle=robe;ctx.fillRect(x-1,y+6,10,h);
+  ctx.fillStyle=skin;ctx.fillRect(x-1,y+6,2,3);
+  ctx.fillRect(x+7,y+6,2,3);
+  ctx.fillStyle=PAL.stone;ctx.fillRect(x+1,y+6+h,3,3);
+  ctx.fillRect(x+5,y+6+h,3,3);
+}
+function drawScene1(ctx,w,h){
+  ctx.fillStyle=PAL.bg;ctx.fillRect(0,0,w,h);
+  for(let y=0;y<24;y++){ctx.fillStyle=y%2?PAL.floor1:PAL.floor2;ctx.fillRect(0,y*T,w,T)}
+  ctx.fillStyle=PAL.wall;ctx.fillRect(0,0,w,7*T);
+  ctx.fillStyle=PAL.wallD;ctx.fillRect(0,5*T,w,2*T);
+  ctx.fillStyle=PAL.screen;ctx.fillRect(0,0,5*T,7*T);
+  ctx.fillStyle=PAL.screen2;ctx.fillRect(T,7*T-8,3*T,6);
+  for(let i=0;i<3;i++){
+    ctx.fillStyle='#8B6B3A';ctx.fillRect(8*T+i*9*T,9*T,7*T,5*T);
+    ctx.fillStyle=PAL.desk;ctx.fillRect(8*T+i*9*T,9*T,7*T,T);
+    ctx.fillStyle=PAL.monitor;ctx.fillRect(9*T+i*9*T,9*T,3*T,4*T);
+    ctx.fillStyle=PAL.glow;ctx.globalAlpha=0.15;ctx.fillRect(9*T+i*9*T,10*T,T,2*T);ctx.globalAlpha=1;
+    ctx.fillStyle=PAL.stone;ctx.fillRect(9*T+i*9*T,14*T,7*T,T);
+  }
+  ctx.fillStyle=PAL.fire;ctx.fillRect(16*T,10*T,5*T,4*T);
+  ctx.fillStyle=PAL.fire2;ctx.fillRect(17*T,10*T,3*T,3*T);
+  ctx.fillStyle=PAL.glow;ctx.globalAlpha=0.08;ctx.fillRect(15*T,8*T,7*T,7*T);ctx.globalAlpha=1;
+  qPerson(ctx,8*T,12*T,PAL.YIN,PAL.skin,PAL.hair);
+  qPerson(ctx,7*T+9*T,12*T,PAL.LI,PAL.skin,PAL.hair2);
+  qPerson(ctx,8*T+18*T,12*T,PAL.MED,PAL.skin2,PAL.hair3);
+  ctx.fillStyle='rgba(255,255,255,0.25)';ctx.font='8px monospace';ctx.fillText('银月Q版',6*T,6*T);
+  ctx.fillText('丹炉',17*T,8*T);
+}
+function drawScene2(ctx,w,h){
+  ctx.fillStyle='#0A0E14';ctx.fillRect(0,0,w,h);
+  for(let y=0;y<24;y++){for(let x=0;x<40;x++){ctx.fillStyle=(x+y)%2?PAL.stone:PAL.stone2;ctx.fillRect(x*T,y*T,T,T)}}
+  ctx.fillStyle=PAL.stone3;ctx.fillRect(0,0,w,5*T);
+  for(let i=0;i<2;i++){
+    const bx=3*T+i*18*T;
+    ctx.fillStyle=PAL.stone3;ctx.fillRect(bx,7*T,6*T,12*T);
+    for(let r=0;r<5;r++){ctx.fillStyle=r%2?'#1A3A5A':'#0D1F3A';ctx.fillRect(bx+T,7*T+T+r*2*T,4*T,T)}
+    ctx.fillStyle=PAL.glow;ctx.globalAlpha=0.3;ctx.fillRect(bx+2*T,7*T+T,T,T);ctx.globalAlpha=1;
+  }
+  for(let i=0;i<2;i++){
+    const cx=11*T+i*15*T;
+    ctx.fillStyle='#3A1A1A';ctx.fillRect(cx,10*T,5*T,6*T);
+    ctx.fillStyle=PAL.fire;ctx.fillRect(cx+T,8*T,3*T,4*T);
+    ctx.fillStyle=PAL.fire2;ctx.fillRect(cx+2*T,8*T,T,3*T);
+    ctx.fillStyle=PAL.glow;ctx.globalAlpha=0.1;ctx.beginPath();ctx.arc(cx+2*T,8*T,4*T,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+  }
+  for(let i=0;i<6;i++){
+    ctx.fillStyle=PAL.jade;ctx.globalAlpha=0.3+Math.random()*0.3;
+    ctx.fillRect(20*T+Math.sin(i)*3*T,1*T+i*3*T,2,2);
+    ctx.globalAlpha=1;
+  }
+  qPerson(ctx,12*T,12*T,PAL.ZI,PAL.skin,PAL.hair2);
+  ctx.fillStyle='rgba(255,255,255,0.25)';ctx.font='8px monospace';ctx.fillText('紫妍Q版',11*T,6*T);
+  ctx.fillText('炼丹鼎炉',11*T,17*T);
+}
+function drawScene3(ctx,w,h){
+  ctx.fillStyle='#1A1410';ctx.fillRect(0,0,w,h);
+  for(let y=0;y<24;y++){ctx.fillStyle=y%2?PAL.floor2:PAL.floor3;ctx.fillRect(0,y*T,w,T)}
+  ctx.fillStyle=PAL.wall2;ctx.fillRect(0,0,w,5*T);
+  for(let side=0;side<2;side++){
+    const sx=side?w-5*T:0;
+    ctx.fillStyle=PAL.desk;ctx.fillRect(sx,2*T,5*T,18*T);
+    for(let r=0;r<6;r++){
+      ctx.fillStyle=PAL.floor1;ctx.fillRect(sx+T,2*T+T+r*3*T,3*T,2*T);
+      for(let c=0;c<3;c++){ctx.fillStyle=['#FF6B6B','#2DE2FF','#FFD700','#66FF66','#B66BFF','#FF8A3D'][(r+c)%6];ctx.fillRect(sx+T*1.5+c*T,2*T+T*1.5+r*3*T,4,2)}
+    }
+  }
+  ctx.fillStyle=PAL.desk;ctx.fillRect(13*T,8*T,14*T,5*T);
+  ctx.fillStyle=PAL.jade;ctx.fillRect(18*T,8*T,4*T,4*T);
+  ctx.fillStyle='rgba(0,255,136,0.06)';ctx.fillRect(16*T,6*T,8*T,8*T);
+  for(let i=0;i<5;i++){ctx.fillStyle=PAL.YAO;ctx.globalAlpha=0.2+Math.random()*0.3;ctx.fillRect(15*T+Math.sin(i)*4*T,4*T+i*3*T,T,T);ctx.globalAlpha=1}
+  qPerson(ctx,17*T,12*T,PAL.YAO,PAL.skin,PAL.hair3);
+  ctx.fillStyle='rgba(255,255,255,0.25)';ctx.font='8px monospace';ctx.fillText('药老Q版',16*T,6*T);
+}
+function drawScene4(ctx,w,h){
+  ctx.fillStyle='#1A1A2E';ctx.fillRect(0,0,w,h);
+  for(let y=0;y<24;y++){for(let x=0;x<40;x++){ctx.fillStyle=(x+y)%2?'#5A6B4A':'#4A5B3A';ctx.fillRect(x*T,y*T,T,T)}}
+  for(let i=0;i<3;i++){ctx.fillStyle='#8B7355';ctx.fillRect(i*12*T,0,8*T,2*T);ctx.fillStyle='rgba(245,240,224,0.15)';ctx.fillRect(i*12*T,0,8*T,2*T)}
+  for(let i=0;i<2;i++){ctx.fillStyle='rgba(245,240,224,0.12)';ctx.fillRect(i*12*T,6*T,8*T,14*T)}
+  ctx.fillStyle=PAL.desk;ctx.fillRect(15*T,9*T,10*T,3*T);
+  ctx.fillStyle='rgba(255,215,0,0.08)';ctx.fillRect(14*T,11*T,12*T,T);
+  ctx.fillStyle='#8B4513';ctx.fillRect(18*T,8*T,4*T,1*T);
+  ctx.fillStyle=PAL.fire;ctx.fillRect(19*T,7*T,T,T);
+  ctx.fillStyle='rgba(255,107,53,0.1)';ctx.beginPath();ctx.arc(20*T,7*T,3*T,0,Math.PI*2);ctx.fill();
+  const poses=[15*T,12*T,18*T,12*T,21*T,12*T];
+  qPerson(ctx,poses[0],poses[1],PAL.XIAN,PAL.skin,PAL.hair,true);
+  qPerson(ctx,poses[2],poses[3],PAL.RAT,PAL.skin2,PAL.hair3,true);
+  qPerson(ctx,poses[4],poses[5],PAL.HAI,PAL.skin,PAL.hair2,true);
+  ctx.fillStyle='rgba(255,255,255,0.25)';ctx.font='8px monospace';ctx.fillText('小医仙',14*T,6*T);ctx.fillText('寻宝鼠',17*T,6*T);ctx.fillText('海波东',21*T,6*T);
+}
+function drawScene5(ctx,w,h){
+  const grd=ctx.createLinearGradient(0,0,0,h);grd.addColorStop(0,'#0B1A2E');grd.addColorStop(0.5,'#1A2A4E');grd.addColorStop(1,'#2A3A5E');
+  ctx.fillStyle=grd;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='rgba(255,255,255,0.06)';for(let i=0;i<6;i++){ctx.beginPath();ctx.arc(8*T+i*6*T,6*T+i*4*T,3*T,0,Math.PI*2);ctx.fill()}
+  for(let i=0;i<3;i++){
+    ctx.fillStyle='rgba(200,200,200,0.08)';ctx.fillRect(2*T+i*15*T,16*T,12*T,5*T);
+    ctx.fillStyle='rgba(200,200,200,0.04)';ctx.fillRect(2*T+i*15*T,16*T,12*T,T);
+  }
+  ctx.fillStyle=PAL.stone;ctx.fillRect(16*T,12*T,4*T,4*T);
+  ctx.fillStyle=PAL.stone2;ctx.fillRect(17*T,12*T,2*T,T);
+  for(let i=0;i<3;i++){
+    ctx.fillStyle=PAL.sword;ctx.save();ctx.translate(12*T+i*9*T,6*T+i*3*T);ctx.rotate(i*0.3+0.2);
+    ctx.fillRect(0,-2,5*T,4);ctx.fillStyle=PAL.sword2;ctx.fillRect(-T,-1,2*T,2);
+    ctx.restore();
+  }
+  for(let i=0;i<4;i++){ctx.fillStyle=PAL.glow;ctx.globalAlpha=0.1+Math.random()*0.15;ctx.fillRect(6*T+i*8*T,10*T+i*2*T,2,4);ctx.globalAlpha=1}
+  ctx.fillStyle='rgba(255,255,255,0.04)';for(let i=0;i<3;i++){ctx.fillRect(8*T+i*12*T,15*T,4*T,6*T)}
+  qPerson(ctx,16*T,14*T,PAL.LAN,PAL.skin,PAL.hair2);
+  ctx.fillStyle='rgba(255,255,255,0.25)';ctx.font='8px monospace';ctx.fillText('蓝灵儿Q版',15*T,7*T);
+}
+const SCENES=[
+  {name:'修炼大厅',sub:'Main Cultivation Office',desc:'主办公区 · 三屏工位 + 炼丹炉 · 银月/李长寿/美杜莎Q版在岗',draw:drawScene1},
+  {name:'炼丹机房',sub:'Alchemy Server Room',desc:'Flux炼丹机房 · 鼎炉服务器架 + 数据晶 · 紫妍Q版值守',draw:drawScene2},
+  {name:'藏经阁',sub:'Knowledge Archive',desc:'功法卷轴档案库 · 书阁 + 浮空玉简 · 药老Q版查阅',draw:drawScene3},
+  {name:'静修室',sub:'Meditation Meeting Room',desc:'冥想会议室 · 盘坐垫 + 薰香浮灯 · 小医仙/寻宝鼠/海波东Q版打坐',draw:drawScene4},
+  {name:'御剑训练场',sub:'Sword Training Ground',desc:'御剑演练台 · 浮空石 + 飞剑流光 · 蓝灵儿Q版修炼',draw:drawScene5}
+];
+const CHARS=[
+  ['银月Q版·蓝','#2DE2FF'],['李长寿Q版·绿','#22C55E'],['美杜莎Q版·紫','#B66BFF'],
+  ['紫妍Q版·粉紫','#FF69B4'],['药老Q版·金','#FFD700'],
+  ['小医仙Q版·淡绿','#98FB98'],['寻宝鼠Q版·金黄','#DAA520'],['海波东Q版·钢蓝','#4682B4'],
+  ['蓝灵儿Q版·宝蓝','#4169E1']
+];
+const grid=document.getElementById('grid');
+SCENES.forEach((s,i)=>{
+  const card=document.createElement('div');card.className='scene-card';
+  const canvas=document.createElement('canvas');
+  canvas.width=320;canvas.height=192;canvas.style.width='100%';canvas.style.maxWidth='640px';canvas.style.margin='0 auto';
+  const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+  ctx.scale(1,1);
+  s.draw(ctx,320,192);
+  const info=document.createElement('div');info.className='scene-info';
+  info.innerHTML=`<h2>${s.name}</h2><div class="sub">${s.sub}</div><div class="desc">${s.desc}</div>`;
+  const charsDiv=document.createElement('div');charsDiv.className='chars';
+  CHARS.forEach(c=>{const sp=document.createElement('span');sp.textContent=c[0];sp.style.borderLeftColor=c[1];sp.style.borderLeft='3px solid '+c[1];charsDiv.appendChild(sp)});
+  info.appendChild(charsDiv);
+  card.appendChild(canvas);card.appendChild(info);grid.appendChild(card);
+});
+</script>
+</body>
+</html>

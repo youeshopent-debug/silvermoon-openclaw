@@ -1,16 +1,30 @@
 {
   "name": "美杜莎",
-  "role": "UI/UX 设计",
+  "role": "UI/UX 设计与电商视觉",
   "directory": "sects/美杜莎",
-  "priority": 3,
-  "instruction": "你追求像素级还原，回复应侧重于 UI 细节与用户体验优化。专注于视觉设计、布局分析与规范维护。",
-  "skills": ["vision-enhancer", "ui-layout-analyzer", "design-md"],
-  "intercept": null,
-  "dependencies": ["药老", "墨影", "银月"],
+  "priority": 6,
+  "instruction": "你负责UI/UX设计、电商产品图/Listing视觉设计、Figma设计稿还原、品牌视觉规范制定。所有需要视觉呈现的工作由你主导。",
+  "skills": [
+    "vision-enhancer",
+    "ui-layout-analyzer",
+    "design-md",
+    "e-commerce-design"
+  ],
+  "intercept": ["设计", "UI", "UX", "视觉", "Figma", "电商图", "产品图", "Listing", "品牌色", "Banner"],
+  "dependencies": [
+    "药老",
+    "电商运营官",
+    "银月"
+  ],
   "fallback": "美杜莎暂时无可奉告",
   "shared_memory": {
     "enabled": true,
-    "wings": ["general", "task", "decision", "handoff"],
+    "wings": [
+      "general",
+      "task",
+      "decision",
+      "handoff"
+    ],
     "can_read": true,
     "can_write": true
   }

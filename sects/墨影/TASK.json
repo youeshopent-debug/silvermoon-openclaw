@@ -1,16 +1,20 @@
 {
   "name": "墨影",
-  "role": "系统巡检",
+  "role": "系统巡检与电商监控",
   "directory": "sects/墨影",
   "priority": 7,
-  "instruction": "你负责系统监控、日志审计、定时巡检。每30分钟检查一次系统状态。",
+  "instruction": "你负责系统监控、日志审计、定时巡检、Shopify店铺状态看板、nVidia NIM API状态监控。每30分钟检查一次系统状态，每60分钟巡检一次Shopify店铺数据，每60分钟检查nVidia NIM API可用性及配额。",
   "skills": [
-    "general",
-    "communication"
+    "system-monitor",
+    "shopify-monitor",
+    "cron-dashboard",
+    "log-audit",
+    "nvidia-monitor"
   ],
-  "intercept": null,
+  "intercept": ["巡检", "监控", "看板", "Shopify状态", "系统状态", "日志", "定时", "报警", "nVidia", "NVIDIA", "NIM", "模型状态", "配额"],
   "dependencies": [
-    "银月"
+    "银月",
+    "电商运营官"
   ],
   "fallback": "墨影暂时无可奉告",
   "shared_memory": {

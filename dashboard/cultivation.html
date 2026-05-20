@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>银月钱庄 · 修炼场</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Inter','SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif;
+  background:#0A0A0A;color:#E8EDF2;overflow:hidden;
+  display:flex;flex-direction:column;
+}
+
+/* ===== BACKGROUND AMBIENT ===== */
+#bg-ambient{
+  position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(0,212,255,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(204,68,255,0.03) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(245,158,11,0.02) 0%, transparent 50%);
+}
+#bg-ambient::before{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,0.015) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+#bg-ambient::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent, rgba(0,212,255,0.15), rgba(204,68,255,0.15), transparent);
+}
+/* Floating particles */
+.bg-particle{
+  position:absolute;border-radius:50%;pointer-events:none;
+  animation:particleDrift 20s ease-in-out infinite;
+}
+@keyframes particleDrift{
+  0%{transform:translate(0,0);opacity:0}
+  10%{opacity:0.5}
+  90%{opacity:0.3}
+  100%{transform:translate(100px,-80px);opacity:0}
+}
+
+/* ===== APP CONTAINER ===== */
+#app{
+  position:relative;z-index:1;flex:1;display:flex;flex-direction:column;
+  min-height:0;padding:20px 28px 16px;gap:14px;max-width:100%;
+}
+
+/* ===== HEADER ===== */
+#header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 4px;flex-shrink:0;min-height:36px;
+}
+#header-l{
+  display:flex;align-items:center;gap:14px;
+}
+#header-l h1{
+  font-size:17px;font-weight:700;letter-spacing:1px;
+  background:linear-gradient(135deg,#E8EDF2 0%,#A0B0C8 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+#header-l .badge{
+  font-size:9px;padding:2px 10px;border-radius:999px;
+  background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.2);
+  color:rgba(0,212,255,0.8);font-weight:500;letter-spacing:0.5px;
+}
+#header-r{
+  display:flex;align-items:center;gap:16px;font-size:12px;color:rgba(232,237,242,0.5);
+}
+#header-r .online-dot{width:6px;height:6px;border-radius:50%;background:#22C55E;display:inline-block;margin-right:6px;box-shadow:0 0 8px rgba(34,197,94,0.4);animation:pulseDot 2s ease-in-out infinite}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:0.4}}
+#header-clock{font-variant-numeric:tabular-nums;font-family:'JetBrains Mono','SF Mono',monospace;font-size:11px;color:rgba(232,237,242,0.3)}
+
+/* ===== FILTER BAR ===== */
+#filter-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;padding:0 4px;
+}
+#filter-btns{display:flex;gap:6px}
+.filter-btn{
+  padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.08);
+  background:transparent;color:rgba(232,237,242,0.45);font-size:11px;
+  cursor:pointer;transition:all 0.2s;font-family:inherit;font-weight:500;
+  white-space:nowrap;
+}
+.filter-btn:hover{border-color:rgba(255,255,255,0.2);color:rgba(232,237,242,0.7);background:rgba(255,255,255,0.03)}
+.filter-btn.active{
+  border-color:#00D4FF;background:rgba(0,212,255,0.1);color:#00D4FF;
+  box-shadow:0 0 16px rgba(0,212,255,0.08);
+}
+.filter-btn .count{
+  display:inline-block;font-size:9px;padding:0 6px;border-radius:99px;
+  background:rgba(255,255,255,0.06);color:rgba(232,237,242,0.3);
+  margin-left:5px;font-weight:400;
+}
+.filter-btn.active .count{background:rgba(0,212,255,0.15);color:rgba(0,212,255,0.6)}
+#filter-search{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.03);transition:all 0.2s;
+}
+#filter-search:focus-within{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.04);box-shadow:0 0 0 2px rgba(0,212,255,0.06)}
+#filter-search svg{width:14px;height:14px;fill:none;stroke:rgba(232,237,242,0.2);flex-shrink:0}
+#filter-search input{
+  border:none;background:transparent;outline:none;color:#E8EDF2;
+  font-size:11px;width:140px;font-family:inherit;
+}
+#filter-search input::placeholder{color:rgba(232,237,242,0.2)}
+#filter-clear{
+  display:none;background:none;border:none;color:rgba(232,237,242,0.2);
+  cursor:pointer;font-size:12px;padding:0 2px;
+}
+#filter-clear.show{display:block}
+#filter-clear:hover{color:rgba(232,237,242,0.5)}
+
+/* ===== METRIC CARDS ===== */
+#metrics{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;flex-shrink:0;
+}
+.metric-card{
+  position:relative;border-radius:12px;padding:16px 20px;
+  background:rgba(22,27,34,0.7);
+  border:1px solid rgba(255,255,255,0.04);
+  transition:all 0.3s;overflow:hidden;
+}
+.metric-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent, rgba(255,255,255,0.08), transparent);
+}
+.metric-card:hover{
+  border-color:rgba(255,255,255,0.1);background:rgba(22,27,34,0.85);
+  transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.metric-label{
+  font-size:11px;color:rgba(232,237,242,0.4);font-weight:500;
+  display:flex;align-items:center;gap:6px;margin-bottom:6px;
+}
+.metric-label .icon{width:14px;height:14px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:10px}
+.metric-value{
+  font-size:28px;font-weight:700;letter-spacing:-0.5px;
+  font-family:'JetBrains Mono','SF Mono',monospace;
+}
+.metric-value.green{color:#22C55E}
+.metric-value.gold{color:#F59E0B}
+.metric-value.blue{color:#00D4FF}
+.metric-sub{
+  font-size:10px;color:rgba(232,237,242,0.2);margin-top:2px;
+  font-variant-numeric:tabular-nums;
+}
+.metric-bar{
+  margin-top:8px;height:2px;border-radius:2px;background:rgba(255,255,255,0.04);overflow:hidden;
+}
+.metric-bar-fill{
+  height:100%;border-radius:2px;transition:width 0.8s ease;
+}
+.metric-bar-fill.green{background:linear-gradient(90deg,#22C55E, rgba(34,197,94,0.3))}
+.metric-bar-fill.gold{background:linear-gradient(90deg,#F59E0B, rgba(245,158,11,0.3))}
+.metric-bar-fill.blue{background:linear-gradient(90deg,#00D4FF, rgba(0,212,255,0.3))}
+
+/* ===== MAIN CONTENT ===== */
+#main{
+  display:flex;gap:12px;flex:1;min-height:0;
+}
+#main-l{flex:1;display:flex;flex-direction:column;gap:12px;min-width:0;overflow-y:auto;padding-right:4px}
+#main-l::-webkit-scrollbar{width:3px}
+#main-l::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:2px}
+#main-l::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.1)}
+#main-r{
+  width:280px;flex-shrink:0;border-radius:12px;
+  background:rgba(13,17,23,0.6);border:1px solid rgba(255,255,255,0.04);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+
+/* ===== GROUP SECTION ===== */
+.group-section{
+  border-radius:12px;
+  background:rgba(13,17,23,0.4);border:1px solid rgba(255,255,255,0.03);
+  overflow:hidden;transition:all 0.3s;
+}
+.group-section.oc{border-left:2px solid rgba(0,212,255,0.25);background:rgba(0,212,255,0.02)}
+.group-section.tr{border-left:2px solid rgba(245,158,11,0.25);background:rgba(245,158,11,0.02)}
+.group-section.cc{border-left:2px solid rgba(204,68,255,0.25);background:rgba(204,68,255,0.02)}
+.group-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;cursor:pointer;user-select:none;
+  transition:background 0.2s;
+}
+.group-hdr:hover{background:rgba(255,255,255,0.02)}
+.group-hdr-l{display:flex;align-items:center;gap:8px}
+.group-icon{font-size:13px;line-height:1}
+.group-name{font-size:12px;font-weight:600;letter-spacing:0.5px}
+.group-name.oc-c{color:#00D4FF}
+.group-name.tr-c{color:#F59E0B}
+.group-name.cc-c{color:#CC44FF}
+.group-count{font-size:10px;color:rgba(232,237,242,0.25);font-family:'JetBrains Mono','SF Mono',monospace}
+.group-toggle{font-size:10px;color:rgba(232,237,242,0.15);transition:transform 0.2s}
+.group-section.collapsed .group-toggle{transform:rotate(-90deg)}
+.group-section.collapsed .agent-grid{display:none}
+.agent-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));
+  gap:8px;padding:6px 12px 12px;
+}
+
+/* ===== AGENT CARD ===== */
+.agent-card{
+  position:relative;border-radius:10px;padding:12px;
+  background:rgba(22,27,34,0.7);border:1px solid rgba(255,255,255,0.04);
+  cursor:pointer;transition:all 0.25s cubic-bezier(0.16,1,0.3,1);
+  animation:cardAppear 0.35s ease-out both;
+  overflow:hidden;
+}
+.agent-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);
+}
+.agent-card::after{
+  content:'';position:absolute;inset:0;border-radius:10px;
+  opacity:0;transition:opacity 0.3s;pointer-events:none;
+}
+.agent-card.oc-card::after{background:radial-gradient(ellipse at 50% 0%,rgba(0,212,255,0.06),transparent 70%)}
+.agent-card.tr-card::after{background:radial-gradient(ellipse at 50% 0%,rgba(245,158,11,0.06),transparent 70%)}
+.agent-card.cc-card::after{background:radial-gradient(ellipse at 50% 0%,rgba(204,68,255,0.06),transparent 70%)}
+.agent-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  border-color:rgba(255,255,255,0.1);
+}
+.agent-card:hover::after{opacity:1}
+.agent-card:active{transform:scale(0.98)}
+.agent-card.hidden{display:none}
+
+@keyframes cardAppear{
+  0%{opacity:0;transform:translateY(8px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+
+.card-row1{
+  display:flex;align-items:center;gap:6px;margin-bottom:4px;
+}
+.status-dot{
+  width:7px;height:7px;border-radius:50%;flex-shrink:0;
+  transition:all 0.3s;
+}
+.status-dot.online{background:#22C55E;box-shadow:0 0 6px rgba(34,197,94,0.4)}
+.status-dot.busy{background:#F59E0B;box-shadow:0 0 6px rgba(245,158,11,0.4)}
+.status-dot.error{background:#EF4444;box-shadow:0 0 6px rgba(239,68,68,0.4)}
+.status-dot.offline{background:#52525B}
+.faction-badge{
+  font-size:8px;font-weight:700;padding:1px 7px;border-radius:99px;
+  letter-spacing:0.5px;
+}
+.faction-badge.oc{color:#00D4FF;background:rgba(0,212,255,0.12)}
+.faction-badge.tr{color:#F59E0B;background:rgba(245,158,11,0.12)}
+.faction-badge.cc{color:#CC44FF;background:rgba(204,68,255,0.12)}
+.card-name{
+  font-size:12px;font-weight:600;color:#E8EDF2;flex:1;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.card-role{
+  font-size:10px;color:rgba(232,237,242,0.3);margin-bottom:4px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-top:6px;border-top:1px solid rgba(255,255,255,0.04);
+}
+.card-heart{
+  font-size:9px;color:rgba(232,237,242,0.25);font-family:'JetBrains Mono','SF Mono',monospace;
+}
+.card-heart span{color:#EF4444;margin-right:3px}
+.card-time{
+  font-size:9px;color:rgba(232,237,242,0.15);font-family:'JetBrains Mono','SF Mono',monospace;
+}
+
+/* ===== ACTIVITY LOG ===== */
+#log-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px 8px;flex-shrink:0;
+}
+#log-hdr span{font-size:11px;font-weight:600;color:rgba(232,237,242,0.5)}
+#log-hdr .count{font-size:9px;color:rgba(232,237,242,0.15);font-family:'JetBrains Mono',monospace;font-weight:400}
+#log-body{flex:1;overflow-y:auto;padding:0 12px 8px}
+#log-body::-webkit-scrollbar{width:2px}
+#log-body::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.05);border-radius:2px}
+.log-entry{
+  display:flex;gap:8px;padding:6px 8px;border-radius:6px;
+  font-size:10px;color:rgba(232,237,242,0.35);
+  animation:logSlide 0.25s ease-out;
+  border-bottom:1px solid rgba(255,255,255,0.02);
+  transition:background 0.2s;
+}
+.log-entry:hover{background:rgba(255,255,255,0.02)}
+.log-icon{width:14px;height:14px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700}
+.log-icon.hb{background:rgba(34,197,94,0.12);color:#22C55E}
+.log-icon.tk{background:rgba(0,212,255,0.12);color:#00D4FF}
+.log-icon.er{background:rgba(239,68,68,0.12);color:#EF4444}
+.log-icon.sc{background:rgba(245,158,11,0.12);color:#F59E0B}
+.log-body{flex:1;min-width:0}
+.log-top{display:flex;align-items:center;gap:6px;margin-bottom:1px}
+.log-time{font-size:8px;color:rgba(232,237,242,0.15);font-family:'JetBrains Mono',monospace}
+.log-name{font-size:10px;font-weight:600;color:rgba(232,237,242,0.5)}
+.log-msg{font-size:9px;color:rgba(232,237,242,0.2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@keyframes logSlide{
+  0%{opacity:0;transform:translateX(-6px)}
+  100%{opacity:1;transform:translateX(0)}
+}
+
+/* ===== MODAL ===== */
+#modal-overlay{
+  position:fixed;inset:0;z-index:999;display:none;
+  background:rgba(0,0,0,0.5);backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  animation:modalFadeIn 0.2s ease;
+}
+#modal-overlay.open{display:flex;align-items:center;justify-content:center}
+@keyframes modalFadeIn{0%{opacity:0}100%{opacity:1}}
+#modal-box{
+  width:480px;max-height:80vh;overflow-y:auto;border-radius:16px;
+  background:rgba(22,27,34,0.95);border:1px solid rgba(255,255,255,0.06);
+  box-shadow:0 24px 64px rgba(0,0,0,0.5);
+  animation:modalScaleIn 0.3s cubic-bezier(0.16,1,0.3,1);
+  padding:0;
+}
+@keyframes modalScaleIn{0%{opacity:0;transform:scale(0.95)}100%{opacity:1;transform:scale(1)}}
+#modal-box::-webkit-scrollbar{width:3px}
+#modal-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.06);border-radius:2px}
+.modal-close{
+  position:absolute;top:12px;right:14px;background:none;border:none;
+  color:rgba(232,237,242,0.2);font-size:16px;cursor:pointer;padding:2px 6px;
+  border-radius:4px;transition:all 0.2s;
+}
+.modal-close:hover{color:rgba(232,237,242,0.6);background:rgba(255,255,255,0.05)}
+.modal-hdr{position:relative;padding:20px 24px 14px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.modal-hdr-top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.modal-hdr-top .status-dot{width:9px;height:9px}
+.modal-name{font-size:16px;font-weight:700;color:#E8EDF2}
+.modal-faction{font-size:9px;font-weight:700;padding:1px 8px;border-radius:99px;letter-spacing:0.5px}
+.modal-faction.oc{color:#00D4FF;background:rgba(0,212,255,0.12)}
+.modal-faction.tr{color:#F59E0B;background:rgba(245,158,11,0.12)}
+.modal-faction.cc{color:#CC44FF;background:rgba(204,68,255,0.12)}
+.modal-sub{font-size:11px;color:rgba(232,237,242,0.3);margin-top:2px}
+.modal-body{padding:16px 24px 20px}
+.modal-info{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-info-item{padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)}
+.modal-info-label{font-size:9px;color:rgba(232,237,242,0.25);margin-bottom:3px;text-transform:uppercase;letter-spacing:0.5px}
+.modal-info-value{font-size:12px;color:rgba(232,237,242,0.7);font-weight:500}
+.modal-actions{display:flex;gap:8px;margin-top:16px}
+.modal-btn{
+  padding:7px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);
+  background:rgba(255,255,255,0.03);color:rgba(232,237,242,0.6);
+  font-size:11px;cursor:pointer;transition:all 0.2s;font-family:inherit;
+}
+.modal-btn:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);color:#E8EDF2}
+.modal-btn.primary{border-color:rgba(0,212,255,0.3);background:rgba(0,212,255,0.08);color:#00D4FF}
+.modal-btn.primary:hover{background:rgba(0,212,255,0.15);box-shadow:0 0 16px rgba(0,212,255,0.08)}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:1100px){
+  #main-r{width:220px}
+  #metrics{grid-template-columns:repeat(3,1fr)}
+}
+@media(max-width:768px){
+  #app{padding:12px 14px 10px;gap:10px}
+  #main-r{display:none}
+  #metrics{grid-template-columns:1fr 1fr;gap:8px}
+  #metrics .metric-card:last-child{grid-column:1/-1}
+  .agent-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  #filter-search input{width:80px}
+  #header-l h1{font-size:14px}
+  .filter-btn{padding:4px 10px;font-size:10px}
+}
+</style>
+</head>
+<body>
+
+<div id="bg-ambient"></div>
+
+<div id="app">
+
+  <!-- HEADER -->
+  <div id="header">
+    <div id="header-l">
+      <h1>修炼场</h1>
+      <span class="badge">Cultivation Hub</span>
+    </div>
+    <div id="header-r">
+      <span><span class="online-dot"></span><span id="onlineCount">0</span> / <span id="totalCount">17</span> 在线</span>
+      <span id="header-clock"></span>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div id="filter-bar">
+    <div id="filter-btns">
+      <button class="filter-btn active" data-filter="all">全部 <span class="count" id="fc-all">17</span></button>
+      <button class="filter-btn" data-filter="online">在线 <span class="count" id="fc-online">0</span></button>
+      <button class="filter-btn" data-filter="busy">繁忙 <span class="count" id="fc-busy">0</span></button>
+      <button class="filter-btn" data-filter="error">异常 <span class="count" id="fc-error">0</span></button>
+      <button class="filter-btn" data-filter="offline">离线 <span class="count" id="fc-offline">0</span></button>
+    </div>
+    <div id="filter-search">
+      <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="搜索 Agent..." spellcheck="false">
+      <button id="filter-clear">✕</button>
+    </div>
+  </div>
+
+  <!-- METRIC CARDS -->
+  <div id="metrics">
+    <div class="metric-card">
+      <div class="metric-label"><span class="icon" style="color:#00D4FF">◆</span> Agent 舰队</div>
+      <div class="metric-value blue" id="m-fleet">17</div>
+      <div class="metric-sub">全员就位</div>
+      <div class="metric-bar"><div class="metric-bar-fill blue" id="mb-fleet" style="width:100%"></div></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label"><span class="icon" style="color:#22C55E">●</span> 在线率</div>
+      <div class="metric-value green" id="m-online-rate">82%</div>
+      <div class="metric-sub">状态良好</div>
+      <div class="metric-bar"><div class="metric-bar-fill green" id="mb-online" style="width:82%"></div></div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label"><span class="icon" style="color:#F59E0B">♡</span> 心跳总数</div>
+      <div class="metric-value gold" id="m-heartbeat">0</div>
+      <div class="metric-sub" id="m-hb-sub">累计心跳</div>
+      <div class="metric-bar"><div class="metric-bar-fill gold" id="mb-heartbeat" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div id="main">
+    <div id="main-l" role="feed">
+      <!-- Group sections rendered by JS -->
+    </div>
+    <div id="main-r">
+      <div id="log-hdr"><span>● 最近活动</span><span class="count" id="logCount">0 条</span></div>
+      <div id="log-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <div class="modal-hdr">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div class="modal-hdr-top">
+        <span class="status-dot" id="modal-dot"></span>
+        <span class="modal-name" id="modal-name"></span>
+        <span class="modal-faction" id="modal-faction"></span>
+      </div>
+      <div class="modal-sub" id="modal-role"></div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info" id="modal-info"></div>
+      <div class="modal-actions">
+        <button class="modal-btn primary" id="modal-restart" onclick="closeModal()">重启代理</button>
+        <button class="modal-btn" onclick="closeModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// 银月钱庄 · 修炼场 v3
+// Card-Matrix Layout | Enhanced Visual Design
+// ═══════════════════════════════════════════════════════════════
+
+// ─── CONFIG ───────────────────────────────────────────────────
+
+const FACTION_COLORS = { OC:'#00D4FF', TR:'#F59E0B', CC:'#CC44FF' };
+const STATUS_ORDER = ['online','busy','error','offline'];
+const STATUS_LABELS = { online:'在线', busy:'繁忙', error:'异常', offline:'离线' };
+
+const AGENTS = [
+  // OC 总管区
+  { name:'银月',   role:'掌门 · 网关调度',    faction:'OC', status:'online', uptime:'12h 33m', heartbeats:247 },
+  { name:'韩立',   role:'侦查 · 情报',        faction:'OC', status:'online', uptime:'8h 12m',  heartbeats:156 },
+  { name:'雅妃',   role:'资源 · 对接',        faction:'OC', status:'busy',   uptime:'6h 45m',  heartbeats:98  },
+  { name:'墨影',   role:'巡检 · 通知',        faction:'OC', status:'online', uptime:'24h 0m',  heartbeats:512 },
+  { name:'许青',   role:'电商运营',           faction:'OC', status:'online', uptime:'4h 20m',  heartbeats:73  },
+  { name:'紫灵',   role:'知识库 · 只读',      faction:'OC', status:'offline', uptime:'0h 0m',   heartbeats:0   },
+  { name:'紫妍',   role:'数字人 · 出镜',      faction:'OC', status:'busy',   uptime:'3h 15m',  heartbeats:42  },
+  { name:'紫研',   role:'内部运营 · 自动化',  faction:'OC', status:'online', uptime:'5h 30m',  heartbeats:89  },
+  // TR 宗门区
+  { name:'李长寿', role:'全栈架构 · 研发',    faction:'TR', status:'online', uptime:'11h 20m', heartbeats:203 },
+  { name:'药老',   role:'电商增长 · SEO',     faction:'TR', status:'online', uptime:'9h 15m',  heartbeats:178 },
+  { name:'萧炎',   role:'金融交易 · 情报',    faction:'TR', status:'busy',   uptime:'7h 40m',  heartbeats:145 },
+  { name:'美杜莎', role:'UI/UX 设计',         faction:'TR', status:'online', uptime:'10h 5m',  heartbeats:192 },
+  { name:'寻宝鼠', role:'爆款选品',           faction:'TR', status:'error',  uptime:'2h 10m',  heartbeats:31  },
+  { name:'小医仙', role:'社媒 · 编剧',        faction:'TR', status:'online', uptime:'6h 50m',  heartbeats:110 },
+  { name:'海波东', role:'风控 · 合规',       faction:'TR', status:'online', uptime:'8h 30m',  heartbeats:167 },
+  { name:'蓝灵儿', role:'多媒体自动化',       faction:'TR', status:'offline', uptime:'0h 0m',   heartbeats:0   },
+  // CC 外援区
+  { name:'曹操',   role:'战术参谋 · Claude',  faction:'CC', status:'online', uptime:'14h 22m', heartbeats:289 },
+];
+
+const STATUS_DATA = { online:0, busy:0, error:0, offline:0 };
+AGENTS.forEach(a => STATUS_DATA[a.status]++);
+
+const MSG_TEMPLATES = {
+  online:  [ '心跳正常 · 稳定运行', '系统状态良好', '连接正常', '资源充足 · 待命中' ],
+  busy:    [ '执行任务中', '运算负载 78%', '处理批量请求', '多线程调度中' ],
+  error:   [ '连接超时 · 重试 (3/5)', 'API 响应异常', '内存使用 92%', '重连中⋯' ],
+  offline: [ '离线 · 等待唤醒', '未注册心跳', '静默状态' ],
+};
+
+const EVENTS = ['hb','tk','er','sc'];
+const EVENT_ICONS = { hb:'●', tk:'⚡', er:'✕', sc:'◉' };
+
+// ═══════════════════════════════════════════════════════════════
+
+let filterActive = 'all';
+let searchTerm = '';
+let agentsState = [];
+let heartbeatCount = 0;
+let logEntries = [];
+
+function init(){
+  agentsState = AGENTS.map((a,i) => ({ ...a, idx:i, hidden:false }));
+  heartbeatCount = AGENTS.reduce((s,a) => s + a.heartbeats, 0);
+
+  createBgParticles();
+  renderGroups();
+  updateAll();
+  startClock();
+  startDemo();
+}
+
+// ─── BACKGROUND PARTICLES ──────────────────────────────────────
+
+function createBgParticles(){
+  const c = document.getElementById('bg-ambient');
+  for(let i=0;i<20;i++){
+    const p = document.createElement('div');
+    p.className = 'bg-particle';
+    const s = 1 + Math.random() * 2;
+    p.style.cssText = `
+      width:${s}px;height:${s}px;
+      left:${Math.random()*100}%;top:${Math.random()*100}%;
+      background:rgba(255,255,255,${0.03+Math.random()*0.04});
+      animation-delay:${Math.random()*20}s;
+      animation-duration:${15+Math.random()*20}s;
+    `;
+    c.appendChild(p);
+  }
+}
+
+// ─── RENDER GROUPS ─────────────────────────────────────────────
+
+const FACTION_ORDER = ['OC','TR','CC'];
+const FACTION_ICONS = { OC:'👑', TR:'⚔️', CC:'🔗' };
+const FACTION_CLS  = { OC:'oc', TR:'tr', CC:'cc' };
+
+function renderGroups(){
+  const container = document.getElementById('main-l');
+  container.innerHTML = '';
+
+  FACTION_ORDER.forEach(f => {
+    const agents = AGENTS.filter(a => a.faction === f);
+    if(!agents.length) return;
+
+    const sec = document.createElement('div');
+    sec.className = `group-section ${FACTION_CLS[f]}`;
+
+    const online = agents.filter(a => a.status === 'online').length;
+    sec.innerHTML = `
+      <div class="group-hdr" onclick="this.parentElement.classList.toggle('collapsed')">
+        <div class="group-hdr-l">
+          <span class="group-icon">${FACTION_ICONS[f]}</span>
+          <span class="group-name ${FACTION_CLS[f]}-c">${f === 'OC' ? 'OC 总管区' : f === 'TR' ? 'TR 宗门区' : 'CC 外援区'}</span>
+          <span class="group-count">${online}/${agents.length}</span>
+        </div>
+        <span class="group-toggle">▼</span>
+      </div>
+      <div class="agent-grid" id="grid-${f}"></div>
+    `;
+    container.appendChild(sec);
+
+    const grid = sec.querySelector('.agent-grid');
+    agents.forEach((a,gi) => {
+      const card = createCard(a, gi);
+      grid.appendChild(card);
+    });
+  });
+}
+
+function createCard(agent, idx){
+  const card = document.createElement('div');
+  const cls = FACTION_CLS[agent.faction];
+  card.className = `agent-card ${cls}-card`;
+  card.style.animationDelay = (idx * 0.04) + 's';
+  card.dataset.name = agent.name;
+  card.dataset.status = agent.status;
+  card.dataset.faction = agent.faction;
+  card.onclick = () => openModal(agent);
+
+  card.innerHTML = `
+    <div class="card-row1">
+      <span class="status-dot ${agent.status}"></span>
+      <span class="faction-badge ${cls}">${agent.faction}</span>
+      <span class="card-name">${agent.name}</span>
+    </div>
+    <div class="card-role">${agent.role}</div>
+    <div class="card-footer">
+      <span class="card-heart"><span>♥</span>${agent.heartbeats}</span>
+      <span class="card-time">${agent.uptime}</span>
+    </div>
+  `;
+  return card;
+}
+
+// ─── FILTER + SEARCH ───────────────────────────────────────────
+
+function applyFilter(){
+  searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+
+  document.querySelectorAll('.agent-card').forEach(card => {
+    const name = card.dataset.name.toLowerCase();
+    const status = card.dataset.status;
+    const matchStatus = filterActive === 'all' || status === filterActive;
+    const matchSearch = !searchTerm || name.includes(searchTerm);
+    card.classList.toggle('hidden', !(matchStatus && matchSearch));
+  });
+
+  document.getElementById('filter-clear').classList.toggle('show', !!searchTerm);
+  updateFilterCounts();
+}
+
+function updateFilterCounts(){
+  const counts = { online:0, busy:0, error:0, offline:0 };
+  document.querySelectorAll('.agent-card:not(.hidden)').forEach(c => {
+    const s = c.dataset.status;
+    if(counts[s] !== undefined) counts[s]++;
+  });
+  const total = Object.values(counts).reduce((a,b)=>a+b,0);
+  document.getElementById('fc-all').textContent = total;
+  STATUS_ORDER.forEach(s => {
+    document.getElementById('fc-'+s).textContent = counts[s];
+  });
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    filterActive = this.dataset.filter;
+    applyFilter();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', applyFilter);
+document.getElementById('filter-clear').addEventListener('click', () => {
+  document.getElementById('searchInput').value = '';
+  applyFilter();
+});
+
+// ─── UPDATE ALL ────────────────────────────────────────────────
+
+function updateAll(){
+  const on = STATUS_DATA.online;
+  const total = AGENTS.length;
+  const rate = total > 0 ? Math.round(on / total * 100) : 0;
+
+  document.getElementById('onlineCount').textContent = on;
+  document.getElementById('totalCount').textContent = total;
+  document.getElementById('m-fleet').textContent = total;
+  document.getElementById('m-online-rate').textContent = rate + '%';
+  document.getElementById('mb-online').style.width = rate + '%';
+  document.getElementById('m-heartbeat').textContent = heartbeatCount.toLocaleString();
+
+  // Filter counts
+  STATUS_ORDER.forEach(s => {
+    document.getElementById('fc-'+s).textContent = STATUS_DATA[s] || 0;
+  });
+}
+
+// ─── CLOCK ────────────────────────────────────────────────────
+
+function startClock(){
+  function tick(){
+    document.getElementById('header-clock').textContent = new Date().toLocaleTimeString('zh-CN',{hour12:false});
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+// ─── DEMO / ACTIVITY ──────────────────────────────────────────
+
+function startDemo(){
+  addLog('银月','hb','修炼场初始化完成 · 全员待命');
+
+  // Random activity every 3-7 seconds
+  function nextActivity(){
+    const delay = 3000 + Math.random() * 4000;
+    setTimeout(() => {
+      const agent = AGENTS[Math.floor(Math.random() * AGENTS.length)];
+      const evt = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+      const isError = Math.random() < 0.15;
+
+      if(isError && agent.status !== 'offline'){
+        addLog(agent.name, 'er', `异常: ${agent.role.split('·')[0].trim()} 服务超时`);
+      } else if(evt === 'hb' || Math.random() < 0.4){
+        const msgs = MSG_TEMPLATES[agent.status] || MSG_TEMPLATES.online;
+        addLog(agent.name, 'hb', msgs[Math.floor(Math.random() * msgs.length)]);
+        // Increment heartbeat
+        const target = agentsState.find(a => a.name === agent.name);
+        if(target && target.status !== 'offline'){
+          target.heartbeats++;
+          heartbeatCount++;
+          updateCardHeart(agent.name, target.heartbeats);
+          document.getElementById('m-heartbeat').textContent = heartbeatCount.toLocaleString();
+        }
+      } else if(evt === 'tk'){
+        addLog(agent.name, 'tk', `任务: ${agent.role} 调度就绪`);
+      } else if(evt === 'sc'){
+        addLog(agent.name, 'sc', `状态变更 → ${STATUS_LABELS[agent.status] || agent.status}`);
+      }
+
+      nextActivity();
+    }, delay);
+  }
+  nextActivity();
+
+  // Periodic status change simulation
+  setInterval(() => {
+    // Pick a random online agent and briefly show busy
+    const targets = agentsState.filter(a => a.status === 'online');
+    if(targets.length > 1){
+      const t = targets[Math.floor(Math.random() * targets.length)];
+      if(t.name === '银月') return;
+      addLog(t.name, 'sc', '进入繁忙状态 · 高负载');
+      // Don't actually change for visual consistency
+    }
+  }, 15000);
+}
+
+function updateCardHeart(name, val){
+  const cards = document.querySelectorAll('.agent-card');
+  cards.forEach(c => {
+    if(c.dataset.name === name){
+      const el = c.querySelector('.card-heart');
+      if(el) el.innerHTML = `<span>♥</span>${val}`;
+    }
+  });
+}
+
+// ─── LOG ──────────────────────────────────────────────────────
+
+function addLog(name, type, msg){
+  const t = new Date().toLocaleTimeString('zh-CN',{hour12:false});
+  logEntries.unshift({ t, name, type, msg });
+  if(logEntries.length > 80) logEntries.pop();
+
+  const container = document.getElementById('log-body');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `
+    <span class="log-icon ${type}">${EVENT_ICONS[type] || '●'}</span>
+    <div class="log-body">
+      <div class="log-top">
+        <span class="log-time">${t}</span>
+        <span class="log-name">${name}</span>
+      </div>
+      <div class="log-msg">${msg}</div>
+    </div>
+  `;
+  container.insertBefore(entry, container.firstChild);
+  document.getElementById('logCount').textContent = logEntries.length + ' 条';
+
+  // Trim excess DOM
+  while(container.children.length > 80){
+    container.removeChild(container.lastChild);
+  }
+}
+
+// ─── MODAL ────────────────────────────────────────────────────
+
+function openModal(agent){
+  const overlay = document.getElementById('modal-overlay');
+  document.getElementById('modal-dot').className = 'status-dot ' + agent.status;
+  document.getElementById('modal-name').textContent = agent.name;
+  document.getElementById('modal-faction').textContent = agent.faction;
+  document.getElementById('modal-faction').className = 'modal-faction ' + FACTION_CLS[agent.faction];
+  document.getElementById('modal-role').textContent = agent.role;
+
+  document.getElementById('modal-info').innerHTML = `
+    <div class="modal-info-item">
+      <div class="modal-info-label">席位</div>
+      <div class="modal-info-value">${agent.role.split('·')[0].trim()}</div>
+    </div>
+    <div class="modal-info-item">
+      <div class="modal-info-label">归属</div>
+      <div class="modal-info-value">${agent.faction === 'OC' ? 'OC 总管区' : agent.faction === 'TR' ? 'TR 宗门区' : 'CC 外援区'}</div>
+    </div>
+    <div class="modal-info-item">
+      <div class="modal-info-label">状态</div>
+      <div class="modal-info-value">${STATUS_LABELS[agent.status]} (${agent.status})</div>
+    </div>
+    <div class="modal-info-item">
+      <div class="modal-info-label">心跳</div>
+      <div class="modal-info-value">${agent.heartbeats} 次</div>
+    </div>
+    <div class="modal-info-item">
+      <div class="modal-info-label">运行时长</div>
+      <div class="modal-info-value">${agent.uptime}</div>
+    </div>
+    <div class="modal-info-item">
+      <div class="modal-info-label">最后活跃</div>
+      <div class="modal-info-value">${agent.status === 'offline' ? '—' : '刚刚'}</div>
+    </div>
+  `;
+
+  overlay.classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+document.getElementById('modal-overlay').addEventListener('click', function(e){
+  if(e.target === this) closeModal();
+});
+
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') closeModal();
+});
+
+// ─── BOOT ──────────────────────────────────────────────────────
+
+init();
+</script>
+</body>
+</html>

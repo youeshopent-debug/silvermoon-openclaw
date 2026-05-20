@@ -1,0 +1,14 @@
+{
+  "ts": "2026-05-18T15:51:34.310Z",
+  "type": "handoff",
+  "agent": "李长寿",
+  "to": "银月",
+  "task": "记忆系统加固 + FB 发帖流程注入",
+  "details": [
+    "1. main.js handleMemdb 函数已实现（原为空壳！）",
+    "2. 命令：!记忆 list / add / del / help",
+    "3. 注入10条核心记忆（FB发帖/GSC/Vercel/Agent分工/网络/Stripe）",
+    "4. restart.request 已发，等待银月重启生效"
+  ],
+  "note": "银月下次对话被问 FB 发帖时，持久记忆会自动注入 system prompt，不会忘"
+}

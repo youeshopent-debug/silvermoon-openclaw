@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>银月钱庄 · 像素修仙 · 三套视觉方案</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#080A0F;color:#E8EDF2;font-family:'Inter','SF Pro Display','PingFang SC','Microsoft YaHei',sans-serif;padding:20px;min-height:100vh;overflow-x:hidden}
+.header{text-align:center;margin-bottom:24px;position:relative}
+.header h1{font-size:24px;font-weight:700;letter-spacing:2px}
+.header h1 span.jrpg{color:#E8A842}
+.header h1 span.cyber{color:#00D4FF}
+.header h1 span.zen{color:#9CAFAA}
+.header p{color:#6B7280;font-size:13px;margin-top:4px}
+.tabs{display:flex;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.tab{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);transition:all .25s;color:#6B7280}
+.tab:hover{background:rgba(255,255,255,0.07);color:#9CA3AF}
+.tab.active.jrpg{border-color:#E8A842;background:rgba(232,168,66,0.12);color:#E8A842}
+.tab.active.cyber{border-color:#00D4FF;background:rgba(0,212,255,0.12);color:#00D4FF}
+.tab.active.zen{border-color:#9CAFAA;background:rgba(156,175,170,0.12);color:#9CAFAA}
+.style-info{display:flex;gap:16px;align-items:center;justify-content:center;margin-bottom:20px;flex-wrap:wrap;padding:10px 16px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);max-width:900px;margin-left:auto;margin-right:auto}
+.style-info .label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#6B7280}
+.style-info .swatches{display:flex;gap:4px}
+.style-info .swatch{width:16px;height:16px;border-radius:3px;border:1px solid rgba(255,255,255,0.1)}
+.style-info .desc{font-size:12px;color:#9CA3AF}
+.scenes-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:20px;max-width:1100px;margin:0 auto}
+.scene-card{background:rgba(18,22,28,0.85);border:1px solid rgba(255,255,255,0.05);border-radius:10px;overflow:hidden;transition:transform .2s,border-color .2s;position:relative}
+.scene-card:hover{transform:translateY(-3px)}
+.scene-card .canvas-wrap{position:relative;line-height:0;background:#000}
+.scene-card canvas{display:block;width:100%;image-rendering:pixelated;image-rendering:crisp-edges;aspect-ratio:320/192}
+.scene-card .scene-badge{position:absolute;top:8px;left:8px;padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;background:rgba(0,0,0,0.65);backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.08)}
+.scene-card .scene-badge.jrpg{color:#E8A842}
+.scene-card .scene-badge.cyber{color:#00D4FF}
+.scene-card .scene-badge.zen{color:#9CAFAA}
+.scene-info{padding:12px 16px}
+.scene-info h3{font-size:14px;font-weight:600}
+.scene-info .sub{color:#6B7280;font-size:11px;margin-top:2px}
+.scene-info .highlights{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.scene-info .highlights span{padding:2px 8px;border-radius:3px;font-size:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.03);color:#9CA3AF}
+@media(max-width:600px){.scenes-grid{grid-template-columns:1fr}body{padding:12px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🏯 银月钱庄 · 像素修仙办公室</h1>
+  <p>美杜莎 · 三套风格视觉方案 · 游戏级像素美术</p>
+</div>
+<div class="tabs" id="tabs"></div>
+<div class="style-info" id="styleInfo"></div>
+<div class="scenes-grid" id="grid"></div>
+<script>
+const T=8, CW=320, CH=192;
+
+const THEMES={
+  jrpg:{
+    label:'复古日式RPG',emoji:'⚔️',accent:'#E8A842',
+    palette:['#6B4B2A','#8B6B3A','#C4A882','#E8D4B0','#2A4A3A','#4A7A5A','#E8A842','#A02020','#7A5A3A','#3A5A7A'],
+    pal:{
+      sky1:'#1A2A3A',sky2:'#3A5A7A',sky3:'#6A8AAA',
+      wall:'#C4A882',wallL:'#D4B892',wallS:'#8B7355',
+      floor1:'#6B4B2A',floor2:'#7A5A3A',floor3:'#8B6B3A',
+      floorP:'#5A3A1A',floorL:'#9B7B4A',
+      wood:'#5A3A1A',woodL:'#7A5A3A',woodD:'#3A2A0A',
+      stone:'#4A4F56',stone2:'#5A5F66',stone3:'#3A3F46',
+      fire:'#FF6B35',fire2:'#FFD700',fire3:'#FF4500',
+      glow:'#FFD700',glow2:'#FF9933',
+      jade:'#00FF88',jadeD:'#00AA55',
+      screen:'#8B0000',screen2:'#CC2222',
+      desk:'#4A2A0A',monitor:'#1A3A5A',
+      gold:'#E8A842',goldD:'#B8882A',
+      YIN:'#2DE2FF',LI:'#22C55E',MED:'#B66BFF',
+      YAO:'#FFD700',ZI:'#FF69B4',XIAO:'#FF6B6B',
+      XIAN:'#98FB98',RAT:'#DAA520',HAI:'#4682B4',
+      LAN:'#4169E1',skin:'#FFE0BD',skin2:'#FFD4A0',
+      hair:'#1A1A2E',hair2:'#2A2A4E',hair3:'#6B3A2A',
+      white:'#F0EDE8',
+      door:'#3A2A0A',doorF:'#E8D4B0',
+      leaf:'#4A8A5A',leafL:'#6AAA6A',
+      cloud:'rgba(255,255,255,0.12)',shadow:'rgba(0,0,0,0.25)'
+    }
+  },
+  cyber:{
+    label:'赛博修仙',emoji:'🌀',accent:'#00D4FF',
+    palette:['#0A0A2E','#1A1A4E','#00D4FF','#FF00AA','#FFD700','#8B00FF','#2A0A3A','#00FF88','#3A3A6A','#FFFFFF'],
+    pal:{
+      sky1:'#06061A',sky2:'#0A0A2E',sky3:'#1A1A4E',
+      wall:'#1A1A3A',wallL:'#2A2A5A',wallS:'#0A0A1A',
+      floor1:'#0A0A1A',floor2:'#12122A',floor3:'#1A1A3A',
+      floorP:'#06060E',floorL:'#2A2A5A',
+      wood:'#1A1A2A',woodL:'#2A2A3A',woodD:'#0A0A0A',
+      stone:'#1A1A2E',stone2:'#2A2A4E',stone3:'#0A0A1E',
+      fire:'#FF0066',fire2:'#FF00AA',fire3:'#FF00FF',
+      glow:'#00D4FF',glow2:'#00AADD',
+      jade:'#00FF88',jadeD:'#00AA66',
+      screen:'#FF00AA',screen2:'#CC0088',
+      desk:'#0A0A1A',monitor:'#00AAEE',
+      gold:'#FFD700',goldD:'#CCAA00',
+      YIN:'#00D4FF',LI:'#22FF66',MED:'#FF66FF',
+      YAO:'#FFD700',ZI:'#FF00AA',XIAO:'#FF3366',
+      XIAN:'#00FF88',RAT:'#FFAA00',HAI:'#00AAFF',
+      LAN:'#4488FF',skin:'#D4B8A0',skin2:'#C8A88A',
+      hair:'#0A0A1E',hair2:'#1A0A0A',hair3:'#2A0A2A',
+      white:'#E0E8F0',
+      door:'#0A0A2E',doorF:'#00D4FF',
+      leaf:'#00FF88',leafL:'#44FFAA',
+      cloud:'rgba(0,212,255,0.08)',shadow:'rgba(0,0,255,0.15)'
+    }
+  },
+  zen:{
+    label:'水墨禅意',emoji:'🌊',accent:'#9CAFAA',
+    palette:['#1A1A18','#3A3A38','#6A6A68','#9A9A98','#CACAC8','#F0EDE8','#CC4433','#4A8A6A','#8A7A5A','#E8E0D0'],
+    pal:{
+      sky1:'#E8E4DC',sky2:'#D0CCC2',sky3:'#B8B4AA',
+      wall:'#D8D4CA',wallL:'#E4E0D8',wallS:'#C0BCB2',
+      floor1:'#A0988A',floor2:'#B0A898',floor3:'#908878',
+      floorP:'#807868',floorL:'#C0B8A8',
+      wood:'#8A7A5A',woodL:'#9A8A6A',woodD:'#6A5A3A',
+      stone:'#6A6862',stone2:'#7A7872',stone3:'#5A5852',
+      fire:'#CC4433',fire2:'#E06050',fire3:'#AA3322',
+      glow:'#E8D4A0',glow2:'#D4C090',
+      jade:'#4A8A6A',jadeD:'#2A6A4A',
+      screen:'#6A5A3A',screen2:'#8A7A5A',
+      desk:'#6A5A3A',monitor:'#3A4A4A',
+      gold:'#C8B060',goldD:'#A89840',
+      YIN:'#6AA0B0',LI:'#5A8A6A',MED:'#9980A0',
+      YAO:'#C8B060',ZI:'#B08090',XIAO:'#8A6860',
+      XIAN:'#7A9A80',RAT:'#B0A060',HAI:'#608090',
+      LAN:'#6080A0',skin:'#E8DCC8',skin2:'#DCD0BC',
+      hair:'#1A1A18',hair2:'#2A2818',hair3:'#3A2A18',
+      white:'#F0EDE8',
+      door:'#6A5A3A',doorF:'#E8E0D0',
+      leaf:'#4A8A5A',leafL:'#6AAA7A',
+      cloud:'rgba(200,190,180,0.12)',shadow:'rgba(80,70,60,0.15)'
+    }
+  }
+};
+
+function dither(ctx,x,y,w,h,c1,c2,step){
+  for(let iy=y;iy<y+h;iy++)for(let ix=x;ix<x+w;ix++){
+    ctx.fillStyle=(ix+iy)%2?c1:c2;
+    ctx.fillRect(ix,iy,1,1);
+  }
+}
+function gradV(ctx,x,y,w,h,c1,c2){
+  const g=ctx.createLinearGradient(x,y,x,y+h);
+  g.addColorStop(0,c1);g.addColorStop(1,c2);ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
+}
+function gradH(ctx,x,y,w,h,c1,c2){
+  const g=ctx.createLinearGradient(x,y,x+w,y);
+  g.addColorStop(0,c1);g.addColorStop(1,c2);ctx.fillStyle=g;ctx.fillRect(x,y,w,h);
+}
+function radialG(ctx,x,y,r,c1,c2){
+  const g=ctx.createRadialGradient(x,y,0,x,y,r);
+  g.addColorStop(0,c1);g.addColorStop(1,c2);ctx.fillStyle=g;
+}
+function glow(ctx,x,y,r,c,alpha){
+  ctx.save();
+  radialG(ctx,x,y,r,c,'transparent');
+  ctx.globalAlpha=alpha;ctx.fillRect(x-r,y-r,r*2,r*2);
+  ctx.restore();
+}
+function rectShadow(ctx,x,y,w,h,alpha){
+  ctx.fillStyle=`rgba(0,0,0,${alpha})`;
+  ctx.fillRect(x+1,y+1,w,h);
+}
+
+const PAL_KEYS=['YIN','LI','MED','YAO','ZI','XIAO','XIAN','RAT','HAI','LAN','skin','skin2','hair','hair2','hair3'];
+
+function qPerson(ctx,x,y,pal,robeKey,skinKey,hairKey,isShort,style){
+  const p=pal, h=isShort?7:9;
+  const robe=p[robeKey], skin=p[skinKey], hair=p[hairKey];
+  if(style==='cyber'){
+    ctx.fillStyle=hair;ctx.fillRect(x+2,y-5,5,5);
+    ctx.fillStyle=p.glow;ctx.globalAlpha=0.4;ctx.fillRect(x+2,y-5,5,2);ctx.globalAlpha=1;
+    ctx.fillStyle=skin;ctx.fillRect(x+1,y,6,6);
+    ctx.fillStyle=robe;ctx.fillRect(x-1,y+6,10,h);
+    ctx.fillStyle=skin;ctx.fillRect(x-1,y+6,2,3);ctx.fillRect(x+7,y+6,2,3);
+    ctx.fillStyle=p.shadow;ctx.fillRect(x+3,y+11,4,2);
+    ctx.fillStyle=p.stone;ctx.fillRect(x+1,y+6+h,3,3);ctx.fillRect(x+5,y+6+h,3,3);
+    ctx.fillStyle=robe;ctx.globalAlpha=0.5;ctx.fillRect(x-1,y+6,10,1);ctx.globalAlpha=1;
+  }else if(style==='zen'){
+    ctx.fillStyle=hair;ctx.fillRect(x+2,y-3,5,3);
+    ctx.fillStyle=skin;ctx.fillRect(x+1,y,6,6);
+    ctx.fillStyle=robe;ctx.fillRect(x,y+5,8,h+1);
+    ctx.fillStyle=skin;ctx.fillRect(x,y+5,2,3);ctx.fillRect(x+6,y+5,2,3);
+    ctx.fillStyle=p.stone;ctx.fillRect(x+2,y+6+h,2,3);ctx.fillRect(x+5,y+6+h,2,3);
+  }else{
+    ctx.fillStyle=hair;ctx.fillRect(x+2,y-4,5,4);
+    ctx.fillStyle=skin;ctx.fillRect(x+1,y,6,6);
+    ctx.fillStyle=robe;ctx.fillRect(x-1,y+6,10,h);
+    ctx.fillStyle=robe;ctx.fillRect(x-2,y+7,1,h);ctx.fillRect(x+9,y+7,1,h);
+    ctx.fillStyle=skin;ctx.fillRect(x-1,y+6,2,3);ctx.fillRect(x+7,y+6,2,3);
+    ctx.fillStyle=p.stone;ctx.fillRect(x+1,y+6+h,3,3);ctx.fillRect(x+5,y+6+h,3,3);
+    ctx.fillStyle=p.gold;ctx.globalAlpha=0.3;ctx.fillRect(x-1,y+6,10,1);ctx.globalAlpha=1;
+  }
+}
+
+// ===== SCENE 1: 修炼大厅 =====
+function drawScene1(ctx,w,h,pal,style,time){
+  gradV(ctx,0,0,w,h,pal.sky1,pal.sky3);
+  for(let y=0;y<24;y++){ctx.fillStyle=y%2?pal.floor1:pal.floor2;ctx.fillRect(0,y*T,w,T)}
+  for(let i=0;i<40;i++){ctx.fillStyle=i%5===0?pal.woodD:pal.wood;ctx.fillRect(i*T,0,T,7*T)}
+  ctx.fillStyle=pal.wall;ctx.fillRect(2*T,0,36*T,7*T);
+  ctx.fillStyle=pal.wallS;ctx.fillRect(0,6*T,40*T,T);
+  ctx.fillStyle=pal.shadow;ctx.globalAlpha=0.15;ctx.fillRect(0,0,40*T,7*T);ctx.globalAlpha=1;
+
+  // screen divider
+  if(style==='jrpg'){
+    ctx.fillStyle=pal.screen;ctx.fillRect(0,0,5*T,8*T);
+    ctx.fillStyle=pal.gold;ctx.fillRect(0,T,5*T,2);
+    for(let i=0;i<4;i++){ctx.fillStyle=i%2?pal.screen2:pal.screen;ctx.fillRect(T,2*T+i*T,3*T,T-2)}
+  }else if(style==='cyber'){
+    ctx.fillStyle=pal.screen;ctx.fillRect(0,0,5*T,8*T);
+    for(let i=0;i<3;i++){ctx.fillStyle=i%2?pal.glow:pal.monitor;ctx.fillRect(T,2*T+i*2*T,3*T,T)}
+    ctx.fillStyle=pal.glow;ctx.globalAlpha=0.5;ctx.fillRect(5*T,0,2,8*T);ctx.globalAlpha=1;
+  }else{
+    ctx.fillStyle=pal.screen;ctx.fillRect(0,0,5*T,8*T);
+    ctx.fillStyle=pal.white;ctx.globalAlpha=0.3;ctx.fillRect(T,2*T,3*T,4*T);ctx.globalAlpha=1;
+  }
+
+  // 3 workstations
+  const ws=style==='zen'?[9,19,29]:[8,17,26];
+  for(let i=0;i<3;i++){
+    const bx=ws[i]*T;
+    ctx.fillStyle=pal.desk;ctx.fillRect(bx-2,9*T,9*T,5*T);
+    if(style==='cyber'){
+      ctx.fillStyle=pal.floor2;ctx.fillRect(bx-2,14*T,9*T,T);
+      ctx.fillStyle=pal.glow;ctx.globalAlpha=0.1;ctx.fillRect(bx-2,9*T,9*T,5*T);ctx.globalAlpha=1;
+    }else{
+      ctx.fillStyle=pal.floorP;ctx.fillRect(bx-2,14*T,9*T,T);
+    }
+    ctx.fillStyle=pal.monitor;ctx.fillRect(bx,9*T,5*T,4*T);
+    ctx.fillStyle=pal.glow;ctx.globalAlpha=0.12+0.08*Math.sin(time*0.002+i);ctx.fillRect(bx+1,10*T,3*T,2*T);ctx.globalAlpha=1;
+  }
+  // window
+  const wx=33*T;
+  ctx.fillStyle=pal.door;ctx.fillRect(wx,0,5*T,8*T);
+  ctx.fillStyle=pal.doorF;ctx.fillRect(wx+T,T,3*T,5*T);
+  if(style==='jrpg'){
+    ctx.fillStyle=pal.sky3;ctx.fillRect(wx+T,T,3*T,5*T);
+    ctx.fillStyle=pal.gold;ctx.globalAlpha=0.2;ctx.fillRect(wx+T,T,3*T,5*T);ctx.globalAlpha=1;
+  }else if(style==='cyber'){
+    ctx.fillStyle=pal.glow;ctx.globalAlpha=0.3;ctx.fillRect(wx+T,T,3*T,5*T);ctx.globalAlpha=1;
+  }
+  // 丹炉
+  const fx=14*T,fy=10*T;
+  if(style==='zen'){
+    ctx.fillStyle=pal.stone;ctx.fillRect(fx-3,8*T,9*T,5*T);
+    for(let i=0;i<3;i++){ctx.fillStyle=pal.fire;ctx.globalAlpha=0.4+0.2*Math.sin(time*0.003+i);ctx.fillRect(fx-1+i*2*T,8*T,2*T,2*T);ctx.globalAlpha=1}
+  }else{
+    ctx.fillStyle=pal.stone;ctx.fillRect(fx-3,fy-1,9*T,6*T);
+    ctx.fillStyle=pal.stone2;ctx.fillRect(fx-2,fy-1,7*T,T);
+    ctx.fillStyle=pal.fire;ctx.fillRect(fx,fy,3*T,4*T);
+    glow(ctx,fx+1*T,fy,4*T,pal.glow,0.12+0.06*Math.sin(time*0.003));
+    ctx.fillStyle=pal.fire2;ctx.fillRect(fx+T,fy,1+T,2*T);
+    ctx.fillStyle=pal.fire2;ctx.globalAlpha=0.5+0.3*Math.sin(time*0.004);ctx.fillRect(fx+T+1,fy+1,T,T*2);ctx.globalAlpha=1;
+  }
+  // 屏风窗棂
+  if(style==='jrpg'){ctx.fillStyle=pal.wood;ctx.fillRect(5*T,0,2,8*T)}
+  // characters
+  qPerson(ctx,ws[0]*T+2*T,12*T,pal,'YIN','skin','hair',false,style);
+  qPerson(ctx,ws[1]*T+2*T,12*T,pal,'LI','skin','hair2',false,style);
+  qPerson(ctx,ws[2]*T+2*T,12*T,pal,'MED','skin2','hair3',false,style);
+}
+
+// ===== SCENE 2: 炼丹机房 =====
+function drawScene2(ctx,w,h,pal,style,time){
+  gradV(ctx,0,0,w,h,pal.sky2,pal.sky3);
+  for(let y=0;y<24;y++){ctx.fillStyle=y%2?pal.floor1:pal.floor2;ctx.fillRect(0,y*T,w,T)}
+  if(style==='cyber'){
+    for(let i=0;i<20;i++)for(let j=0;j<12;j++){
+      ctx.fillStyle=(i+j)%3===0?pal.glow:pal.stone3;
+      ctx.globalAlpha=0.03;ctx.fillRect(i*2*T,j*2*T,2*T,2*T);ctx.globalAlpha=1;
+    }
+  }
+  ctx.fillStyle=pal.wall;ctx.fillRect(0,0,w,8*T);
+  dither(ctx,0,7*T,w,T,pal.wallS,pal.wall,1);
+  ctx.fillStyle=pal.shadow;ctx.globalAlpha=0.1;ctx.fillRect(0,0,w,8*T);ctx.globalAlpha=1;
+  // server racks
+  for(let i=0;i<3;i++){
+    const bx=3*T+i*12*T;
+    ctx.fillStyle=pal.stone;ctx.fillRect(bx,2*T,9*T,14*T);
+    ctx.fillStyle=pal.stone2;ctx.fillRect(bx+2,3*T,7*T,12*T);
+    if(style==='cyber'){
+      for(let j=0;j<8;j++){ctx.fillStyle=pal.glow;ctx.globalAlpha=0.3+0.2*Math.sin(time*0.003+i+j);ctx.fillRect(bx+3,4*T+j*1*T,5*T,2)};ctx.globalAlpha=1
+      ctx.fillStyle=pal.monitor;ctx.fillRect(bx+T,2*T,2*T,T)
+    }else if(style==='jrpg'){
+      for(let j=0;j<6;j++){ctx.fillStyle=j%2?pal.stone3:pal.screen2;ctx.fillRect(bx+3,4*T+j*2*T,5*T,T)}
+      ctx.fillStyle=pal.glow;ctx.globalAlpha=0.1;ctx.fillRect(bx+2,2*T,7*T,2);ctx.globalAlpha=1
+    }else{
+      for(let j=0;j<4;j++){ctx.fillStyle=pal.stone3;ctx.fillRect(bx+2,4*T+j*3*T,7*T,T*2)}
+    }
+  }
+  // cauldron 鼎炉
+  const cx=16*T,cy=12*T;
+  ctx.fillStyle=pal.stone3;ctx.fillRect(cx-3,cy,9*T,6*T);
+  ctx.fillStyle=pal.stone2;ctx.fillRect(cx-2,cy-2,7*T,3*T);
+  if(style==='zen'){
+    ctx.fillStyle=pal.fire;ctx.globalAlpha=0.3;ctx.fillRect(cx,cy-6,3*T,6*T);ctx.globalAlpha=1;
+  }else{
+    ctx.fillStyle=pal.fire;ctx.fillRect(cx+T,cy-4,2*T,4*T);
+    ctx.fillStyle=pal.fire2;ctx.fillRect(cx+T+1,cy-3,T,2*T);
+    glow(ctx,cx+2*T,cy-2,3*T,pal.glow,0.1+0.05*Math.sin(time*0.003));
+  }
+  // floating data crystals
+  for(let i=0;i<6;i++){
+    const dx=5*T+i*6*T+(i%2?2:0), dy=3*T+Math.sin(time*0.0015+i*1.2)*2*T;
+    ctx.fillStyle=pal.jade;ctx.globalAlpha=0.4+0.2*Math.sin(time*0.002+i);ctx.fillRect(dx,dy,3,3);ctx.globalAlpha=1;
+    if(style==='cyber'){ctx.fillStyle=pal.glow;ctx.globalAlpha=0.3;ctx.fillRect(dx-1,dy-1,5,5);ctx.globalAlpha=1}
+  }
+  qPerson(ctx,29*T,15*T,pal,'ZI','skin','hair3',false,style);
+}
+
+// ===== SCENE 3: 藏经阁 =====
+function drawScene3(ctx,w,h,pal,style,time){
+  gradV(ctx,0,0,w,h,pal.sky1,pal.sky2);
+  ctx.fillStyle=pal.floor1;ctx.fillRect(0,0,w,24*T);
+  dither(ctx,0,0,w,24*T,pal.floor2,pal.floor3,2);
+  ctx.fillStyle=pal.wall;ctx.fillRect(0,0,w,8*T);
+  ctx.fillStyle=pal.wallS;ctx.fillRect(0,7*T,w,T);
+  ctx.fillStyle=pal.shadow;ctx.globalAlpha=0.1;ctx.fillRect(0,0,w,8*T);ctx.globalAlpha=1;
+  // scroll racks 卷轴架
+  const cols=style==='zen'?5:8;
+  for(let i=0;i<cols;i++){
+    const bx=2*T+i*4*T;
+    if(style==='zen'){
+      ctx.fillStyle=pal.woodD;ctx.fillRect(bx,T,3*T,16*T);
+      for(let j=0;j<5;j++){ctx.fillStyle=j%2?pal.white:pal.wood;ctx.globalAlpha=0.3;ctx.fillRect(bx+1,2*T+j*3*T,2*T,T)};ctx.globalAlpha=1
+    }else{
+      ctx.fillStyle=pal.wood;ctx.fillRect(bx,T,3*T,16*T);
+      ctx.fillStyle=pal.woodL;ctx.fillRect(bx+T,T,1,16*T);
+      for(let j=0;j<8;j++){
+        const colors=[pal.screen,pal.jade,pal.gold,pal.monitor,pal.screen2];
+        ctx.fillStyle=colors[j%colors.length];ctx.fillRect(bx+1,2*T+j*2*T,2*T,T-2);
+      }
+    }
+  }
+  // desk 玉石桌
+  const dx=style==='zen'?14*T:16*T;
+  ctx.fillStyle=pal.wood;ctx.fillRect(dx-2,12*T,11*T,6*T);
+  ctx.fillStyle=pal.woodL;ctx.fillRect(dx-2,12*T,11*T,T);
+  if(style==='cyber'){
+    ctx.fillStyle=pal.monitor;ctx.fillRect(dx+T,12*T,4*T,3*T);
+    ctx.fillStyle=pal.glow;ctx.globalAlpha=0.2;ctx.fillRect(dx+T,12*T,4*T,3*T);ctx.globalAlpha=1;
+  }else if(style==='jrpg'){
+    ctx.fillStyle=pal.jade;ctx.fillRect(dx+3*T,12*T,3*T,2*T);
+    ctx.fillStyle=pal.jadeD;ctx.fillRect(dx+3*T+1,12*T+1,T,T);
+  }
+  // floating jade scroll
+  for(let i=0;i<3;i++){
+    const sy=T+Math.sin(time*0.0015+i*2)*T;
+    ctx.fillStyle=pal.jade;ctx.fillRect(dx+i*3*T,sy,3,5);
+    if(style==='cyber'){ctx.fillStyle=pal.glow;ctx.globalAlpha=0.25;ctx.fillRect(dx+i*3*T-1,sy-1,5,7);ctx.globalAlpha=1}
+  }
+  // glowing floating particles
+  for(let i=0;i<8;i++){
+    const px=5*T+Math.sin(time*0.001+i*1.5)*(15*T), py=T+Math.sin(time*0.0015+i*2)*5*T+T;
+    ctx.fillStyle=style==='cyber'?pal.glow:pal.gold;ctx.globalAlpha=0.2+0.15*Math.sin(time*0.003+i);ctx.fillRect(px,py,2,2);ctx.globalAlpha=1;
+  }
+  qPerson(ctx,17*T,16*T,pal,'YAO','skin2','hair3',false,style);
+}
+
+// ===== SCENE 4: 静修室 =====
+function drawScene4(ctx,w,h,pal,style,time){
+  if(style==='zen'){
+    gradV(ctx,0,0,w,h,'#E8E4DC','#D8D4C8');
+    ctx.fillStyle='#B8B0A0';ctx.fillRect(0,8*T,w,16*T);
+    for(let i=0;i<20;i++){ctx.fillStyle=i%2?'#B0A898':'#A8A090';ctx.fillRect(i*2*T,8*T,2*T,16*T)}
+    ctx.fillStyle='#C8C0B0';ctx.fillRect(0,0,w,8*T);
+    ctx.fillStyle='#B8B0A0';ctx.fillRect(0,7*T,w,T);
+    for(let i=0;i<4;i++){ctx.fillStyle='#A09888';ctx.fillRect(i*10*T+T,0,6*T,8*T);ctx.fillStyle='rgba(80,70,60,0.15)';ctx.fillRect(i*10*T+T,0,2,8*T)}
+    ctx.fillStyle='#8A7A5A';ctx.fillRect(15*T,10*T,10*T,2*T);
+    ctx.fillStyle='#CC4433';ctx.globalAlpha=0.3+0.15*Math.sin(time*0.002);ctx.fillRect(18*T,9*T,4*T,2*T);ctx.globalAlpha=1;
+    qPerson(ctx,5*T,14*T,pal,'XIAN','skin','hair',true,style);
+    qPerson(ctx,12*T,14*T,pal,'RAT','skin2','hair2',true,style);
+    qPerson(ctx,25*T,14*T,pal,'HAI','skin','hair3',true,style);
+  }else{
+    gradV(ctx,0,0,w,h,pal.sky1,pal.sky2);
+    ctx.fillStyle=pal.floor1;ctx.fillRect(0,0,w,24*T);
+    for(let i=0;i<20;i++)for(let j=0;j<12;j++){
+      ctx.fillStyle=(i+j)%2?pal.floor2:pal.floor3;
+      ctx.fillRect(i*2*T,j*2*T,2*T,2*T);
+    }
+    ctx.fillStyle=pal.wall;ctx.fillRect(0,0,w,8*T);
+    ctx.fillStyle=pal.wallS;ctx.fillRect(0,7*T,w,T);
+    // 障子屏风
+    for(let i=0;i<3;i++){
+      const sx=30*T+i*4*T;
+      ctx.fillStyle=pal.wood;ctx.fillRect(sx-1,0,3*T+2,8*T);
+      ctx.fillStyle=pal.shoji;ctx.fillRect(sx,T,3*T,6*T);
+      ctx.fillStyle=pal.wood;ctx.fillRect(sx+1,T,3*T-2,2);ctx.fillRect(sx+1,4*T,3*T-2,2);
+    }
+    if(style==='cyber'){
+      ctx.fillStyle=pal.glow;ctx.globalAlpha=0.1;ctx.fillRect(30*T,0,12*T,8*T);ctx.globalAlpha=1;
+    }
+    // low table
+    ctx.fillStyle=pal.wood;ctx.fillRect(13*T,11*T,13*T,3*T);
+    ctx.fillStyle=pal.woodL;ctx.fillRect(14*T,11*T,11*T,T);
+    // incense burner
+    if(style==='cyber'){
+      ctx.fillStyle=pal.glow;ctx.fillRect(18*T,10*T,4*T,2*T);
+      ctx.fillStyle=pal.glow;ctx.globalAlpha=0.3+0.2*Math.sin(time*0.003);ctx.fillRect(19*T,8*T,2*T,2*T);ctx.globalAlpha=1;
+    }else{
+      ctx.fillStyle=pal.stone;ctx.fillRect(18*T,10*T,4*T,3*T);
+      ctx.fillStyle=pal.fire;ctx.globalAlpha=0.4+0.2*Math.sin(time*0.002);ctx.fillRect(19*T,10*T,2*T,1);ctx.globalAlpha=1;
+    }
+    qPerson(ctx,6*T,15*T,pal,'XIAN','skin','hair',true,style);
+    qPerson(ctx,12*T,15*T,pal,'RAT','skin2','hair2',true,style);
+    qPerson(ctx,24*T,15*T,pal,'HAI','skin','hair3',true,style);
+  }
+}
+
+// ===== SCENE 5: 御剑训练场 =====
+function drawScene5(ctx,w,h,pal,style,time){
+  if(style==='cyber'){
+    gradV(ctx,0,0,w,h,'#06061A','#1A1A4E');
+    for(let i=0;i<30;i++){ctx.fillStyle='rgba(0,212,255,'+(0.02+0.03*Math.sin(time*0.001+i))+')';ctx.fillRect(Math.sin(i*1.3)*w*0.4+w*0.5,Math.sin(i*2.1)*20,2,2)}
+  }else if(style==='jrpg'){
+    gradV(ctx,0,0,w,h,'#2A4A6A','#6A8AAA');
+    for(let i=0;i<20;i++){ctx.fillStyle='rgba(255,255,255,'+(0.05+0.05*Math.sin(time*0.001+i*1.3))+')';ctx.fillRect(Math.sin(i*1.7)*w*0.4+w*0.5,5+Math.sin(i*2.3)*10,3,2)}
+  }else{
+    gradV(ctx,0,0,w,h,'#E8E4DC','#D0CCC2');
+    ctx.fillStyle='rgba(200,190,180,0.3)';ctx.fillRect(0,0,w,24*T);
+  }
+  // floating platforms
+  const pys=[14*T,10*T,16*T];
+  for(let i=0;i<3;i++){
+    const px=5*T+i*13*T, py=pys[i];
+    ctx.fillStyle=pal.stone;ctx.fillRect(px,py,9*T,3*T);
+    ctx.fillStyle=pal.stone2;ctx.fillRect(px,py,9*T,T);
+    if(style==='zen'){ctx.fillStyle='rgba(100,90,80,0.15)';ctx.fillRect(px+1,py+3*T,7*T,2)}
+  }
+  // flying swords
+  for(let i=0;i<3;i++){
+    const sx=3*T+i*13*T, sy=pys[i]-3*T+Math.sin(time*0.002+i*2)*T;
+    ctx.fillStyle=pal.sword||pal.white;ctx.fillRect(sx,sy,6*T,2);
+    ctx.fillStyle=pal.gold;ctx.fillRect(sx+5*T,sy-1,1,4);
+    if(style==='cyber'){
+      ctx.fillStyle=pal.glow;ctx.globalAlpha=0.4+0.2*Math.sin(time*0.003+i);ctx.fillRect(sx-1,sy-1,7*T,4);ctx.globalAlpha=1;
+    }else if(style==='jrpg'){
+      ctx.fillStyle=pal.glow;ctx.globalAlpha=0.2+0.1*Math.sin(time*0.003+i);ctx.fillRect(sx,sy,6*T,2);ctx.globalAlpha=1;
+    }
+  }
+  // training dummies
+  for(let i=0;i<3;i++){
+    const dx=8*T+i*15*T;
+    ctx.fillStyle=pal.wood;ctx.fillRect(dx+1,pys[i]+2*T,4,6*T);
+    ctx.fillStyle=pal.stone;ctx.fillRect(dx,pys[i]-T,6*T,4*T);
+    ctx.fillStyle=pal.white;ctx.globalAlpha=0.5;ctx.fillRect(dx+1,pys[i]-T,4,T);ctx.globalAlpha=1;
+  }
+  qPerson(ctx,9*T,19*T,pal,'LAN','skin','hair2',false,style);
+}
+
+// ===== 场景定义 =====
+const SCENES=[
+  {id:'cultivation',label:'修炼大厅',sub:'Main Office',draw:drawScene1,highlight:'丹炉火光 · 三屏工位 · 窗棂透光',chars:'银月·李长寿·美杜莎'},
+  {id:'alchemy',label:'炼丹机房',sub:'Server Room',draw:drawScene2,highlight:'鼎炉服务器架 · 数据晶悬浮 · LED流光',chars:'紫妍'},
+  {id:'library',label:'藏经阁',sub:'Knowledge Archive',draw:drawScene3,highlight:'卷轴彩色书脊 · 浮空玉简 · 金符粒子',chars:'药老'},
+  {id:'meditation',label:'静修室',sub:'Meeting Room',draw:drawScene4,highlight:'障子屏风 · 低桌薰炉 · 棋盘榻榻米',chars:'小医仙·寻宝鼠·海波东'},
+  {id:'training',label:'御剑训练场',sub:'Training Ground',draw:drawScene5,highlight:'浮云平台 · 飞剑流光 · 天空渐变',chars:'蓝灵儿'}
+];
+
+const STYLE_KEYS=['jrpg','cyber','zen'];
+
+function buildPage(active){
+  const t=document.getElementById('tabs'), si=document.getElementById('styleInfo'), g=document.getElementById('grid');
+  const theme=THEMES[active];
+  t.innerHTML=STYLE_KEYS.map(k=>{
+    const th=THEMES[k];
+    return `<div class="tab${k===active?' active '+k:''}" data-style="${k}">${th.emoji} ${th.label}</div>`;
+  }).join('');
+  t.querySelectorAll('.tab').forEach(tb=>tb.addEventListener('click',()=>buildPage(tb.dataset.style)));
+
+  si.innerHTML=`
+    <div class="label">${theme.emoji} ${theme.label}</div>
+    <div class="swatches">${theme.palette.slice(0,10).map(c=>`<div class="swatch" style="background:${c}"></div>`).join('')}</div>
+    <div class="desc">色彩体系 · ${theme.palette.length} 色主调 · 针对适配各场景</div>
+  `;
+
+  g.innerHTML=SCENES.map((sc,i)=>{
+    return `<div class="scene-card" data-scene="${sc.id}">
+      <div class="canvas-wrap">
+        <canvas width="${CW}" height="${CH}" data-idx="${i}" data-style="${active}"></canvas>
+        <div class="scene-badge ${active}">${theme.emoji} ${sc.label}</div>
+      </div>
+      <div class="scene-info">
+        <h3>${sc.label} <span style="font-weight:400;color:#6B7280;font-size:12px">· ${sc.sub}</span></h3>
+        <div class="highlights">
+          <span>🎨 ${sc.highlight}</span>
+          <span>👥 ${sc.chars}</span>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  let start;
+  function frame(ts){
+    if(!start)start=ts;
+    g.querySelectorAll('canvas').forEach(cv=>{
+      const idx=parseInt(cv.dataset.idx), st=cv.dataset.style;
+      const p=THEMES[st].pal;
+      const ctx=cv.getContext('2d');
+      ctx.clearRect(0,0,CW,CH);
+      SCENES[idx].draw(ctx,cv.width,cv.height,p,st,ts);
+    });
+    requestAnimationFrame(frame);
+  }
+  if(window._frameId)cancelAnimationFrame(window._frameId);
+  window._frameId=requestAnimationFrame(frame);
+}
+buildPage('jrpg');
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{
+  "episodes": [
+    {
+      "id": "mpcyh2jlvvpn",
+      "summary": "指派任务: 李长寿",
+      "category": "task",
+      "emotionalTag": "neutral",
+      "detail": "任务: {\"name\":\"压力测试任务\",\"priority\":\"high\"}",
+      "timestamp": "2026-05-19T18:17:46.017Z"
+    },
+    {
+      "id": "mpcyh2jn4uf7",
+      "summary": "指派任务: 美杜莎",
+      "category": "task",
+      "emotionalTag": "neutral",
+      "detail": "任务: {\"name\":\"状态流转测试\"}",
+      "timestamp": "2026-05-19T18:17:46.019Z"
+    },
+    {
+      "id": "mpcyhmwrslx2",
+      "summary": "指派任务: 李长寿",
+      "category": "task",
+      "emotionalTag": "neutral",
+      "detail": "任务: {\"name\":\"压力测试任务\",\"priority\":\"high\"}",
+      "timestamp": "2026-05-19T18:18:12.411Z"
+    },
+    {
+      "id": "mpcyhmwsohqf",
+      "summary": "指派任务: 美杜莎",
+      "category": "task",
+      "emotionalTag": "neutral",
+      "detail": "任务: {\"name\":\"状态流转测试\"}",
+      "timestamp": "2026-05-19T18:18:12.412Z"
+    },
+    {
+      "id": "mpcyhmwtnc67",
+      "summary": "任务状态变更: del-mpcyhmws → in_progress",
+      "category": "task",
+      "emotionalTag": "neutral",
+      "detail": "任务: {\"name\":\"状态流转测试\"}",
+      "timestamp": "2026-05-19T18:18:12.413Z"
+    }
+  ]
+}

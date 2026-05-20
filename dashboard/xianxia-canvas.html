@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云门阁·Canvas修仙世界</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            font-family: 'Courier New', Courier, "Microsoft YaHei", monospace;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0c0806;
+            color: #dcd1b4;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .control-panel {
+            width: 260px;
+            height: 100%;
+            background-color: #17100b;
+            border-right: 4px solid #281c13;
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: inset -4px 0 0 #0d0906;
+            z-index: 10;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #e5b842;
+            text-align: center;
+            margin-bottom: 8px;
+            border-bottom: 2px dashed #423021;
+            padding-bottom: 12px;
+            letter-spacing: 2px;
+        }
+
+        .template-btn {
+            background-color: #231810;
+            border: 3px solid #3d2a1c;
+            color: #a49375;
+            padding: 14px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: left;
+            box-shadow: inset 2px 2px 0 #322216;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .template-btn:hover {
+            background-color: #322216;
+            color: #e5b842;
+            border-color: #523926;
+        }
+
+        .template-btn.active {
+            background-color: #802213;
+            border-color: #d94b36;
+            color: #ffffff;
+            box-shadow: inset 3px 3px 0 #ab2f1a;
+        }
+
+        .template-btn::after {
+            content: '▶';
+            font-size: 10px;
+            opacity: 0.5;
+        }
+
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #070504;
+            position: relative;
+            padding: 20px;
+        }
+
+        .canvas-viewport {
+            position: relative;
+            border: 6px solid #23160e;
+            box-shadow: 0 16px 32px rgba(0,0,0,0.8), inset 4px 4px 0 #3d2719;
+            background-color: #1a130e;
+        }
+
+        canvas {
+            display: block;
+            background-color: #1a130e;
+        }
+
+        .scroll-ui-top {
+            position: absolute;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            height: 42px;
+            background-color: #e6d7b8;
+            border: 3px solid #2d251e;
+            box-shadow: inset 2px 2px 0 #f5edd7, 0 4px 8px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: #2d251e;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .stone-ui-bottom {
+            position: absolute;
+            bottom: 16px;
+            right: 16px;
+            width: 420px;
+            height: 110px;
+            background-color: #383d41;
+            border: 4px solid #1d2022;
+            box-shadow: inset 3px 3px 0 #545b60, 0 6px 12px rgba(0,0,0,0.6);
+            padding: 12px;
+            font-size: 12px;
+            color: #c5cbd0;
+            line-height: 1.6;
+        }
+
+        .chat-bubble {
+            position: absolute;
+            background: white;
+            border: 3px solid #000;
+            color: #000;
+            padding: 8px;
+            font-size: 12px;
+            font-weight: bold;
+            width: 190px;
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.3);
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="control-panel">
+        <div class="panel-title">宗门五界图卷</div>
+        <button class="template-btn active" onclick="changeScene(1)">样板 1：宗门修炼大殿</button>
+        <button class="template-btn" onclick="changeScene(2)">样板 2：万火九炼丹房</button>
+        <button class="template-btn" onclick="changeScene(3)">样板 3：断崖演武飞升场</button>
+        <button class="template-btn" onclick="changeScene(4)">样板 4：天工多宝藏宝阁</button>
+        <button class="template-btn" onclick="changeScene(5)">样板 5：后山禁地聚灵阵</button>
+    </div>
+
+    <div class="main-container">
+        <div class="canvas-viewport">
+            <div class="scroll-ui-top">
+                <span style="color:#8a1f11; font-size:15px; margin-right:30px;">雲門阁内修图卷</span>
+                <span style="margin-right:20px;">聚灵指数: <span style="color:#2b6bb3;">99.4k</span></span>
+                <span>仙晶储备: <span style="color:#b3742b;">12,500</span></span>
+                <span style="margin-left:auto; color:#8a1f11;">宗门令: 2 / 11</span>
+            </div>
+
+            <div id="msg-bubble" class="chat-bubble" style="left: 280px; top: 160px;">
+                <b>【传书】</b> 师妹，本次宗门大比的《天仙录》抄本你可备齐了？
+            </div>
+
+            <canvas id="xianxiaCanvas" width="960" height="640"></canvas>
+
+            <div class="stone-ui-bottom">
+                <b style="color:#e56952;">宗门传闻纪事 (Chronicles)</b>
+                <div id="log-content" style="margin-top: 6px;">
+                    <div>【突破】内门弟子 <span style="color:#ffe66f;">陆青</span> 成功将《紫阳真诀》提升至第七层！</div>
+                    <div>【系统】Canvas像素级硬边引擎启动成功，Tileset网格无损对齐。</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('xianxiaCanvas');
+        const ctx = canvas.getContext('2d');
+
+        ctx.imageSmoothingEnabled = false;
+        ctx.mozImageSmoothingEnabled = false;
+        ctx.webkitImageSmoothingEnabled = false;
+        ctx.msImageSmoothingEnabled = false;
+
+        let currentScene = 1;
+
+        function createPixelTexture(width, height, pixelData, colorMap) {
+            const buffer = ctx.createImageData(width, height);
+            for (let i = 0; i < pixelData.length; i++) {
+                const colorCode = pixelData[i];
+                const color = colorMap[colorCode] || [0,0,0,0];
+                const rIdx = i * 4;
+                buffer.data[rIdx] = color[0];
+                buffer.data[rIdx+1] = color[1];
+                buffer.data[rIdx+2] = color[2];
+                buffer.data[rIdx+3] = color[3];
+            }
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = width;
+            tempCanvas.height = height;
+            tempCanvas.getContext('2d').putImageData(buffer, 0, 0);
+            return tempCanvas;
+        }
+
+        // ====================================================================
+        // ① 青石地砖（保留基准）
+        // ====================================================================
+        const tileColors = {
+            '.': [35, 26, 20, 255],
+            'x': [43, 32, 24, 255],
+            'o': [28, 20, 15, 255]
+        };
+        const tileMatrix = [
+            'o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o',
+            'o','.','.','.','.','.','.','.','.','.','.','.','.','.','x','o',
+            'o','.','x','.','.','.','x','.','.','.','.','x','.','.','.','o',
+            'o','.','.','.','.','.','.','.','.','.','.','.','.','.','.','o',
+            'o','.','.','.','o','o','.','.','.','.','o','o','.','.','.','o',
+            'o','.','.','.','o','o','.','.','.','.','o','o','.','.','.','o',
+            'o','x','.','.','.','.','.','.','x','.','.','.','.','.','x','o',
+            'o','.','.','.','.','.','.','.','.','.','.','.','.','.','.','o',
+            'o','.','.','x','.','.','.','.','.','.','.','.','x','.','.','o',
+            'o','.','.','.','.','.','.','.','.','.','.','.','.','.','.','o',
+            'o','.','.','.','.','.','o','o','o','o','.','.','.','.','.','o',
+            'o','.','x','.','.','.','o','o','o','o','.','.','.','x','.','o',
+            'o','.','.','.','.','.','.','.','.','.','.','.','.','.','.','o',
+            'o','.','.','.','.','.','.','.','.','.','.','.','.','.','.','o',
+            'o','x','.','.','.','x','.','.','.','.','x','.','.','.','x','o',
+            'o','o','o','o','o','o','o','o','o','o','o','o','o','o','o','o'
+        ];
+        const floorTile = createPixelTexture(16, 16, tileMatrix, tileColors);
+
+        // ====================================================================
+        // ② 禁地绿草地（5级色阶，大反差自然草簇，tileable）
+        // ====================================================================
+        const grassColors = {
+            '.': [58, 102, 42, 255],
+            'x': [92, 148, 62, 255],
+            'o': [25, 54, 18, 255],
+            '#': [102, 62, 30, 255],
+            '@': [152, 192, 82, 255]
+        };
+        const grassMatrix = [
+            'o','.','.','#','.','x','.','.','.','x','.','#','.','.','.','o',
+            '.','.','x','.','.','.','.','o','.','.','.','.','.','@','.','.',
+            '.','.','.','.','@','.','.','.','.','.','.','x','.','.','.','.',
+            '#','.','.','o','.','.','.','#','.','.','o','.','.','.','#','.',
+            '.','x','.','.','.','.','.','.','.','.','.','.','@','.','.','.',
+            '.','.','.','.','#','.','.','o','.','#','.','.','.','.','.','.',
+            '.','@','.','.','.','.','x','.','.','.','.','.','o','.','@','.',
+            '.','.','.','o','.','.','.','.','.','.','.','.','.','.','.','.',
+            '.','.','#','.','.','.','.','.','@','.','.','.','.','#','.','.',
+            'x','.','.','.','.','o','.','.','.','.','o','.','.','.','.','x',
+            '.','.','.','.','.','.','.','#','.','.','.','.','.','.','.','.',
+            '.','@','.','.','x','.','.','.','.','.','.','x','.','.','@','.',
+            '.','.','.','.','.','.','o','.','.','o','.','.','.','.','.','.',
+            '#','.','.','.','#','.','.','.','.','.','.','.','#','.','.','#',
+            '.','.','@','.','.','.','.','x','.','.','.','.','.','@','.','.',
+            'o','.','.','#','.','x','.','.','.','.','x','.','#','.','.','o'
+        ];
+        const grassTile = createPixelTexture(16, 16, grassMatrix, grassColors);
+
+        // ====================================================================
+        // ③ 角色精灵（保留基准）
+        // ====================================================================
+        const spriteColors = {
+            ' ': [0, 0, 0, 0],
+            'k': [0, 0, 0, 255],
+            'h': [40, 35, 30, 255],
+            'f': [252, 208, 161, 255],
+            'r': [140, 45, 25, 255],
+            'b': [74, 126, 187, 255],
+            'l': [124, 162, 204, 255],
+            'd': [43, 85, 140, 255],
+            'p': [217, 123, 166, 255],
+            'w': [255, 255, 255, 255]
+        };
+        const maleSpriteMatrix = [
+            ' ',' ',' ',' ','k','k','k',' ',' ',' ',' ',
+            ' ',' ',' ','k','h','h','h','k',' ',' ',' ',
+            ' ',' ','k','r','r','h','r','r','k',' ',' ',
+            ' ',' ','k','h','f','f','f','h','k',' ',' ',
+            ' ',' ','k','f','k','f','k','f','k',' ',' ',
+            ' ',' ',' ','k','f','f','f','k',' ',' ',' ',
+            ' ',' ','k','k','b','b','b','k','k',' ',' ',
+            ' ','k','l','l','b','b','b','d','d','k',' ',
+            ' ','k','l','b','b','b','b','b','d','k',' ',
+            ' ','k','b','b','b','b','b','b','b','k',' ',
+            ' ',' ','k','b','b','k','b','b','k',' ',' ',
+            ' ',' ',' ','k','k',' ','k','k',' ',' ',' '
+        ];
+        const maleSprite = createPixelTexture(11, 12, maleSpriteMatrix, spriteColors);
+
+        // ====================================================================
+        // ④ 丹炉（保留基准）
+        // ====================================================================
+        const cauldronColors = {
+            ' ': [0,0,0,0], 'k': [0,0,0,255], 'c': [74,80,82,255], 'g': [110,118,120,255],
+            'd': [45,49,50,255], 'f': [255,69,0,255], 'y': [255,165,0,255]
+        };
+        const cauldronMatrix = [
+            ' ',' ','k','k','k','k',' ',' ',
+            ' ','k','g','g','g','g','k',' ',
+            'k','g','c','c','c','c','d','k',
+            'k','g','c','c','c','c','d','k',
+            'k','c','c','c','c','c','d','k',
+            ' ','k','d','f','y','d','k',' ',
+            ' ',' ','k','f','f','k',' ',' ',
+            ' ',' ','k','g','d','k',' ',' '
+        ];
+        const cauldronAsset = createPixelTexture(8, 8, cauldronMatrix, cauldronColors);
+
+        // ====================================================================
+        // ⑤ 古木墙板纹理（16×12，用于藏宝阁后墙，tileable水平）
+        // ====================================================================
+        const wallColors = {
+            'w': [42, 28, 18, 255],
+            'W': [55, 36, 22, 255],
+            'Z': [30, 20, 12, 255],
+            'D': [70, 46, 28, 255]
+        };
+        const wallMatrix = [
+            'Z','D','w','w','w','w','D','w','w','w','w','D','w','w','w','Z',
+            'w','w','w','w','W','w','w','w','w','W','w','w','w','w','W','w',
+            'w','w','D','w','w','w','w','D','w','w','w','w','D','w','w','w',
+            'w','w','w','w','w','w','w','w','w','w','w','w','w','w','w','w',
+            'W','w','w','Z','w','w','W','w','w','Z','w','w','W','w','w','Z',
+            'w','w','w','w','w','w','w','w','w','w','w','w','w','w','w','w',
+            'D','w','w','w','w','D','w','w','w','w','D','w','w','w','w','D',
+            'w','w','w','w','w','w','w','w','w','w','w','w','w','w','w','w',
+            'w','W','w','w','Z','w','w','W','w','w','Z','w','w','W','w','w',
+            'w','w','w','w','w','w','w','w','w','w','w','w','w','w','w','w',
+            'Z','w','w','w','D','w','w','w','w','D','w','w','w','w','Z','w',
+            'w','w','w','w','w','w','w','w','w','w','w','w','w','w','w','w'
+        ];
+        const wallTile = createPixelTexture(16, 12, wallMatrix, wallColors);
+
+        // ====================================================================
+        // ⑥ 金匾额（24×5，天工阁金字招牌）
+        // ====================================================================
+        const plaqueColors = {
+            ' ': [0,0,0,0],
+            'k': [0,0,0,255],
+            'g': [205, 160, 20, 255],
+            'G': [145, 110, 10, 255],
+            'b': [110, 55, 22, 255]
+        };
+        const plaqueMatrix = [
+            'k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k',
+            'k','g','g','g','g','g','G','g','g','g','g','g','g','g','g','g','g','g','G','g','g','g','g','k',
+            'k','g','b','b','b','b','G','b','b','b','b','b','b','b','b','b','b','b','G','b','b','b','g','k',
+            'k','g','g','g','g','g','g','g','g','g','g','g','g','g','g','g','g','g','g','g','g','g','g','k',
+            'k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k'
+        ];
+        const plaqueAsset = createPixelTexture(24, 5, plaqueMatrix, plaqueColors);
+
+        // ====================================================================
+        // ⑦ 矮台/基座（24×4，石纹平台）
+        // ====================================================================
+        const pedestalColors = {
+            'k': [0,0,0,255],
+            's': [90, 82, 72, 255],
+            'S': [110, 100, 88, 255],
+            'd': [65, 58, 50, 255]
+        };
+        const pedestalMatrix = [
+            'k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k',
+            'k','S','s','s','s','S','s','s','S','s','s','s','S','s','s','s','S','s','s','s','S','s','s','k',
+            'k','s','s','s','d','s','s','d','s','s','d','s','s','s','d','s','s','d','s','s','d','s','s','k',
+            'k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k','k'
+        ];
+        const pedestalAsset = createPixelTexture(24, 4, pedestalMatrix, pedestalColors);
+
+        // ====================================================================
+        // ⑧ 宝箱Ⅰ：金丝蟠龙宝箱（12×12，檀木+金丝镶边+朱砂锁扣）
+        // ====================================================================
+        const chest1Colors = {
+            ' ': [0,0,0,0],
+            'k': [0,0,0,255],
+            'g': [225, 178, 10, 255],
+            'G': [140, 105, 5, 255],
+            'T': [115, 50, 20, 255],
+            't': [72, 30, 12, 255],
+            'r': [200, 50, 25, 255],
+            'd': [160, 35, 18, 255],
+            'w': [180, 95, 45, 255]
+        };
+        const chest1Matrix = [
+            ' ',' ','k','k','k','k','k','k','k','k',' ',' ',
+            ' ','k','g','g','g','g','g','g','g','g','k',' ',
+            'k','g','G','G','G','G','G','G','G','G','G','k',
+            'k','g','G','t','t','t','t','t','t','G','G','k',
+            'k','g','G','t','d','t','t','t','t','G','G','k',
+            'k','g','r','r','r','r','r','r','r','r','r','k',
+            'k','k','g','g','g','g','g','g','g','g','k','k',
+            'k','T','T','T','T','T','T','T','T','T','T','k',
+            'k','T','w','T','t','t','t','w','T','t','T','k',
+            'k','T','T','T','T','T','T','T','T','T','T','k',
+            'k','t','t','t','t','t','t','t','t','t','t','k',
+            ' ','k','k','k','k','k','k','k','k','k','k',' '
+        ];
+        const chest1Asset = createPixelTexture(12, 12, chest1Matrix, chest1Colors);
+
+        // ====================================================================
+        // ⑨ 宝箱Ⅱ：玄铁重宝箱（12×12，冷灰玄铁+黄铜铆钉+铜锁）
+        // ====================================================================
+        const chest2Colors = {
+            ' ': [0,0,0,0],
+            'k': [0,0,0,255],
+            'I': [100, 105, 110, 255],
+            'i': [60, 65, 72, 255],
+            'B': [180, 130, 38, 255],
+            'b': [130, 95, 25, 255],
+            'C': [205, 165, 50, 255],
+            'R': [115, 42, 20, 255],
+            'W': [140, 145, 152, 255]
+        };
+        const chest2Matrix = [
+            ' ',' ','k','k','k','k','k','k','k','k',' ',' ',
+            ' ','k','I','I','I','I','I','I','I','I','k',' ',
+            'k','I','W','I','I','I','I','I','W','I','I','k',
+            'k','I','I','B','I','I','I','B','I','I','I','k',
+            'k','i','i','i','R','i','R','i','i','i','i','k',
+            'k','k','i','C','C','C','C','C','i','k','k','k',
+            'k','I','I','I','I','I','I','I','I','I','I','k',
+            'k','I','B','I','i','i','i','I','B','I','I','k',
+            'k','I','I','I','i','i','i','I','I','I','I','k',
+            'k','I','I','I','I','I','I','I','I','I','I','k',
+            'k','i','i','i','i','i','i','i','i','i','i','k',
+            ' ','k','k','k','k','k','k','k','k','k','k',' '
+        ];
+        const chest2Asset = createPixelTexture(12, 12, chest2Matrix, chest2Colors);
+
+        // ====================================================================
+        // ⑩ 挂轴（6×17，竹简卷轴装饰）
+        // ====================================================================
+        const scrollColors = {
+            'k': [0,0,0,255],
+            's': [185, 155, 85, 255],
+            'S': [200, 170, 100, 255],
+            'd': [130, 100, 45, 255],
+            'b': [75, 55, 28, 255]
+        };
+        const scrollMatrix = [
+            'k','s','s','s','s','k',
+            's','S','S','S','S','s',
+            's','d','d','d','d','s',
+            's','S','S','S','S','s',
+            's','d','b','b','d','s',
+            's','S','S','S','S','s',
+            's','d','b','b','d','s',
+            's','S','S','S','S','s',
+            's','d','b','b','d','s',
+            's','S','S','S','S','s',
+            's','d','b','b','d','s',
+            's','S','S','S','S','s',
+            's','d','d','d','d','s',
+            's','S','S','S','S','s',
+            's','d','d','d','d','s',
+            's','S','S','S','S','s',
+            'k','s','s','s','s','k'
+        ];
+        const scrollAsset = createPixelTexture(6, 17, scrollMatrix, scrollColors);
+
+        // ====================================================================
+        // 渲染函数
+        // ====================================================================
+        let currentTile = floorTile;
+
+        function drawBackground() {
+            const tileSize = 48;
+            for (let x = 0; x < canvas.width; x += tileSize) {
+                for (let y = 0; y < canvas.height; y += tileSize) {
+                    ctx.drawImage(currentTile, x, y, tileSize, tileSize);
+                }
+            }
+        }
+
+        function drawTiledTexture(tex, startX, startY, width, height, tileW, tileH) {
+            for (let x = startX; x < startX + width; x += tileW) {
+                for (let y = startY; y < startY + height; y += tileH) {
+                    ctx.drawImage(tex, x, y, tileW, tileH);
+                }
+            }
+        }
+
+        function drawCharacter(x, y, name, type, isPink) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+            ctx.beginPath();
+            ctx.ellipse(x + 24, y + 84, 20, 7, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            let img = maleSprite;
+            if (isPink) {
+                const pinkMatrix = maleSpriteMatrix.map(c => c === 'b' ? 'p' : (c === 'l' ? 'w' : (c === 'd' ? 'r' : c)));
+                img = createPixelTexture(11, 12, pinkMatrix, spriteColors);
+            }
+            ctx.drawImage(img, x, y, 48, 88);
+
+            ctx.fillStyle = isPink ? '#ffbde2' : '#ffe464';
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.font = 'bold 12px "Microsoft YaHei"';
+
+            const textWidth = ctx.measureText(name).width;
+            ctx.fillRect(x + 24 - textWidth/2 - 6, y - 22, textWidth + 12, 20);
+            ctx.strokeRect(x + 24 - textWidth/2 - 6, y - 22, textWidth + 12, 20);
+
+            ctx.fillStyle = '#000000';
+            ctx.fillText(name, x + 24 - textWidth/2, y - 8);
+            ctx.restore();
+        }
+
+        function drawCauldron(x, y, label) {
+            ctx.drawImage(cauldronAsset, x, y, 96, 96);
+            ctx.fillStyle = 'rgba(255,69,0,' + (0.2 + Math.random()*0.3) + ')';
+            ctx.beginPath();
+            ctx.arc(x+48, y+96, 40, 0, Math.PI, false);
+            ctx.fill();
+
+            ctx.fillStyle = '#dcd1b4';
+            ctx.font = '12px "Microsoft YaHei"';
+            ctx.fillText(label, x + 12, y - 10);
+        }
+
+        function drawChest(x, y, asset, label, isOpen) {
+            ctx.drawImage(asset, x, y, 96, 96);
+
+            if (isOpen) {
+                ctx.fillStyle = 'rgba(255,195,0,' + (0.06 + Math.random()*0.1) + ')';
+                ctx.beginPath();
+                ctx.arc(x + 48, y + 10, 60, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            if (label) {
+                ctx.fillStyle = '#dcd1b4';
+                ctx.font = '12px "Microsoft YaHei"';
+                ctx.fillText(label, x, y - 10);
+            }
+        }
+
+        // ====================================================================
+        // 5大场景渲染
+        // ====================================================================
+        function renderLoop() {
+            currentTile = (currentScene === 4 || currentScene === 5) ? grassTile : floorTile;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+
+            const msgBubble = document.getElementById('msg-bubble');
+
+            if (currentScene === 1) {
+                msgBubble.style.display = 'block';
+
+                ctx.fillStyle = '#422817';
+                ctx.strokeStyle = '#1a0f08';
+                ctx.lineWidth = 4;
+                ctx.fillRect(200, 260, 96, 40);
+                ctx.strokeRect(200, 260, 96, 40);
+
+                drawCharacter(224, 170, "大师兄·陆青");
+                drawCharacter(500, 220, "传功长老");
+
+            } else if (currentScene === 2) {
+                msgBubble.style.display = 'none';
+                drawCauldron(160, 200, "乾坤九龙炉 (地火)");
+                drawCauldron(400, 200, "寒漓淬灵鼎 (冰火)");
+                drawCharacter(300, 240, "炼丹执事", 'male', true);
+
+            } else if (currentScene === 3) {
+                msgBubble.style.display = 'none';
+
+                ctx.strokeStyle = '#5a6266';
+                ctx.lineWidth = 6;
+                ctx.strokeRect(100, 150, 760, 400);
+
+                drawCharacter(200, 260, "执事·张铁");
+                drawCharacter(600, 260, "试炼弟子");
+
+            } else if (currentScene === 4) {
+                msgBubble.style.display = 'none';
+
+                // ── 全点阵资产：天工多宝藏宝阁 ──
+
+                // 后墙木壁（点阵纹理平铺）
+                drawTiledTexture(wallTile, 70, 44, 820, 200, 48, 48);
+
+                // 金匾额 ×2倍
+                ctx.drawImage(plaqueAsset, 240, 56, 192, 40);
+
+                // 两侧竹简挂轴（点阵资产）
+                ctx.drawImage(scrollAsset, 78, 70, 48, 136);
+                ctx.drawImage(scrollAsset, 834, 70, 48, 136);
+
+                // 矮台（点阵资产）
+                ctx.drawImage(pedestalAsset, 120, 396, 240, 40);
+                ctx.drawImage(pedestalAsset, 600, 396, 240, 40);
+
+                // 双宝箱（12×12矩阵，96×96渲染）
+                drawChest(182, 290, chest1Asset, "金丝蟠龙宝箱（开启中）", true);
+                drawChest(668, 290, chest2Asset, "玄铁重宝箱（禁制锁闭）", false);
+
+                // 守阁人居中
+                drawCharacter(448, 380, "守阁·玄铁真人");
+
+            } else if (currentScene === 5) {
+                msgBubble.style.display = 'none';
+
+                ctx.save();
+                ctx.translate(480, 320);
+                ctx.strokeStyle = '#2b7851';
+                ctx.lineWidth = 6;
+                ctx.beginPath();
+                ctx.arc(0, 0, 120, 0, Math.PI*2);
+                ctx.stroke();
+
+                ctx.fillStyle = 'rgba(255,255,255,0.15)';
+                ctx.beginPath();
+                ctx.arc(0, 0, 110, Math.PI/2, Math.PI*1.5);
+                ctx.fill();
+                ctx.restore();
+
+                drawCharacter(456, 260, "小师妹·银月", 'male', true);
+            }
+        }
+
+        function changeScene(index) {
+            currentScene = index;
+
+            const btns = document.querySelectorAll('.template-btn');
+            btns.forEach((btn, i) => {
+                if (i === index - 1) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            const logContent = document.getElementById('log-content');
+            const titles = [
+                `<div>【突破】内门弟子 <span style="color:#ffe66f;">陆青</span> 成功将《紫阳真诀》提升至第七层！</div><div>【系统】大殿香火充沛，全宗门修炼速度提升10%。</div>`,
+                `<div>【顿悟】外门弟子 <span style="color:#ffe66f;">张铁</span> 在炼丹房观摩地火，触发流火顿悟！</div><div>【产出】今日极品筑基丹已入库 50 颗。</div>`,
+                `<div>【切磋】演武场剑气纵横，张铁一式"断浪"击碎了木人桩！</div><div>【日常】弟子们正在进行高强度体魄淬炼。</div>`,
+                `<div>【珍宝】金丝蟠龙宝箱金芒大盛！玄铁重箱禁制锁固不可破。</div><div>【镇守】玄铁真人坐镇天工阁，两侧秘卷挂轴微微颤动。</div>`,
+                `<div>【灵潮】后山阵法触发百年一遇的灵潮，核心灵气纯度大增！</div><div>【挂机】<span style="color:#ffbde2;">小师妹·银月</span> 正在此地深度闭关。</div>`
+            ];
+            logContent.innerHTML = titles[index - 1];
+
+            renderLoop();
+        }
+
+        setInterval(renderLoop, 300);
+    </script>
+</body>
+</html>

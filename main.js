@@ -25,6 +25,21 @@ if (_fs2.existsSync(_envFile)) {
 
 const IS_REQUIRED = require.main !== module;
 
+// ── PID 锁：防止多实例冲突（仅子进程检查） ──
+const _pidPath = _path2.join(__dirname, 'main.pid');
+if (process.env.__SILVERMOON_CHILD__) {
+  try {
+    if (_fs2.existsSync(_pidPath)) {
+      const _oldPid = Number(_fs2.readFileSync(_pidPath, 'utf8'));
+      if (_oldPid > 0) {
+        try { process.kill(_oldPid, 0); console.log(`[pidlock] 旧实例 ${_oldPid} 仍在运行，退出`); process.exit(0); } catch (e) { /* 旧进程已死 */ }
+      }
+    }
+    _fs2.writeFileSync(_pidPath, String(process.pid), 'utf8');
+    process.on('exit', () => { try { _fs2.unlinkSync(_pidPath); } catch (e) { /* ignore */ } });
+  } catch (e) { /* PID 文件操作失败不阻塞 */ }
+}
+
 // ═══════════════════════════════════════════════════════════
 // 自愈守护进程 — 银月断线自动重启
 // ═══════════════════════════════════════════════════════════
@@ -170,24 +185,30 @@ if (!_fs.existsSync(_logDir)) _fs.mkdirSync(_logDir, { recursive: true });
 const _origConsoleLog = console.log;
 const _origConsoleWarn = console.warn;
 const _origConsoleError = console.error;
+const _origStdoutWrite = process.stdout.write.bind(process.stdout);
+const _origStderrWrite = process.stderr.write.bind(process.stderr);
 const _ts = () => new Date().toISOString().replace('T', ' ').slice(0, 19);
 const _logFile = _path.join(_logDir, 'gateway-out.log');
 const _errFile = _path.join(_logDir, 'gateway-err.log');
-// 双写：文件 + 静默（不输出到终端，根治闪屏）
+// 双写：日志文件 + 终端（根治闪屏靠 stdio pipe，不靠静默 stdout）
 console.log = (...args) => {
   const line = `[${_ts()}] ${args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ')}\n`;
   try { _fs.appendFileSync(_logFile, line, 'utf8'); } catch {}
+  _origConsoleLog(...args);
 };
 console.warn = (...args) => {
   const line = `[${_ts()}] [WARN] ${args.map(a => typeof a === 'object' ? JSON.stringify(a) : String(a)).join(' ')}\n`;
   try { _fs.appendFileSync(_logFile, line, 'utf8'); } catch {}
+  _origConsoleWarn(...args);
 };
 console.error = (...args) => {
   const msg = args.map(a => typeof a === 'object' ? (a instanceof Error ? a.stack : JSON.stringify(a)) : String(a)).join(' ');
   const line = `[${_ts()}] ${msg}\n`;
   try { _fs.appendFileSync(_errFile, line, 'utf8'); } catch {}
+  _origConsoleError(...args);
 };
-// 额外静默：劫持 stdout/stderr write（根治所有终端输出）
+// 劫持 stdout/stderr write：日志文件 + 终端（根治 require hang）
+// 之前不转发终端导致 require 链中某些模块 hang（fs.appendFileSync 阻塞）
 process.stdout.write = function(...args) {
   try {
     const str = typeof args[0] === 'string' ? args[0] : '';
@@ -195,7 +216,7 @@ process.stdout.write = function(...args) {
       _fs.appendFileSync(_logFile, `[${_ts()}] ${str}`, 'utf8');
     }
   } catch {}
-  // HTTP 响应走 socket，不走 stdout，直接静默不输出到终端
+  _origStdoutWrite(...args);
 };
 process.stderr.write = function(...args) {
   try {
@@ -204,6 +225,7 @@ process.stderr.write = function(...args) {
       _fs.appendFileSync(_errFile, `[${_ts()}] ${str}`, 'utf8');
     }
   } catch {}
+  _origStderrWrite(...args);
 };
 // ═══════════════════════════════════════════════════════════
 
@@ -235,6 +257,8 @@ const { fetchUsdMyrWithFallback, fetchGoldSpotUsdWithFallback } = require('./lib
 const llmProxy = require('./lib/llm-proxy');
 // Discord 已移除，Telegram 全权接管
 const telegramBridge = require('./lib/telegram-bridge');
+// 注册全局引用，供 process error handler 和健康监控回调调用
+global.__telegramBridge = telegramBridge;
 // 内联 sendDiscordWithFallback：优先 Telegram，兼容旧调用
 async function sendDiscordWithFallback(msg, payload) {
   const txt = typeof payload === 'string' ? payload : (payload?.content || '');
@@ -250,6 +274,7 @@ async function sendDiscordWithFallback(msg, payload) {
 const { SilvermoonPersona, buildSilvermoonSystemPrompt, buildWorkCard } = require('./lib/persona-silvermoon');
 const { routeWithLLM } = require('./lib/brain-router');
 const tabbitBridge = require('./lib/tabbit-bridge');
+const workflowState = require('./lib/workflow-state');
 const vision = require('./lib/vision');
 const { startTaskWatcher } = require('./lib/task-watcher');
 const { startDispatchConsumer, getDispatchHistory } = require('./silvermoon_local/silvermoon/lib/dispatch-consumer');
@@ -261,6 +286,7 @@ const { createMemory } = require('./lib/memory');
 const openclawSwitch = require('./lib/openclaw-switch');
 const { createEvidenceDeduper } = require('./lib/evidence-dedupe');
 const { buildSystemPrompt } = require('./lib/prompt-builder');
+const memdb = require('./lib/memdb');
 const agents = require('./lib/agents');
 const { tryIntentIntercept, INTENT } = require('./lib/intent');
 const toolRouter = require('./lib/tool-router');
@@ -276,8 +302,17 @@ const { sanitize } = require('./lib/sanitizer');
 const cron = require('./lib/cron');
 const CONFIG = require('./lib/config');
 const mempalaceBridge = require('./lib/mempalace-bridge');
+const selfState = require('./lib/self-state');
+const reflectionEngine = require('./lib/reflection-engine');
+const memoryPalace = require('./lib/memory-palace');
+const selfHeal = require('./lib/self-heal');
+const planner = require('./lib/planner');
+const teamOrchestrator = require('./lib/team-orchestrator');
+const empathyEngine = require('./lib/empathy-engine');
+const mindEngine = require('./lib/mind-engine');
 const { getToolSystemPrompt, processToolCalls } = require('./lib/agent-tools');
 const { getUnifiedPersonaPrompt } = require('./lib/agent-thinking-modes');
+const { updateAnchor, getAnchorBlock } = require('./lib/conversation-anchor');
 
 // ── 精准化快速回复表 (QUICK_REPLY_TABLE) ──
 // 仅拦截纯粹社交辞令，含"天气/如何/做什么"等关键词时跳过
@@ -516,11 +551,31 @@ const JARVIS_WAKE_WORDS = CONFIG.business.wakeWords;
 const OLLAMA_TIMEOUT_MS = CONFIG.limits.ollamaTimeout;
 const CLOUD_TIMEOUT_MS = CONFIG.limits.cloudTimeout;
 const DISCORD_MAX_UPLOAD_BYTES = CONFIG.limits.discordMaxUpload;
-const ZERO_TOKEN_BASE_URL = String(process.env.OPENCLAW_ZERO_TOKEN_URL || '').trim();
-const ZERO_TOKEN_GATEWAY_TOKEN = String(process.env.OPENCLAW_ZERO_TOKEN_TOKEN || '').trim();
-const ZERO_TOKEN_MODEL_DEFAULT = String(process.env.OPENCLAW_ZERO_TOKEN_MODEL || 'deepseek-web/deepseek-chat').trim();
 const OPENCLAW_TZ_OFFSET_MIN = CONFIG.business.tzOffsetMin;
 const BUILD_TAG = '2026-04-16_opsdash_v1';
+
+// ── Agent↔Model 路由表：分发 DEEPSEEK / Nvidia NIM / Ollama 三大引擎 ──
+const AGENT_MODEL_ROUTES = {
+  '银月':     { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '李长寿':   { provider: 'nvidia',       model: 'deepseek-ai/deepseek-v4-flash' },
+  '药老':     { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '萧炎':     { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '美杜莎':   { provider: 'nvidia',       model: 'google/gemma-4-31b-it' },
+  '寻宝鼠':   { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '小医仙':   { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '海波东':   { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '蓝灵儿':   { provider: 'ollama-cloud',  model: 'minimax-m2.7:cloud' },
+  '墨影':     { provider: 'ollama-local', model: 'qwen2.5:3b' },
+  '韩立':     { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '雅妃':     { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '许青':     { provider: 'deepseek',     model: 'deepseek-v4-flash' },
+  '紫灵':     { provider: 'ollama-local', model: 'qwen2.5:3b' },
+  '紫妍':     { provider: 'nvidia',       model: 'microsoft/phi-4-mini-instruct' },
+};
+const AGENT_PROVIDER_NVIDIA = 'nvidia';
+const AGENT_PROVIDER_DEEPSEEK = 'deepseek';
+const AGENT_PROVIDER_OLLAMA_LOCAL = 'ollama-local';
+const AGENT_PROVIDER_OLLAMA_CLOUD = 'ollama-cloud';
 
 const MORNING_BRIEF_HH = CONFIG.business.morningBriefHH;
 const MORNING_BRIEF_MM = CONFIG.business.morningBriefMM;
@@ -1088,6 +1143,23 @@ async function startLinkServer() {
   ensureDir(rootDropbox);
 
   const server = http.createServer(async (req, res) => {
+    const _readBody = (maxBytes = 1048576) => {
+      return new Promise((resolve) => {
+        const chunks = [];
+        let bytes = 0;
+        const timer = setTimeout(() => { resolve(null); }, 30000);
+        req.on('data', (c) => {
+          try {
+            const b = Buffer.isBuffer(c) ? c : Buffer.from(c);
+            bytes += b.length;
+            if (bytes <= maxBytes) chunks.push(b);
+          } catch {}
+        });
+        req.on('end', () => { clearTimeout(timer); resolve(Buffer.concat(chunks)); });
+        req.on('error', () => { clearTimeout(timer); resolve(null); });
+      });
+    };
+
     try {
       // 立即响应，防止 TCP 连接挂起
       console.log('[http] req:', req.url);
@@ -1237,27 +1309,13 @@ async function startLinkServer() {
         }
         const sig = String(req.headers['stripe-signature'] || '').trim();
         const secret = String(process.env.STRIPE_WEBHOOK_SECRET || '').trim();
-        const chunks = [];
-        let bytes = 0;
-        const maxBytes = 1024 * 1024;
-        await new Promise((resolve) => {
-          req.on('data', (c) => {
-            try {
-              const b = Buffer.isBuffer(c) ? c : Buffer.from(c);
-              bytes += b.length;
-              if (bytes <= maxBytes) chunks.push(b);
-            } catch {}
-          });
-          req.on('end', resolve);
-          req.on('error', resolve);
-        });
-        if (bytes > maxBytes) {
-          res.statusCode = 413;
+        const rawBuf = await _readBody(1024 * 1024);
+        if (!rawBuf) {
+          res.statusCode = 408;
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
-          res.end(JSON.stringify({ ok: false, error: 'payload_too_large' }));
+          res.end(JSON.stringify({ ok: false, error: 'body_read_timeout' }));
           return;
         }
-        const rawBuf = Buffer.concat(chunks);
         const raw = rawBuf.toString('utf-8');
         const sigOk = verifyStripeSignature(raw, sig, secret, Number(process.env.CASHCLAW_STRIPE_TOLERANCE_SEC || 300));
         if (!sigOk.ok) {
@@ -1350,20 +1408,27 @@ async function startLinkServer() {
 
       if (p === '/api/hot-reload' && String(req.method || '').toUpperCase() === 'POST') {
         try {
-          const chunks = [];
-          await new Promise((resolve) => {
-            req.on('data', (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)));
-            req.on('end', resolve);
-            req.on('error', resolve);
-          });
-          const body = JSON.parse(Buffer.concat(chunks).toString('utf-8'));
+          const rawBuf = await _readBody(1048576);
+          if (!rawBuf) {
+            res.statusCode = 408;
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+            res.end(JSON.stringify({ ok: false, error: 'body_read_timeout' }));
+            return;
+          }
+          const body = JSON.parse(rawBuf.toString('utf-8'));
           const sourcePath = String(body?.sourcePath || '').trim();
           if (sourcePath) {
             const fileName = path.basename(sourcePath);
             const agentMatch = sourcePath.match(/\.openclaw-workspaces\\([^\\]+)\\/);
             const agentId = agentMatch ? agentMatch[1] : 'unknown';
-            logInfo(`[HOT-RELOAD] ${agentId}/${fileName} saved, clearing cache`);
-            delete require.cache[sourcePath];
+            // 保护核心模块不被清除（避免 cron.js timer 引用丢失）
+            const protectedModules = ['lib\\cron.js', 'lib\\agent-tools.js', 'main.js'];
+            if (protectedModules.some(m => sourcePath.includes(m))) {
+              logWarn(`[HOT-RELOAD] ⚠️ 跳过核心模块 ${fileName} 的 cache 清除，防止定时器引用丢失`);
+            } else {
+              logInfo(`[HOT-RELOAD] ${agentId}/${fileName} saved, clearing cache`);
+              delete require.cache[sourcePath];
+            }
             STATE.hotReloadLog = STATE.hotReloadLog || [];
             STATE.hotReloadLog.push({ agentId, fileName, at: body.reloadedAt || new Date().toISOString() });
             if (STATE.hotReloadLog.length > 100) STATE.hotReloadLog.shift();
@@ -1375,6 +1440,47 @@ async function startLinkServer() {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json; charset=utf-8');
           res.end(JSON.stringify({ ok: true, warn: String(e?.message || e) }));
+        }
+        return;
+      }
+
+      if (p === '/api/stress-test' && (String(req.method || '').toUpperCase() === 'POST' || String(req.method || '').toUpperCase() === 'GET')) {
+        try {
+          let content, channelId;
+          if (String(req.method || '').toUpperCase() === 'GET') {
+            content = '/status';
+            channelId = '__stress_test__';
+          } else {
+            const rawBuf = await _readBody(1048576);
+            if (!rawBuf) {
+              res.statusCode = 408;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.end(JSON.stringify({ ok: false, error: 'body_read_timeout' }));
+              return;
+            }
+            const body = JSON.parse(rawBuf.toString('utf-8'));
+            content = String(body?.content || '').trim();
+            channelId = String(body?.channelId || '__stress_test__').trim();
+            if (!content) {
+              res.statusCode = 400;
+              res.setHeader('Content-Type', 'application/json; charset=utf-8');
+              res.end(JSON.stringify({ ok: false, error: 'missing_content' }));
+              return;
+            }
+          }
+          pushShortMemory(channelId, 'user', content);
+          const reply = await Promise.race([
+            askHermes(content, '银月', null, { channelId }),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('askHermes_timeout')), 30_000)),
+          ]);
+          pushShortMemory(channelId, 'assistant', reply);
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify({ ok: true, reply }));
+        } catch (e) {
+          res.statusCode = 504;
+          res.setHeader('Content-Type', 'application/json; charset=utf-8');
+          res.end(JSON.stringify({ ok: false, error: String(e?.message || e || 'unknown'), timeout: true }));
         }
         return;
       }
@@ -1424,7 +1530,15 @@ async function startLinkServer() {
       const ext = String(path.extname(abs) || '').toLowerCase();
       const isText = ['.txt', '.md', '.json', '.csv', '.log'].includes(ext);
       res.setHeader('Content-Type', isText ? 'text/plain; charset=utf-8' : 'application/octet-stream');
-      fs.createReadStream(abs).pipe(res);
+      const rs = fs.createReadStream(abs);
+      rs.on('error', (e) => {
+        if (!res.headersSent) {
+          res.statusCode = 500;
+          res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+          res.end('Stream Error');
+        }
+      });
+      rs.pipe(res);
     } catch (e) {
       res.statusCode = 500;
       res.setHeader('Content-Type', 'text/plain; charset=utf-8');
@@ -1466,12 +1580,19 @@ async function startLinkServer() {
         header[1] = 127;
         header.writeBigUInt64BE(BigInt(len), 2);
       }
-      try { socket.write(Buffer.concat([header, buf])); } catch {}
+      try { socket.write(Buffer.concat([header, buf])); } catch (e) { console.warn('[ws] sendFrame write error:', e?.message || e); }
     };
     // 接收 WebSocket 帧（仅处理 text 帧）
     let buffer = Buffer.alloc(0);
+    const MAX_WS_BUF = 10 * 1024 * 1024;
     socket.on('data', (chunk) => {
       buffer = Buffer.concat([buffer, chunk]);
+      if (buffer.length > MAX_WS_BUF) {
+        console.warn('[ws] buffer overflow (%d bytes), resetting', buffer.length);
+        buffer = Buffer.alloc(0);
+        try { socket.end(); } catch {}
+        return;
+      }
       while (buffer.length >= 2) {
         const opcode = buffer[0] & 0x0f;
         const masked = (buffer[1] & 0x80) !== 0;
@@ -1530,7 +1651,7 @@ async function startLinkServer() {
         }
       }
     });
-    socket.on('error', () => {});
+    socket.on('error', (e) => { console.warn('[ws] socket error:', e?.message || e); });
     // 30 秒超时关闭
     setTimeout(() => { try { socket.end(); } catch {} }, 30000);
   });
@@ -1872,7 +1993,7 @@ function syncOpenclawAgentSouls() {
       const next = String(body);
       let changed = false;
       if (normalizeNewlines(current) !== normalizeNewlines(next)) changed = !!writeFileSafe(outPath, next);
-      if (agentId === 'trae_yinyue') {
+      if (agentId === 'yinyue') {
         const finalBody = safeReadUtf8(outPath);
         const ok = finalBody.includes('银月狼族圣女');
         console.log(`银月当前加载的 SOUL 路径是：${outPath}`);
@@ -1963,7 +2084,7 @@ function buildSkillVisibility(agentsList) {
 
   for (const name of names) {
     const extra = STATE.agentSkills[name] || [];
-    const base = ['self-improving-agent', 'skill-vetter', 'jarvis-core', 'persistent-agent', 'self-learning', 'long-term-memory', 'voice-wakeup', 'openclaw-zero-token'];
+    const base = ['self-improving-agent', 'skill-vetter', 'jarvis-core', 'persistent-agent', 'self-learning', 'long-term-memory', 'voice-wakeup'];
 
     const allow = []; // agentSkillsMap[name] || [];
     if (name === '银月') allow.push(...CORE_SKILLS, 'stripe-payment-flow', 'lemon-squeezy-api-bridge', 'design-md', 'searxng-search', 'jina-reader', 'narrator-ai-skill');
@@ -2030,7 +2151,7 @@ function getAgentSoulBlock(targetAgent) {
     if (targetAgent === '银月') {
       const blocks = [];
       const srcA = path.join(AGENTS_DIR, '01_总管_银月.md');
-      const srcB = path.join(OPENCLAW_WORKSPACES_ROOT, 'trae_yinyue', 'SOUL.md');
+      const srcB = path.join(OPENCLAW_WORKSPACES_ROOT, 'yinyue', 'SOUL.md');
       const a = fs.existsSync(srcA) ? clip(safeReadUtf8(srcA)) : '';
       const b = fs.existsSync(srcB) ? clip(safeReadUtf8(srcB)) : '';
       if (a) blocks.push(`【灵魂设定A（来源：workspace/AGENTS_SOUL/01_总管_银月.md）】\n${a}`);
@@ -2628,23 +2749,19 @@ function isIdentityQuery(content) {
 
 function buildIdentityReply(msg) {
   const authorId = msg?.author?.id || '';
-  const agentNames = ['银月', ...STATE.agents.map((a) => a.name)].filter(Boolean).filter((v, i, arr) => arr.indexOf(v) === i);
+  const configAgents = readOpenclawConfigAgents();
+  const agentNames = configAgents.map((a) => a.name).filter(Boolean);
   const teamCount = agentNames.length;
-  const top = agentNames.slice(0, 12);
-  const more = teamCount > top.length ? `…等 ${teamCount} 人` : `${teamCount} 人`;
   return [
     '✅ 主人',
     '---',
-    '🌙 我是谁',
-    '🔹 我是银月（银月钱庄内阁总管）',
+    '🌙 我是银月（银月钱庄内阁总管）',
     '🔹 负责路由分工、风控与落盘审计',
     '---',
-    '🧑 你是谁',
-    `🔹 你是主人（Discord ID: ${authorId || '未知'}）`,
+    `🧭 银月钱庄内阁共 ${teamCount} 名成员`,
+    `🔹 ${agentNames.join('、')}`,
     '---',
-    '🧭 团队有多少人',
-    `🔹 当前内阁成员: ${more}`,
-    `🔹 名单: ${top.join('、')}`,
+    '💡 叫我名字即可切换对话',
   ].join('\n');
 }
 
@@ -3378,9 +3495,9 @@ async function transcribeAudioAttachment(att) {
 
   const model = String(process.env.OPENCLAW_STT_MODEL || 'whisper-1').trim() || 'whisper-1';
 
-  // 语音转写优先用独立 STT URL（Groq Whisper），其次 Zero Token 网关
-  const sttBaseUrl = String(process.env.OPENCLAW_STT_URL || process.env.OPENCLAW_ZERO_TOKEN_URL || '').trim().replace(/\/+$/g, '');
-  const sttApiKey = String(process.env.OPENCLAW_STT_TOKEN || process.env.OPENCLAW_ZERO_TOKEN_TOKEN || '').trim();
+  // 语音转写用独立 STT URL（如 Groq Whisper）
+  const sttBaseUrl = String(process.env.OPENCLAW_STT_URL || '').trim().replace(/\/+$/g, '');
+  const sttApiKey = String(process.env.OPENCLAW_STT_TOKEN || '').trim();
   if (sttBaseUrl) {
     const t = await callOpenAiCompatibleTranscription(`${sttBaseUrl}/v1/audio/transcriptions`, sttApiKey, model, buf, name, mime);
     if (t) return t;
@@ -3405,7 +3522,7 @@ async function handleWhisper(msg, content) {
   if (!text) {
     return {
       handled: true,
-      reply: '⚠️ 主人\n🔹 语音转写未配置或不可用\n🔹 需要配置其一：OPENCLAW_ZERO_TOKEN_URL(+TOKEN) 或 OPENAI_API_KEY',
+      reply: '⚠️ 主人\n🔹 语音转写未配置或不可用\n🔹 需要配置 OPENCLAW_STT_URL(+TOKEN) 或 OPENAI_API_KEY',
     };
   }
   if (/(取消|撤销|不要|关掉).{0,6}(提醒|定时)/.test(text)) {
@@ -4234,12 +4351,13 @@ async function refreshOllamaModels() {
   }
 }
 
-function selectHermesModel() {
+function selectHermesModel(targetAgent) {
   const forced = process.env.OLLAMA_MODEL;
   if (forced) return forced;
-  if (ZERO_TOKEN_BASE_URL) return ZERO_TOKEN_MODEL_DEFAULT;
-  // 上策：OpenRouter 云端免费模型（主人明确要求不用本地模型）
-  return 'openrouter/auto';
+  const route = AGENT_MODEL_ROUTES[targetAgent];
+  if (route?.provider === 'ollama-local') return route.model;
+  if (route?.provider === 'ollama-cloud') return route.model || 'deepseek-v4-flash:cloud';
+  return 'deepseek-v4-flash:cloud';
 }
 
 function sanitizeDiscordReply(text, opts) {
@@ -4452,8 +4570,8 @@ function stripBotTemplateLines(text) {
     /(请|麻烦)(你|您)(提供|补充).{0,12}(信息|背景|上下文)/,
     /^方法论路线由[:：]/,
     /^方法论路线[:：]/,
-    /^下一步动作[:：]/,
-    /^下一步[:：，,]/,
+    /^下一步动作[:：]\s*$/,
+    /^下一步[:：]\s*$/,
     /(下一步|接下来)[,，]?\s*我(可以|能)帮助你做什么/,
     /(你|您)想聊什么呢/,
     /我(可以|能)正常聊天了/,
@@ -4785,11 +4903,22 @@ function buildAgentInstruction(targetAgent, modeInstruction, ctx) {
 
 function askHermes(prompt, targetAgent, extraInstruction, ctx) {
   const t0 = Date.now();
+  workflowState.recordUserMessage(prompt);
   return new Promise((resolve, reject) => {
     const rtk = retrieveTopKContext(prompt, targetAgent);
     const channelId = ctx?.channelId || STATE.discord.lastOwnerChannelId || null;
-    const stm = getShortMemoryBlock(channelId);
-    const ltm = getLongMemoryRecentBlock(channelId);
+    // ── 从短期记忆构建对话历史（排除当前 prompt），让模型直接看到上下文 ──
+    const historyMessages = [];
+    if (channelId) {
+      const arr = STATE.shortMemory.byChannel[String(channelId).trim()] || [];
+      const hist = arr.length > 1 ? arr.slice(0, -1).slice(-12) : [];
+      for (const it of hist) {
+        if (it.role === 'user' || it.role === 'assistant') {
+          historyMessages.push({ role: it.role, content: it.content });
+        }
+      }
+    }
+    const ltm = getLongMemoryRecentBlock(channelId, historyMessages.length > 0 ? 10 : 18);
     const agentSoul = getAgentSoulBlock(targetAgent);
     
     const puaMode = getPuaModeForChannel(channelId);
@@ -4802,15 +4931,27 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
     const agentSkills = loadAgentSkills(targetAgent);
     // 注入"最近一次回复"的自我感知，防止复读
     const lastReplyBlock = buildLastReplyBlock(channelId);
+    const anchorBlock = getAnchorBlock(channelId);
+
+    const mindSystem = mindEngine.buildSystemPromptBlock(prompt, channelId);
+
     const safe = (v) => String(v || '');
-    const systemPrompt = buildSystemPrompt({
+    // ── 统一构建消息数组，所有通道都能继承历史上下文 ──
+    const buildMessages = (sys, userMsg) => [
+      { role: 'system', content: sys },
+      ...historyMessages,
+      { role: 'user', content: userMsg }
+    ];
+    const systemPrompt =
+      (anchorBlock ? anchorBlock + '\n\n' : '') +
+      buildSystemPrompt({
         agentName: targetAgent,
         userMessage: prompt,
         lang,
       }) +
       (extraInstruction ? '\n\n' + safe(extraInstruction) : '') +
       (agentSoul ? '\n\n' + safe(agentSoul) : '') +
-      (stm ? '\n\n' + safe(stm) : '') +
+      // STM 已嵌入 historyMessages，不再注入 system prompt
       (ltm ? '\n\n' + safe(ltm) : '') +
       (lastReplyBlock ? '\n\n' + safe(lastReplyBlock) : '') +
       (silvermoonMemory ? '\n\n【银月长效记忆库】\n' + safe(silvermoonMemory) : '') +
@@ -4821,14 +4962,15 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
       safe(rtk) +
       ((targetAgent && targetAgent !== '银月')
         ? '\n\n⚠️ 你现在的身份是【' + safe(targetAgent) + '】，不是银月。请严格以【' + safe(targetAgent) + '】的身份、语气和风格回复。严禁自称银月。'
-        : '');
-    const model = STATE.ollama.selectedModel || selectHermesModel();
+        : '') +
+      '\n\n' + safe(selfState.buildCompactState()) +
+      '\n\n' + safe(planner.getPlannerBlock()) +
+      '\n\n' + safe(teamOrchestrator.getOrchestratorBlock()) +
+      '\n\n' + safe(mindSystem.block);
+    const model = STATE.ollama.selectedModel || selectHermesModel(targetAgent);
     const data = JSON.stringify({
       model,
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: prompt }
-      ],
+      messages: buildMessages(systemPrompt, prompt),
       stream: false
     });
 
@@ -4895,10 +5037,7 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
         };
         let finalBody = JSON.stringify({
           model: useModel,
-          messages: [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: prompt },
-          ],
+          messages: buildMessages(systemPrompt, prompt),
           temperature: 0.3,
         });
         // 如果 LLM Proxy 正在运行，走缓存层
@@ -4920,39 +5059,10 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
         if (!resp.ok) throw new Error(`HTTP ${resp.status} ${txt}`);
         const json = JSON.parse(txt);
         const msg = json?.choices?.[0]?.message || {};
-        // DeepSeek V4-Flash 推理模型：content 可能为空，实际回复在 reasoning_content
+        // 兼容推理模型的 reasoning_content，并过滤 <think> 内部推理标签（Groq qwen3-32b 等思考型模型会用）
         const replyContent = String(msg.content || msg.reasoning_content || '').trim();
-        return replyContent || '（沉默）';
-      } finally {
-        clearTimeout(timer);
-      }
-    };
-
-    const callZeroTokenGateway = async () => {
-      if (!ZERO_TOKEN_BASE_URL) return null;
-      const url = ZERO_TOKEN_BASE_URL.replace(/\/+$/, '') + '/v1/chat/completions';
-      const controller = new AbortController();
-      const timer = setTimeout(() => controller.abort(), CLOUD_TIMEOUT_MS);
-      try {
-        const headers = { 'Content-Type': 'application/json' };
-        if (ZERO_TOKEN_GATEWAY_TOKEN) headers.Authorization = `Bearer ${ZERO_TOKEN_GATEWAY_TOKEN}`;
-        const resp = await fetchImpl(url, {
-          method: 'POST',
-          headers,
-          body: JSON.stringify({
-            model: ZERO_TOKEN_MODEL_DEFAULT,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user', content: prompt },
-            ],
-            temperature: 0.3,
-          }),
-          signal: controller.signal,
-        });
-        const txt = await resp.text();
-        if (!resp.ok) throw new Error(`HTTP ${resp.status} ${txt}`);
-        const json = JSON.parse(txt);
-        return String(json?.choices?.[0]?.message?.content || '').trim() || '（沉默）';
+        const cleanReply = replyContent.replace(/<think>[\s\S]*?<\/think>/g, '').trim();
+        return cleanReply || '（沉默）';
       } finally {
         clearTimeout(timer);
       }
@@ -4960,17 +5070,18 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
 
     const makeLocalRequest = () => {
       const localModel = 'qwen2.5:3b';
-      const localData = { model: localModel, messages: [{ role: 'system', content: systemPrompt }, { role: 'user', content: prompt }], stream: false };
+      const localData = { model: localModel, messages: buildMessages(systemPrompt, prompt), stream: false };
       const ctrl = new AbortController();
       const timer = setTimeout(() => ctrl.abort(), 30_000);
       return fetch('http://127.0.0.1:11434/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(localData), signal: ctrl.signal })
         .then(r => r.ok ? r.json() : r.text().then(t => { throw new Error(`Ollama ${r.status}: ${t.slice(0,200)}`); }))
-        .then(j => { clearTimeout(timer); return j.message?.content || '（沉默）'; })
+        .then(j => { clearTimeout(timer); const c = (j.message?.content || '（沉默）').replace(/<think>[\s\S]*?<\/think>/g, '').trim(); return c || '（沉默）'; })
         .catch(e => { clearTimeout(timer); throw e; });
     };
 
     const runFallback = () => {
       const deepseekKey = String(process.env.DEEPSEEK_API_KEY || '').trim();
+      const nvidiaKey = String(process.env.NVIDIA_API_KEY || '').trim();
 
       const tryDeepSeek = () => {
         if (!deepseekKey) return Promise.reject(new Error('missing_deepseek_key'));
@@ -4984,6 +5095,7 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
           model: geminiModel,
           system: systemPrompt,
           user: prompt,
+          history: historyMessages,
           fetchImpl,
           timeoutMs: CLOUD_TIMEOUT_MS,
         });
@@ -4994,6 +5106,14 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
         return Promise.resolve()
           .then(selectGroqModel)
           .then((m) => callOpenAICompat('https://api.groq.com/openai/v1/chat/completions', groqKey, m));
+      };
+
+      const tryNvidia = () => {
+        const nvidiaKey = String(process.env.NVIDIA_API_KEY || '').trim();
+        if (!nvidiaKey) return Promise.reject(new Error('missing_nvidia_key'));
+        const route = AGENT_MODEL_ROUTES[targetAgent];
+        const nvidiaModel = route?.model || 'deepseek-ai/deepseek-v4-flash';
+        return callOpenAICompat('https://integrate.api.nvidia.com/v1/chat/completions', nvidiaKey, nvidiaModel);
       };
 
       const tryOpenRouter = () => {
@@ -5012,31 +5132,37 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
         if (/model_decommissioned|decommissioned/i.test(msg)) {
           STATE.groq.modelIds = null;
           STATE.groq.lastFetchAt = null;
-          resolve(`⚠️ 主人\n🔹 Groq 模型已下线（已触发自动换模）\n🔹 请再发一次同样的问题重试\n🔹 ${redactSecrets(msg)}`);
+          saveAndResolve(`⚠️ 主人\n🔹 Groq 模型已下线（已触发自动换模）\n🔹 请再发一次同样的问题重试\n🔹 ${redactSecrets(msg)}`);
           return true;
         }
         return false;
       };
 
-      // 推理链：Zero Token → OpenRouter → 本地 Ollama → DeepSeek → Groq → Gemini
+      const saveAndResolve = (value) => {
+        workflowState.recordUserMessage(prompt);
+        updateAnchor(channelId, prompt, '', String(value || '').replace(/\n/g, ' ').slice(0, 200));
+        resolve(value);
+      };
+
+      // 推理链：DeepSeek → Nvidia NIM → OpenRouter → Groq → Gemini → 本地 Ollama
       const tryChain = (chain, idx) => {
         if (idx >= chain.length) {
-          resolve(`⚠️ 主人\n🔹 所有通道均不可用\n🔹 请稍后再试`);
+          saveAndResolve(`⚠️ 主人\n🔹 所有通道均不可用\n🔹 请稍后再试`);
           return;
         }
         chain[idx]()
-          .then((t) => resolve(t || '（沉默）'))
+          .then((t) => saveAndResolve(t || '（沉默）'))
           .catch((err) => {
             if (finalizeExternalFail(err)) return;
             tryChain(chain, idx + 1);
           });
       };
 
-      // 推理链：Zero Token → OpenRouter → DeepSeek → Groq → Gemini → 本地 Ollama（最后兜底）
+      // 推理链：DeepSeek(主模型) → Nvidia NIM → OpenRouter → Groq → Gemini → 本地 Ollama（最后兜底）
       const chain = [];
-      if (ZERO_TOKEN_BASE_URL) chain.push(callZeroTokenGateway);
-      chain.push(tryOpenRouter);
       if (deepseekKey) chain.push(tryDeepSeek);
+      if (nvidiaKey) chain.push(tryNvidia);
+      chain.push(tryOpenRouter);
       if (useGroq && groqKey) chain.push(tryGroq);
       if (geminiKey) chain.push(tryGemini);
       chain.push(makeLocalRequest); // 本地 Ollama 放在最后，所有云端都失败才用它
@@ -5063,7 +5189,8 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
                 try {
                   STATE.ollama.lastLatencyMs = Date.now() - t0;
                   STATE.ollama.lastOkAt = new Date().toISOString();
-                  res(JSON.parse(body).message?.content || '（沉默）');
+                  const raw = JSON.parse(body).message?.content || '（沉默）';
+                  res(raw.replace(/<think>[\s\S]*?<\/think>/g, '').trim() || '（沉默）');
                 } catch (e) {
                   rej(e);
                 }
@@ -5093,10 +5220,7 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
             STATE.ollama.selectedModel = lightModel;
             const lightData = JSON.stringify({
               model: lightModel,
-              messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: prompt }
-              ],
+              messages: buildMessages(systemPrompt, prompt),
               stream: false
             });
             const lightReq = http.request('http://127.0.0.1:11434/api/chat', {
@@ -5111,8 +5235,9 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
               lightRes.on('end', () => {
                 if (lightRes.statusCode === 200) {
                   try {
-                    resolve(JSON.parse(body).message?.content || '（沉默）');
-                    return;
+                      const raw = JSON.parse(body).message?.content || '（沉默）';
+                      resolve(raw.replace(/<think>[\s\S]*?<\/think>/g, '').trim() || '（沉默）');
+                      return;
                   } catch {}
                 }
                 resolve(`✅ 主人\n🔹 银月已切换至轻量模式（${lightModel}）\n🔹 请重发刚才的消息`);
@@ -5129,8 +5254,61 @@ function askHermes(prompt, targetAgent, extraInstruction, ctx) {
       return;
     }
 
-    // ── 直连 DeepSeek（跳过推理链） ──
+    // ── Agent 感知路由：按 AGENT_MODEL_ROUTES 分发到对应引擎 ──
+    const _agentRoute = AGENT_MODEL_ROUTES[targetAgent];
     const _deepseekKey = String(process.env.DEEPSEEK_API_KEY || '').trim();
+    const _nvidiaKey = String(process.env.NVIDIA_API_KEY || '').trim();
+
+    if (_agentRoute?.provider === 'ollama-local') {
+      // 本地轻量：银月/墨影/紫灵 走本地 Ollama
+      const localData = JSON.stringify({
+        model: _agentRoute.model || 'qwen2.5:3b',
+        messages: buildMessages(systemPrompt, prompt),
+        stream: false
+      });
+      const localReq = http.request('http://127.0.0.1:11434/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(localData)
+        }
+      }, (localRes) => {
+        let body = '';
+        localRes.on('data', chunk => body += chunk);
+        localRes.on('end', () => {
+          if (localRes.statusCode === 200) {
+            try {
+              const raw = JSON.parse(body).message?.content || '（沉默）';
+              resolve(raw.replace(/<think>[\s\S]*?<\/think>/g, '').trim() || '（沉默）');
+              return;
+            } catch {}
+          }
+          console.error('[Hermes] 本地 Ollama 失败，走推理链兜底');
+          runFallback();
+        });
+      });
+      localReq.setTimeout(OLLAMA_TIMEOUT_MS, () => { try { localReq.destroy(); } catch {} });
+      localReq.on('error', (e) => { console.error('[Hermes] 本地 Ollama 错误:', e.message); runFallback(); });
+      localReq.write(localData);
+      localReq.end();
+      return;
+    }
+
+    if (_agentRoute?.provider === 'nvidia') {
+      // Nvidia NIM：李长寿/美杜莎/紫妍 走 Nvidia
+      if (_nvidiaKey) {
+        const nvModel = _agentRoute.model || 'deepseek-ai/deepseek-v4-flash';
+        callOpenAICompat('https://integrate.api.nvidia.com/v1/chat/completions', _nvidiaKey, nvModel)
+          .then(resolve)
+          .catch((err) => {
+            console.error('[Hermes] Nvidia NIM 直连失败:', err?.message || err);
+            runFallback();
+          });
+        return;
+      }
+    }
+
+    // 默认路径：DeepSeek → 推理链兜底（药老/萧炎/寻宝鼠等）
     if (_deepseekKey) {
       callOpenAICompat('https://api.deepseek.com/v1/chat/completions', _deepseekKey, 'deepseek-v4-flash')
         .then(resolve)
@@ -5500,7 +5678,7 @@ async function handleXiaoyanTrade(text, channelId, requestedBy) {
   return '❌ 主人，萧炎交易模块无法识别该指令。请使用：交易计划、持仓、MT4 账户等关键词。';
 }
 
-// ── 电商运营官：Shopify API 处理 ────────────────────────────
+// ── 许青：Shopify API 处理 ────────────────────────────
 async function handleShopify(text, channelId, msg) {
   const t = String(text || '').trim();
   const shopifyApi = require('./lib/shopify-api');
@@ -5898,7 +6076,7 @@ async function askSilvermoonAutonomyD({ userText, extraInstruction, channelId, r
       try { if (typeof silvermoonEvolution?.record === 'function') silvermoonEvolution.record('xiaoyanCrawler'); } catch {}
       return await handleXiaoyanCrawler(txt, cid);
     }
-    // SHOPIFY_QUERY 路由到电商运营官
+    // SHOPIFY_QUERY 路由到许青
     if (hit.intent === INTENT.SHOPIFY_QUERY) {
       recordPerformance('shopify');
       try { if (typeof silvermoonEvolution?.record === 'function') silvermoonEvolution.record('shopify'); } catch {}
@@ -6582,15 +6760,16 @@ async function main() {
 
   // 银月钱庄 · 使用 EventEmitter 替代 Discord Client，Telegram 全权接管
   STATE.discord.client = client;
-  STATE.discord.connected = true;
-  STATE.discord.ready = false; // tryLogin 成功后才设为 true
+  STATE.discord.connected = false;
+  STATE.discord.ready = false;
   // 全局兜底：_resetWatchdog 在某些闭包路径中被引用但未定义
   // 防止 [telegram-bridge] message handler error
   globalThis._resetWatchdog = globalThis._resetWatchdog || (() => {});
   console.log('[system] 事件总线就绪（Telegram 模式）');
   logInfo('✅ [银月钱庄] Telegram 模式已启动');
     
-    // 1. 初始化记忆
+    // 1. 初始化记忆（含 shortMemory 磁盘恢复）
+    loadShortMemoryFromDisk();
     try {
       const r = memory.init();
       if (r && r.ok) {
@@ -6624,6 +6803,8 @@ async function main() {
       staff: async (args, deps) => (await handleStaff(deps.msg, `!staff ${args}`)).reply,
       tts: async (args, deps) => (await handleTts(deps.msg, `!tts ${args}`)).reply,
       remind: async (args, deps) => (await handleRemind(deps.msg, `!remind ${args}`)).reply,
+      记忆: async (args, deps) => (await handleMemdb(deps.msg, `!记忆 ${args}`)).reply,
+      memory: async (args, deps) => (await handleMemdb(deps.msg, `!memory ${args}`)).reply,
       news: async (args, deps) => (await handleNews(deps.msg, `!news ${args}`)).reply,
     });
 
@@ -6652,11 +6833,17 @@ async function main() {
     cron.registerPresets({});
     cron.registerByPath('quant_safety_net', 'every 1h', 'scripts/quant-safety-net.js', 'run', '量化保底行情巡检');
     cron.registerByPath('sourcing_pipeline', 'every 1d', 'scripts/sourcing-pipeline.js', 'run', '选品自动化巡检（寻宝鼠 → 利润计算 → 落盘）');
-    cron.registerByPath('fulfillment_pipeline', 'every 1d', 'scripts/fulfillment-pipeline.js', 'run', '选品→上架整链（寻宝鼠→利润→电商运营官上架→dispatch通知）');
+    cron.registerByPath('fulfillment_pipeline', 'every 1d', 'scripts/fulfillment-pipeline.js', 'run', '选品→上架整链（寻宝鼠→利润→许青上架→dispatch通知）');
+    cron.registerByPath('shopify_auto_pipeline', 'every 1d', 'scripts/shopify-auto-pipeline.js', 'run', 'Shopify自动铺货流水线：巡检→选品→美图→草稿上架→邮件通知');
     cron.registerByPath('github_release_watch', 'every 1d', 'scripts/github-release-watch.js', 'run', 'GitHub Release 看门狗（n8n 工作流模式原生实现）');
     cron.registerByPath('self_improving', 'every 6h', 'scripts/self-improving-agent.js', 'run', '自动审计 & 自我修复（Agent 配置/TASK/版本巡检，带 --fix 自愈）');
     cron.registerByPath('self_heal_core_skills', 'every 6h', 'scripts/self-heal-core-skills.js', 'main', '核心技能自愈管线（SKILL.md 元数据校验 + JS 实现自检，缺失自动再生）');
-    cron.register({ name: '药老_Shopify巡检', schedule: '09:00', handler: async () => await runShopifyDiagnostic({}) });
+
+    // ── 自动化改造：自动备份/日志轮转/Engram ──
+    cron.registerByPath('auto_backup', '03:00', 'scripts/auto-backup.js', 'run', '自动备份核心数据（silvermoon_core/data/.env，保留7份）');
+    cron.registerByPath('log_rotate', '04:00', 'scripts/log-rotate.js', 'run', '日志轮转清理（超50MB自动gzip归档，保留7天）');
+    cron.registerByPath('engram_auto', 'every 1h', 'scripts/engram-auto.js', 'run', 'Engram 记忆自动观察（扫描最近1小时会话文件，自动学习）');
+    cron.register({ name: '药老_Shopify巡检', schedule: '09:00', handler: async () => await shopifyDiagnostic.runDiagnostic({}) });
     cron.register({ name: '药老_AI趋势', schedule: '08:30', handler: async () => {
       try {
         const r = await yaolaoTrendPipeline.run({ dryRun: false, force: false });
@@ -6720,6 +6907,13 @@ async function main() {
         }
       } catch (e) { notifyOwner(`⚠️ **紫妍渲染异常**: ${e.message}`); }
     } });
+
+    // ── 社交媒体自动化管线 ──
+    cron.registerByPath('social_auto_pipeline', '09:00', 'scripts/social-auto-pipeline.js', 'run', '社交媒体每日自动发帖管线（趋势→内容→配图→Facebook/X/Reddit）');
+    cron.registerByPath('deep_article_mon', 'Mon 09:00', 'scripts/social-deep-article.js', 'run', '深度论文管线（周一）：DeepCalm/睡眠/焦虑');
+    cron.registerByPath('deep_article_wed', 'Wed 09:00', 'scripts/social-deep-article.js', 'run', '深度论文管线（周三）：DeepCalm/睡眠/焦虑');
+    cron.registerByPath('deep_article_fri', 'Fri 09:00', 'scripts/social-deep-article.js', 'run', '深度论文管线（周五）：DeepCalm/睡眠/焦虑');
+
     cron.registerMemoryTasks();
     cron.startAll();
 
@@ -6804,32 +6998,8 @@ async function main() {
       } catch (e) { logWarn(`[mailer] 启动自检异常: ${e.message}`); }
     }, 5000);
 
-    // ═══ 邮箱心跳（每 30 分钟发一封静默测试邮件） ═══
-    setInterval(async () => {
-      try {
-        const { sendEmail, getEmailHealth, recreateTransporter } = require('./lib/mailer');
-        const h = getEmailHealth();
-        // 熔断中不发心跳
-        if (h.circuitOpen) {
-          logWarn('[mailer] 心跳跳过：熔断中');
-          return;
-        }
-        const r = await sendEmail('🔍 邮箱心跳', '<p style="color:#666">静默测试 — 系统自动发送</p>');
-        if (r.ok) {
-          logInfo('[mailer] 心跳 OK');
-        } else {
-          logWarn(`[mailer] 心跳失败: ${r.error}`);
-          recreateTransporter();
-          // 5 秒后重试
-          setTimeout(async () => {
-            const { sendEmail } = require('./lib/mailer');
-            const retry = await sendEmail('🔍 邮箱心跳(重试)', '<p style="color:#666">心跳重试 — 系统自动发送</p>');
-            if (retry.ok) logInfo('[mailer] 心跳重试通过');
-            else logError(`[mailer] 心跳重试仍失败: ${retry.error}`);
-          }, 5000);
-        }
-      } catch (e) { logWarn(`[mailer] 心跳异常: ${e.message}`); }
-    }, 30 * 60 * 1000);
+    // ═══ 邮箱已就绪 — 邮件仅在晨报/夜报/管线报告时发送，不发送无用心跳 ═══
+    logInfo('[mailer] 邮箱心跳已禁用 — 仅在有价值的报告时发送邮件');
     // 日志清理：每6小时清理一次超过50MB的日志文件
     setInterval(() => {
       try {
@@ -6898,7 +7068,12 @@ async function main() {
           prefetchMoYingMorning: () => { logDebug('[CRON] 墨影早检预取'); return null; },
           prefetchMoYingAfternoon: () => { logDebug('[CRON] 墨影午检预取'); return null; },
           prefetchMoYingNight: () => { logDebug('[CRON] 墨影夜检预取'); return null; },
-          prefetchMoYingHourly: () => { logDebug('[CRON] 墨影每小时巡检预取'); return null; },
+          prefetchMoYingHourly: async () => {
+            logDebug('[CRON] 墨影每小时巡检预取');
+            try {
+              require('./scripts/moying-nvidia-monitor.cjs');
+            } catch (e) { logError('[CRON] 墨影nVidia监控失败:', e?.message); }
+          },
           wakeMoYing: () => { logDebug('[CRON] 唤醒墨影'); return null; },
         },
         formatTs: (d) => d.toISOString().replace('T', ' ').slice(0, 19),
@@ -6908,6 +7083,21 @@ async function main() {
     } catch (e) {
       console.log(`[CRON] 调度器加载失败: ${e?.message || e}`);
     }
+
+    // 启动主动自愈循环（BossMode 自主修复能力）
+    try {
+      const { startAutoHeal, setOnHealCallback } = require('./lib/self-heal.js');
+      setOnHealCallback((round) => {
+        if (round.errors > 0 || round.retried > 0) {
+          logWarn(`[AUTO-HEAL] 轮次完成: ${round.retried}次重试, ${round.errors}个错误`);
+        }
+      });
+      startAutoHeal(60000);
+      logDebug('[AUTO-HEAL] 主动自愈循环已启动 (60s间隔)');
+    } catch (e) {
+      logError('[AUTO-HEAL] 启动失败:', e?.message);
+    }
+
     // 6. 奏折审批模块（Discord 已移除，跳过）
     console.log('[memorial] Discord 已移除，奏折模块跳过');
 
@@ -7021,18 +7211,6 @@ async function main() {
               }
             }
 
-            if (/截图|screenshot|截屏|截取屏幕/.test(userText)) {
-              try {
-                const tools = require('./lib/agent-tools');
-                const urlMatch = userText.match(/https?:\/\/[^\s]+/);
-                const result = await tools.handlers.screenshot({ url: urlMatch ? urlMatch[0] : undefined });
-                await telegramBridge.sendTelegramReply(tgEvent.chatId, result, tgEvent.messageId);
-              } catch (e) {
-                await telegramBridge.sendTelegramReply(tgEvent.chatId, `📸 正在截图...\n（截图引擎: ${e?.message?.slice(0,100) || '未知'}）`, tgEvent.messageId);
-              }
-              return;
-            }
-
             // ── 位置设定命令 ──
             const locRequest = /^(?:我的)?位置(?:\s*分享|\s*在哪|\s*在哪|分享位置|定位|location)?$/i.test(userText.trim());
             if (locRequest) {
@@ -7066,8 +7244,19 @@ async function main() {
               return;
             }
 
+            // ── 团队/身份查询拦截（文本消息） ──
+            if (isIdentityQuery(userText)) {
+              const identityReply = buildIdentityReply({ author: { id: String(tgEvent.chatId) } });
+              await telegramBridge.sendTelegramReply(tgEvent.chatId, identityReply, tgEvent.messageId);
+              return;
+            }
+
             _resetWatchdog();
             try {
+              // ── 共情引擎+记忆宫殿记录 ──
+              if (userText) empathyEngine.recordInteraction(userText, 'user', { channelId: cid });
+              if (userText) memoryPalace.addToWorkingMemory('user', userText, { channel: 'telegram' });
+
               const mode = determineMode(userText);
               const extra = buildAgentInstruction(agentName, mode?.instruction || '', { channelId: cid, userText });
               const switchResult = await openclawSwitch.callWithDegrade(agentName, async () => {
@@ -7087,27 +7276,39 @@ async function main() {
 
               let finalReply = reply;
               try {
-                const { cleaned, results } = await processToolCalls(reply);
+                const { results } = await processToolCalls(reply);
                 if (results.length > 0) {
-                  const summary = results.map(r =>
-                    `\n🔧 工具[${r.tool}]: ${r.success ? '✅ 成功' : '❌ 失败'}\n${r.result}`
-                  ).join('');
-                  finalReply = cleaned + '\n\n---\n' + summary;
-                } else {
-                  finalReply = cleaned;
+                  const MAX_TOOL_LEN = 500;
+                  finalReply = results.map(r => {
+                    let txt = r.result.startsWith('✅') || r.result.startsWith('ℹ️')
+                      ? r.result
+                      : `🔧 工具[${r.tool}]: ${r.result}`;
+                    if (txt.length > MAX_TOOL_LEN) {
+                      txt = txt.slice(0, MAX_TOOL_LEN - 100);
+                      const end = txt.lastIndexOf('\n', MAX_TOOL_LEN - 120);
+                      txt = (end > 50 ? txt.slice(0, end) : txt) + '\n…（结果过长已截断）';
+                    }
+                    return txt;
+                  }).join('\n');
                 }
               } catch (e) {
                 console.error(`[telegram-bridge][tool-exec] 工具处理异常:`, e?.message || e);
               }
 
-              const { cleanText: processedReply, note: tabbitNote } = processTabbitAutoTrigger(finalReply);
-              const sendTxt = processedReply + tabbitNote;
+              const sendTxt = finalReply;
               if (sendTxt.trim()) {
                 await telegramBridge.sendTelegramReply(tgEvent.chatId, sendTxt, tgEvent.messageId);
+                pushShortMemory(cid, 'assistant', sendTxt);
+                memoryPalace.addToWorkingMemory('assistant', sendTxt, { channel: 'telegram' });
+                selfState.recordCall(true);
               }
               writeHeartbeat(`${agentName}_telegram`);
             } catch (e) {
               console.error('[telegram-bridge] 消息处理异常:', e?.message || e);
+              try {
+                selfState.recordCall(false);
+                selfHeal.handleError(e, { context: 'telegram_message_handler' });
+              } catch {}
               try {
                 await telegramBridge.sendTelegramReply(tgEvent.chatId, `⚠️ 银月处理异常: ${(e?.message || String(e)).slice(0, 200)}`, tgEvent.messageId);
               } catch {}
@@ -7127,6 +7328,15 @@ async function main() {
               const agentName = '银月';
               const cid = `tg_${voiceEvent.chatId}`;
               const userText = text;
+              // ── 共情引擎+记忆宫殿记录 ──
+              if (userText) empathyEngine.recordInteraction(userText, 'user', { channelId: cid, source: 'voice' });
+              if (userText) memoryPalace.addToWorkingMemory('user', userText, { channel: 'telegram_voice' });
+              // ── 团队/身份查询拦截（语音消息） ──
+              if (isIdentityQuery(userText)) {
+                const identityReply = buildIdentityReply({ author: { id: String(voiceEvent.chatId) } });
+                await telegramBridge.sendTelegramTextWithVoice(voiceEvent.chatId, identityReply, voiceEvent.messageId);
+                return;
+              }
               try {
                 const mode = determineMode(userText);
                 const extra = buildAgentInstruction(agentName, mode?.instruction || '', { channelId: cid, userText });
@@ -7144,13 +7354,19 @@ async function main() {
                     verbose: STATE.discord.lastUserVerboseByChannel?.[cid],
                   });
                 }
-                const { cleanText: processedReply, note: tabbitNote } = processTabbitAutoTrigger(reply);
-                const sendTxt = processedReply + tabbitNote;
+                const sendTxt = reply;
                 if (sendTxt.trim()) {
                   await telegramBridge.sendTelegramTextWithVoice(voiceEvent.chatId, sendTxt, voiceEvent.messageId);
+                  pushShortMemory(cid, 'assistant', sendTxt);
+                  memoryPalace.addToWorkingMemory('assistant', sendTxt, { channel: 'telegram_voice' });
+                  selfState.recordCall(true);
                 }
               } catch (e) {
                 console.error('[telegram-bridge] 语音回复处理异常:', e?.message || e);
+                try {
+                  selfState.recordCall(false);
+                  selfHeal.handleError(e, { context: 'telegram_voice_handler' });
+                } catch {}
                 try {
                   await telegramBridge.sendTelegramTextWithVoice(voiceEvent.chatId, `⚠️ 银月处理异常: ${(e?.message || String(e)).slice(0, 200)}`, voiceEvent.messageId);
                 } catch {}
@@ -7453,94 +7669,10 @@ async function main() {
         return;
       }
 
-      // ── 强制截图拦截：检测到截图/网页截图/screenshot 时直接执行 ──
-      const screenshotMatch = content.match(/(?:截图|screenshot|网页截图|截屏)(?:\s*(?:这个|那个|这个网站|这个页面|这个网址|这个链接))?\s*(?:https?:\/\/[^\s,，。]+)?/i);
-      if (screenshotMatch) {
-        console.log('--- [DEBUG] 触发强制截图拦截 ---');
-        // 从消息中提取 URL
-        let targetUrl = '';
-        const urlMatch = content.match(/https?:\/\/[^\s,，。]+/);
-        if (urlMatch) {
-          targetUrl = urlMatch[0];
-        } else {
-          try {
-            const recentMemories = await memory?.search?.(content) || [];
-            const memList = Array.isArray(recentMemories) ? recentMemories : [];
-            for (const mem of memList) {
-              const u = String(mem?.content || '').match(/https?:\/\/[^\s,，。]+/);
-              if (u) { targetUrl = u[0]; break; }
-            }
-          } catch {}
-        }
-        if (!targetUrl) {
-          // 没 URL → 直接截桌面，不说「请给我网址」
-          await msg.channel.sendTyping();
-          try {
-            const shotDir = require('path').join(process.cwd(), 'user_data', 'screenshots');
-            require('fs').mkdirSync(shotDir, { recursive: true });
-            const shotPath = require('path').join(shotDir, `desktop_${Date.now()}.png`);
-            require('child_process').execSync(
-              `powershell -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.SendKeys]::SendWait('{PRTSC}'); Start-Sleep -Milliseconds 500; $img = [System.Windows.Forms.Clipboard]::GetImage(); if($img){ $img.Save('${shotPath}','png') }"`,
-              { timeout: 10000, encoding: 'utf-8' }
-            );
-            if (require('fs').existsSync(shotPath)) {
-              const tgChatId = String(msg.channelId || '').replace(/^tg_/, '');
-              await telegramBridge.sendTelegramPhoto(tgChatId, shotPath, '📸 桌面截图');
-              await replyAndRemember(msg, '✅ 桌面截图已完成');
-            } else {
-              await replyAndRemember(msg, '📸 截图指令已发送（PrtSc 模式）');
-            }
-          } catch (e) {
-            await replyAndRemember(msg, `📸 正在尝试截图...\n（如有需要可附带网址：截图 https://example.com）`);
-          }
-          STATE.discord.inflightByChannel[cid] = false;
-          try { delete STATE.discord.inflightSinceByChannel[cid]; } catch {}
-          return;
-        }
-        // 执行截图（含 fallback 引擎）
-        await msg.channel.sendTyping();
-        let screenshotResult;
-        // Plan A: Puppeteer
-        try {
-          const puppeteer = require('puppeteer');
-          const browser = await puppeteer.launch({ headless: true, args: ['--no-sandbox', '--disable-setuid-sandbox'] });
-          const page = await browser.newPage();
-          await page.goto(targetUrl, { waitUntil: 'networkidle2', timeout: 30000 });
-          const shotDir = require('path').join(process.cwd(), 'user_data', 'screenshots');
-          require('fs').mkdirSync(shotDir, { recursive: true });
-          const shotPath = require('path').join(shotDir, `shot_${Date.now()}.png`);
-          await page.screenshot({ path: shotPath, fullPage: false });
-          await browser.close();
-          screenshotResult = { ok: true, path: shotPath, engine: 'puppeteer' };
-        } catch (e) {
-          screenshotResult = { ok: false, reason: e?.message || String(e), engine: 'puppeteer' };
-        }
-        // Plan B: 如果 Puppeteer 失败，尝试用 API 截图服务
-        if (!screenshotResult.ok) {
-          try {
-            const apiUrl = `https://api.screenshotone.com/take?url=${encodeURIComponent(targetUrl)}&access_key=free&viewport_width=1280&viewport_height=800&format=png`;
-            const resp = await fetch(apiUrl, { signal: AbortSignal.timeout(15000) });
-            if (resp.ok) {
-              const shotDir = require('path').join(process.cwd(), 'user_data', 'screenshots');
-              require('fs').mkdirSync(shotDir, { recursive: true });
-              const shotPath = require('path').join(shotDir, `shot_api_${Date.now()}.png`);
-              const buf = Buffer.from(await resp.arrayBuffer());
-              require('fs').writeFileSync(shotPath, buf);
-              screenshotResult = { ok: true, path: shotPath, engine: 'api' };
-            }
-          } catch {}
-        }
-        if (screenshotResult.ok) {
-          const tgChatId = String(msg.channelId || '').replace(/^tg_/, '');
-          const tgSent = await telegramBridge.sendTelegramPhoto(tgChatId, screenshotResult.path, `📸 ${targetUrl}`);
-          if (tgSent?.ok) {
-            await replyAndRemember(msg, `✅ 截图完成：${targetUrl}`);
-          } else {
-            await replyAndRemember(msg, `✅ 截图已保存：${screenshotResult.path}\n${targetUrl}`);
-          }
-        } else {
-          await replyAndRemember(msg, `❌ 功法受阻：截图失败（${screenshotResult.engine}引擎：${screenshotResult.reason?.slice(0, 80)}）。银月建议：主人手动截图，或换个网站试试。`);
-        }
+      // ── 团队/身份查询拦截 ──
+      if (isIdentityQuery(content)) {
+        const identityReply = buildIdentityReply(msg);
+        await replyAndRemember(msg, identityReply);
         STATE.discord.inflightByChannel[cid] = false;
         try { delete STATE.discord.inflightSinceByChannel[cid]; } catch {}
         return;
@@ -7645,8 +7777,7 @@ async function main() {
             return true;
           });
           const silentReply = silentLines.join('\n').trim() || '✅ 主人\n🔹 指令已执行。';
-          const { cleanText: processedReply, note: tabbitNote } = processTabbitAutoTrigger(silentReply);
-          await replyAndRemember(msg, processedReply + tabbitNote);
+          await replyAndRemember(msg, silentReply);
           writeHeartbeat(`${currentAgent} silent_execution`);
         }
         STATE.discord.inflightByChannel[cid] = false;
@@ -7669,8 +7800,7 @@ async function main() {
           userText: content,
           verbose: STATE.discord.lastUserVerboseByChannel[cid],
         });
-        const { cleanText: processedReply, note: tabbitNote } = processTabbitAutoTrigger(cleanReply);
-        await replyAndRemember(msg, processedReply + tabbitNote);
+        await replyAndRemember(msg, cleanReply);
         writeHeartbeat(`${currentAgent} fallback_reply`);
       }
 
@@ -7725,20 +7855,27 @@ async function main() {
 
   process.on('unhandledRejection', (e) => {
     const msg = String(e?.stack || e?.message || e || '');
-    console.error('[unhandledRejection]', msg.slice(0, 500));
-    // 永不退出进程，记录后继续运行
+    console.error('[unhandledRejection] 🛡️ 优雅降级 — 不退出', msg.slice(0, 500));
+    try { fs.writeFileSync(path.join(_logDir, 'crash.log'), `[${new Date().toISOString()}] unhandledRejection: ${msg}\n`, { flag: 'a' }); } catch {}
+    if (typeof global.__telegramBridge?.restartAllBots === 'function') {
+      global.__telegramBridge.restartAllBots().catch(() => {});
+    }
   });
   process.on('uncaughtException', (e) => {
     const msg = String(e?.stack || e?.message || e || '');
-    console.error('[uncaughtException]', msg.slice(0, 500));
-    // 永不退出进程，记录后继续运行
+    console.error('[uncaughtException] 🛡️ 优雅降级 — 不退出', msg.slice(0, 500));
+    try { fs.writeFileSync(path.join(_logDir, 'crash.log'), `[${new Date().toISOString()}] uncaughtException: ${msg}\n`, { flag: 'a' }); } catch {}
+    if (typeof global.__telegramBridge?.restartAllBots === 'function') {
+      global.__telegramBridge.restartAllBots().catch(() => {});
+    }
   });
   process.on('SIGINT', () => {
     try {
       if (global.__llmProxyServer) global.__llmProxyServer.close();
       memory.close();
       agents.saveChannelAgentMap();
-    } catch {}
+    } catch (e) { console.warn('[SIGINT] cleanup error:', e?.message || e); }
+    try { require('./lib/shared-memory-bridge').close(); } catch (e) { console.warn('[SIGINT] sharedMem close error:', e?.message || e); }
     process.exit(0);
   });
   process.on('SIGTERM', () => {
@@ -7746,7 +7883,8 @@ async function main() {
       if (global.__llmProxyServer) global.__llmProxyServer.close();
       memory.close();
       agents.saveChannelAgentMap();
-    } catch {}
+    } catch (e) { console.warn('[SIGTERM] cleanup error:', e?.message || e); }
+    try { require('./lib/shared-memory-bridge').close(); } catch (e) { console.warn('[SIGTERM] sharedMem close error:', e?.message || e); }
     process.exit(0);
   });
 
@@ -7759,14 +7897,29 @@ async function main() {
   }, 30_000);
   global.__lastHeartbeat = Date.now();
 
+  // 银月钱庄 · Telegram Polling 健康监控（每60秒探活一次）
+  setInterval(async () => {
+    try {
+      if (typeof global.__telegramBridge?.healthCheck === 'function') {
+        const ok = await global.__telegramBridge.healthCheck();
+        if (!ok) {
+          console.warn('[health] Telegram Polling 异常，触发自愈');
+          global.__telegramBridge.restartAllBots().catch(() => {});
+        }
+      }
+    } catch (e) {
+      console.error('[health] 探活异常:', e?.message || e);
+    }
+  }, 60_000);
+
   // 银月钱庄 · 进程保活：防止 polling 中断后 Node 自动退出
   setInterval(() => {}, 1 << 30);
 
   const tryLogin = async () => {
     const token = process.env.DISCORD_TOKEN;
     if (!token || typeof client.login !== 'function') {
-      console.log('[login] Discord 客户端不可用，已降级为 Telegram-only 模式');
-      STATE.discord.connected = true;
+      console.log('[login] Discord 已禁用，Telegram-only 模式');
+      STATE.discord.connected = false;
       STATE.discord.ready = false;
       return;
     }
@@ -7843,18 +7996,8 @@ async function main() {
               return;
             }
 
-            // ── 强制截图截断 ──
-            if (/截图|screenshot|截屏|截取屏幕/.test(userText)) {
-              try {
-                const tools = require('./lib/agent-tools');
-                const urlMatch = userText.match(/https?:\/\/[^\s]+/);
-                const result = await tools.handlers.screenshot({ url: urlMatch ? urlMatch[0] : undefined });
-                await telegramBridge.sendTelegramReply(tgEvent.chatId, result, tgEvent.messageId);
-              } catch (e) {
-                await telegramBridge.sendTelegramReply(tgEvent.chatId, `📸 正在截图...\n（截图引擎: ${e?.message?.slice(0,100) || '未知'}）`, tgEvent.messageId);
-              }
-              return;
-            }
+            // ── 先写入短期记忆，让 LLM 有对话上下文 ──
+            pushShortMemory(cid, 'user', userText);
 
             // ── 直接走 Agent LLM ──
             const mode = determineMode(userText);
@@ -7877,22 +8020,28 @@ async function main() {
             // ── 处理工具调用块 ──
             let finalReply = reply;
             try {
-              const { cleaned, results } = await processToolCalls(reply);
+              const { results } = await processToolCalls(reply);
               if (results.length > 0) {
-                const summary = results.map(r =>
-                  `\n🔧 工具[${r.tool}]: ${r.success ? '✅ 成功' : '❌ 失败'}\n${r.result}`
-                ).join('');
-                finalReply = cleaned + '\n\n---\n' + summary;
-              } else {
-                finalReply = cleaned;
+                const MAX_TOOL_LEN = 500;
+                finalReply = results.map(r => {
+                  let txt = r.result.startsWith('✅') || r.result.startsWith('ℹ️')
+                    ? r.result
+                    : `🔧 工具[${r.tool}]: ${r.result}`;
+                  if (txt.length > MAX_TOOL_LEN) {
+                    txt = txt.slice(0, MAX_TOOL_LEN - 100);
+                    const end = txt.lastIndexOf('\n', MAX_TOOL_LEN - 120);
+                    txt = (end > 50 ? txt.slice(0, end) : txt) + '\n…（结果过长已截断）';
+                  }
+                  return txt;
+                }).join('\n');
               }
             } catch (e) {
               console.error(`[telegram-bridge][tool-exec] 工具处理异常:`, e?.message || e);
             }
 
-            const { cleanText: processedReply, note: tabbitNote } = processTabbitAutoTrigger(finalReply);
-            const sendTxt = processedReply + tabbitNote;
+            const sendTxt = finalReply;
             if (sendTxt.trim()) {
+              pushShortMemory(cid, 'assistant', sendTxt);
               await telegramBridge.sendTelegramReply(tgEvent.chatId, sendTxt, tgEvent.messageId);
             }
             writeHeartbeat(`${agentName}_telegram`);
@@ -7918,6 +8067,7 @@ async function main() {
               const agentName = '银月';
               const cid = `tg_${voiceEvent.chatId}`;
               const userText = text;
+              pushShortMemory(cid, 'user', `[语音] ${userText}`);
               const mode = determineMode(userText);
               const extra = buildAgentInstruction(agentName, mode?.instruction || '', { channelId: cid, userText });
               const switchResult = await openclawSwitch.callWithDegrade(agentName, async () => {
@@ -7936,16 +8086,25 @@ async function main() {
               }
               let finalReply = reply;
               try {
-                const { cleaned, results } = await processToolCalls(reply);
+                const { results } = await processToolCalls(reply);
                 if (results.length > 0) {
-                  finalReply = cleaned + '\n\n---\n' + results.map(r => `\n🔧 工具[${r.tool}]: ${r.success ? '✅ 成功' : '❌ 失败'}\n${r.result}`).join('');
-                } else {
-                  finalReply = cleaned;
+                  const MAX_TOOL_LEN = 500;
+                  finalReply = results.map(r => {
+                    let txt = r.result.startsWith('✅') || r.result.startsWith('ℹ️')
+                      ? r.result
+                      : `🔧 工具[${r.tool}]: ${r.result}`;
+                    if (txt.length > MAX_TOOL_LEN) {
+                      txt = txt.slice(0, MAX_TOOL_LEN - 100);
+                      const end = txt.lastIndexOf('\n', MAX_TOOL_LEN - 120);
+                      txt = (end > 50 ? txt.slice(0, end) : txt) + '\n…（结果过长已截断）';
+                    }
+                    return txt;
+                  }).join('\n');
                 }
               } catch {}
-              const { cleanText: processedReply, note: tabbitNote } = processTabbitAutoTrigger(finalReply);
-              const sendTxt = processedReply + tabbitNote;
+              const sendTxt = finalReply;
               if (sendTxt.trim()) {
+                pushShortMemory(cid, 'assistant', sendTxt);
                 await telegramBridge.sendTelegramTextWithVoice(voiceEvent.chatId, sendTxt, voiceEvent.messageId);
               }
               writeHeartbeat(`${agentName}_telegram_voice`);
@@ -8062,20 +8221,6 @@ async function main() {
             return;
           }
 
-          // ── 强制截图截断 — 绝不说「请给我网址」──
-          if (/截图|screenshot|截屏|截取屏幕/.test(userText)) {
-            await fakeMsg.channel.sendTyping();
-            try {
-              const tools = require('./lib/agent-tools');
-              const urlMatch = userText.match(/https?:\/\/[^\s]+/);
-              const result = await tools.handlers.screenshot({ url: urlMatch ? urlMatch[0] : undefined });
-              await fakeMsg.channel.send(result);
-            } catch (e) {
-              await fakeMsg.channel.send(`📸 正在截图...\n（截图引擎: ${e?.message?.slice(0,100) || '未知'}）`);
-            }
-            return;
-          }
-
           // ── 直接走 Agent LLM ──
           const mode = determineMode(userText);
           const extra = buildAgentInstruction(agentName, mode?.instruction || '', { channelId: cid, userText });
@@ -8097,21 +8242,26 @@ async function main() {
           // ── 处理工具调用块 ──
           let finalReply = reply;
           try {
-            const { cleaned, results } = await processToolCalls(reply);
+            const { results } = await processToolCalls(reply);
             if (results.length > 0) {
-              const summary = results.map(r =>
-                `\n🔧 工具[${r.tool}]: ${r.success ? '✅ 成功' : '❌ 失败'}\n${r.result}`
-              ).join('');
-              finalReply = cleaned + '\n\n---\n' + summary;
-            } else {
-              finalReply = cleaned;
+              const MAX_TOOL_LEN = 500;
+              finalReply = results.map(r => {
+                let txt = r.result.startsWith('✅') || r.result.startsWith('ℹ️')
+                  ? r.result
+                  : `🔧 工具[${r.tool}]: ${r.result}`;
+                if (txt.length > MAX_TOOL_LEN) {
+                  txt = txt.slice(0, MAX_TOOL_LEN - 100);
+                  const end = txt.lastIndexOf('\n', MAX_TOOL_LEN - 120);
+                  txt = (end > 50 ? txt.slice(0, end) : txt) + '\n…（结果过长已截断）';
+                }
+                return txt;
+              }).join('\n');
             }
           } catch (e) {
             console.error(`[agent-bot][tool-exec] 工具处理异常:`, e?.message || e);
           }
 
-          const { cleanText: processedReply, note: tabbitNote } = processTabbitAutoTrigger(finalReply);
-          await fakeMsg.channel.send(processedReply + tabbitNote);
+          await fakeMsg.channel.send(finalReply);
           writeHeartbeat(`${agentName}_agent_bot`);
         } catch (e) {
           console.error(`[agent-bot][${event.agentName}] 消息处理异常:`, e?.message || e);
@@ -8344,7 +8494,7 @@ function getSkillStatus(skillName) {
   if (skillName === 'persistent-agent') return '在线(常驻)';
   if (skillName === 'self-learning') return '在线(增量)';
   if (skillName === 'long-term-memory') return fs.existsSync(LONG_TERM_DB_PATH) ? '在线(DB)' : '缺失';
-  if (skillName === 'openclaw-zero-token') return ZERO_TOKEN_BASE_URL ? '在线(网关)' : '未配置';
+
   if (CORE_SKILLS.includes(skillName)) return '在线(声明)';
   if (skillName === 'narrator-ai-skill') return '在线(协议)';
   if (skillName === 'narrator-script') return '在线(文案)';
@@ -8487,6 +8637,33 @@ function pushShortMemory(channelId, role, text) {
   const max = 24;
   while (arr.length > max) arr.shift();
   STATE.shortMemory.byChannel[cid] = arr;
+  persistShortMemory();
+}
+
+// shortMemory 磁盘持久化路径
+const SHORT_MEMORY_PATH = _path.join(_logDir, 'short-memory.json');
+
+function persistShortMemory() {
+  try {
+    const raw = JSON.stringify(STATE.shortMemory.byChannel);
+    _fs.writeFileSync(SHORT_MEMORY_PATH, raw, 'utf8');
+  } catch (e) {
+    console.error('[shortMemory] 持久化失败:', e?.message || e);
+  }
+}
+
+function loadShortMemoryFromDisk() {
+  try {
+    if (!_fs.existsSync(SHORT_MEMORY_PATH)) return;
+    const raw = _fs.readFileSync(SHORT_MEMORY_PATH, 'utf8');
+    if (!raw || raw === '{}') return;
+    const data = JSON.parse(raw);
+    if (typeof data !== 'object') return;
+    STATE.shortMemory.byChannel = data;
+    console.log(`[shortMemory] 已从磁盘恢复 ${Object.keys(data).length} 个频道`);
+  } catch (e) {
+    console.error('[shortMemory] 磁盘加载失败:', e?.message || e);
+  }
 }
 
 function getShortMemoryBlock(channelId) {
@@ -8504,7 +8681,8 @@ function getShortMemoryBlock(channelId) {
   return lines.join('\n');
 }
 
-function getLongMemoryRecentBlock(channelId) {
+function getLongMemoryRecentBlock(channelId, maxItems) {
+  if (maxItems === undefined) maxItems = 18;
   const cid = String(channelId || '').trim();
   if (!cid) return '';
   const raw = readLastChars(LONG_TERM_DB_PATH, 220_000);
@@ -8535,7 +8713,7 @@ function getLongMemoryRecentBlock(channelId) {
   }
 
   if (items.length === 0) return '';
-  const ordered = items.reverse().slice(-18);
+  const ordered = items.reverse().slice(-maxItems);
   const out = [];
   out.push('【长期记忆（本频道近期）】');
   for (const it of ordered) {
@@ -8717,7 +8895,7 @@ async function replyAndRemember(msg, text, meta, skipMemory) {
         meta: { channelId: msg.channelId },
       });
     }
-  } catch {}
+  } catch (e) { console.warn('[SharedMem] write error:', e?.message || e); }
   // 每次回复后更新记忆库（只记录关键信息，不记录无意义的"已回复"）
   const userMsg = String(msg?.content || '').trim().slice(0, 60);
   if (userMsg && !isPresencePing(userMsg)) {
@@ -9250,6 +9428,34 @@ async function fetchCryptoUsd() {
   };
 }
 
+async function fetchCsv(url) {
+  const txt = await fetchText(url);
+  return String(txt || '').trim();
+}
+
+function parseCsvLatestValue(csvText) {
+  const lines = String(csvText || '')
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (lines.length < 2) return null;
+  const last = lines[lines.length - 1];
+  const cols = last.split(',').map((c) => c.trim());
+  if (cols.length < 2) return null;
+  const date = cols[0];
+  const val = Number(cols[1]);
+  if (!Number.isFinite(val)) return null;
+  return { date, value: val };
+}
+
+async function fetchFredLatest(seriesId) {
+  const id = String(seriesId || '').trim();
+  if (!id) return null;
+  const url = `https://fred.stlouisfed.org/graph/fredgraph.csv?id=${encodeURIComponent(id)}`;
+  const csv = await fetchCsv(url);
+  return parseCsvLatestValue(csv);
+}
+
 async function fetchStooqLatest(symbol) {
   const s = String(symbol || '').trim().toLowerCase();
   if (!s) return null;
@@ -9775,6 +9981,63 @@ async function handleRemind(msg, content) {
   return { handled: true, reply: '⚠️ 主人\n🔹 创建提醒失败' };
 }
 
+// ── !记忆 / !memory 持久记忆管理 ──
+async function handleMemdb(msg, content) {
+  if (!isOwnerOrAdmin(msg)) return { handled: true, reply: '⚠️ 主人\n🔹 记忆 仅允许主人/管理员触发\n🔹 已拒绝执行' };
+  const s = String(content || '').trim();
+  const parts = s.split(/\s+/);
+  const subCmd = String(parts[1] || '').toLowerCase();
+  const args = parts.slice(2).join(' ').trim();
+
+  if (!subCmd || subCmd === 'help' || subCmd === '?') {
+    return {
+      handled: true,
+      reply: [
+        '✅ 主人 — 持久记忆管理',
+        '🔹 !记忆 list                  查看所有记忆',
+        '🔹 !记忆 add <内容>          添加新记忆',
+        '🔹 !记忆 del <id前缀>        删除记忆（前8位ID）',
+        '🔹 !记忆 help                 本帮助',
+      ].join('\n'),
+    };
+  }
+
+  if (subCmd === 'list') {
+    const rules = memdb.listRules(30);
+    if (!rules.length) return { handled: true, reply: '✅ 主人\n🔹 记忆库为空' };
+    const lines = ['🧠 银月核心记忆（共' + rules.length + '条）'];
+    for (const r of rules) {
+      const id8 = String(r.id || '').slice(0, 8);
+      const t = String(r.text || '').replace(/\n/g, ' ').trim().slice(0, 120);
+      lines.push(`🔹 (${id8}) ${t}`);
+    }
+    return { handled: true, reply: lines.join('\n') };
+  }
+
+  if (subCmd === 'add') {
+    if (!args) return { handled: true, reply: '⚠️ 主人\n🔹 用法：!记忆 add <要记住的内容>' };
+    const r = memdb.addRule(args, '银月', ['telegram']);
+    if (r.ok) {
+      const id8 = String(r.item.id || '').slice(0, 8);
+      await logToSharedMemory({ type: 'memdb_add', id: r.item.id, text: args, by: 'telegram' });
+      return { handled: true, reply: `✅ 已记住 (${id8})\n🔹 ${args.slice(0, 150)}` };
+    }
+    return { handled: true, reply: '⚠️ 主人\n🔹 写入记忆失败' };
+  }
+
+  if (subCmd === 'del' || subCmd === 'delete' || subCmd === 'remove') {
+    if (!args) return { handled: true, reply: '⚠️ 主人\n🔹 用法：!记忆 del <id前缀>（用 !记忆 list 查看ID）' };
+    const r = memdb.deleteRuleByPrefix(args);
+    if (r.ok) {
+      await logToSharedMemory({ type: 'memdb_del', prefix: args, removed: r.removed, by: 'telegram' });
+      return { handled: true, reply: `✅ 已遗忘\n🔹 删除了 ${r.removed} 条记忆` };
+    }
+    return { handled: true, reply: '⚠️ 主人\n🔹 未找到匹配的记忆' };
+  }
+
+  return { handled: true, reply: '⚠️ 主人\n🔹 未知子命令，用 !记忆 help 查看用法' };
+}
+
 function buildAgentSelfCheckBlock(deliveriesByAgent) {
   const names = ['银月', '李长寿', '墨影', '美杜莎', '雅妃', '萧炎', '韩立', '药老', '小医仙', '紫灵', '紫妍'];
   const lines = [];
@@ -9793,10 +10056,11 @@ function buildAgentSelfCheckBlock(deliveriesByAgent) {
 }
 
 async function buildMorningBrief() {
+  let abs, fileName;
   try {
   const tzNow = getTzNow();
   const ymd = formatYmd(tzNow);
-  const fileName = `${ymd}_早报.md`;
+  fileName = `${ymd}_早报.md`;
   const briefCache = readJsonSafe(BRIEF_CACHE_PATH) || {};
   const profile = loadUserProfile();
   const city = profile.location || '斗湖';
@@ -9941,14 +10205,15 @@ async function buildMorningBrief() {
   parts.push(`📄 简报归档：${fileName}`);
 
   const body = parts.join('\n').trim();
-  const abs = path.join(CRON_DIR, fileName);
+  abs = path.join(CRON_DIR, fileName);
   writeFileSafe(abs, body + '\n');
   writeFileSafe(BRIEF_CACHE_PATH, JSON.stringify(briefCache, null, 2) + '\n');
   return body;
   } catch (e) {
     logError(`[buildMorningBrief] 早报生成异常: ${e?.message || e}`);
-    const fallback = `📣 银月情报局 | 早报\n（生成时间：${formatTs(getTzNow())}）\n\n⚠️ 早报生成暂不可用，部分网络源可能超时。\n\n📄 简报归档：${fileName}`;
-    writeFileSafe(abs, fallback + '\n');
+    const fallback = `📣 银月情报局 | 早报\n（生成时间：${formatTs(getTzNow())}）\n\n⚠️ 早报生成暂不可用，部分网络源可能超时。\n\n📄 简报归档：${fileName || 'unknown'}`;
+    if (abs) writeFileSafe(abs, fallback + '\n');
+    else writeFileSafe(path.join(CRON_DIR, `${formatYmd(getTzNow())}_早报.md`), fallback + '\n');
     return fallback;
   }
 }
@@ -9981,6 +10246,7 @@ async function runSilverMoonMorningBrief(opts) {
         })()
       : text;
     await notifyOwner(body);
+    notifyOwnerEmail('银月早报', body.replace(/\n/g, '<br>')).catch(() => {});
     writeFileSafe(marker, `sentAt=${new Date().toISOString()}\n`);
     writeHeartbeat('Cron:晨报');
     return { ok: true, skipped: false };
@@ -10059,7 +10325,7 @@ function buildNightlyReport() {
   parts.push('');
 
   parts.push('🧑‍🤝‍🧑 需要补强（技能/助手）');
-  parts.push(`🔹 语音转写：需要配置 OPENCLAW_ZERO_TOKEN_URL(+TOKEN) 或 OPENAI_API_KEY（否则只能提示未配置）`);
+  parts.push(`🔹 语音转写：需要配置 OPENCLAW_STT_URL(+TOKEN) 或 OPENAI_API_KEY（否则只能提示未配置）`);
   parts.push(`🔹 搜索：如需更稳定，配置 SEARXNG_URL 或启用可用代理`);
 
   const fileName = `${formatYmd(tzNow)}_夜报.md`;
@@ -10071,7 +10337,9 @@ async function runSilverMoonNightlyReport() {
   const tName = '银月_每日23点55汇总';
   STATE.cron.lastRuns[tName] = formatTs(new Date());
   try {
-    await notifyOwner(buildNightlyReport());
+    const nightReport = buildNightlyReport();
+    await notifyOwner(nightReport);
+    notifyOwnerEmail('银月夜报', nightReport.replace(/\n/g, '<br>')).catch(() => {});
     writeHeartbeat('Cron:夜报');
   } catch {
     writeHeartbeat('Cron:夜报失败');
@@ -10169,31 +10437,6 @@ function updateSilvermoonMemory(entry) {
       : base + '\n' + newEntry + '\n';
     fs.writeFileSync(SILVERMOON_MEMORY_PATH, content, 'utf8');
   } catch {}
-}
-
-/**
- * 扫描回复文本中的 【TABBIT】 标记，自动启动 Tabbit 浏览器
- * 返回处理后的文本（移除标记）和启动结果信息
- */
-function processTabbitAutoTrigger(replyText) {
-  const pattern = /【TABBIT】\s*(.+?)(?=\n|$)/g;
-  let match;
-  let tabbitNote = '';
-  while ((match = pattern.exec(replyText)) !== null) {
-    const query = match[1].trim();
-    if (query) {
-      const task = tabbitBridge.enqueueTask({ type: 'browse', query, instruction: query });
-      const launched = tabbitBridge.launchTabbit(`https://www.google.com/search?q=${encodeURIComponent(query)}`);
-      if (launched.ok) {
-        tabbitNote += `\n🔍 已自动启动 Tabbit 搜索「${query}」（ID: ${task?.id || '?'}）`;
-      } else {
-        tabbitNote += `\n⚠️ 需要你帮忙在 Tabbit 中搜索：${query}`;
-      }
-    }
-  }
-  if (!tabbitNote) return { cleanText: replyText, note: '' };
-  const cleanText = replyText.replace(/【TABBIT】\s*.+?(?=\n|$)/g, '').replace(/\n{3,}/g, '\n\n').trim();
-  return { cleanText, note: tabbitNote };
 }
 
 function initCronJobs() {

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "jobs": {
+    "cc36330f-a9a3-4e03-b800-1fe9c2521804": {
+      "updatedAtMs": 1779069776911,
+      "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"cron\",\"expr\":\"0 10 * * *\",\"tz\":\"Asia/Singapore\"}}",
+      "state": {
+        "nextRunAtMs": 1779232420792,
+        "lastRunAtMs": 1779069601249,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 175662,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0,
+        "consecutiveSkipped": 0
+      }
+    },
+    "09ede591-96f8-4a55-ae22-aaef5a99f121": {
+      "updatedAtMs": 1779088778827,
+      "scheduleIdentity": "{\"version\":1,\"enabled\":true,\"schedule\":{\"kind\":\"cron\",\"expr\":\"0 3 * * *\",\"tz\":\"Asia/Singapore\"}}",
+      "state": {
+        "nextRunAtMs": 1779232415792,
+        "lastRunAtMs": 1779088678174,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 100653,
+        "lastDiagnostics": {
+          "summary": "cron: isolated agent run stalled before execution start (last phase: attempt-dispatch)",
+          "entries": [
+            {
+              "ts": 1779088778827,
+              "source": "cron-setup",
+              "severity": "error",
+              "message": "cron: isolated agent run stalled before execution start (last phase: attempt-dispatch)"
+            }
+          ]
+        },
+        "lastDiagnosticSummary": "cron: isolated agent run stalled before execution start (last phase: attempt-dispatch)",
+        "lastDeliveryStatus": "unknown",
+        "consecutiveErrors": 2,
+        "consecutiveSkipped": 0,
+        "lastError": "cron: isolated agent run stalled before execution start (last phase: attempt-dispatch)"
+      }
+    }
+  }
+}

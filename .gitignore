@@ -75,10 +75,21 @@ gw-err.txt
 gw-out.txt
 _tmp_*
 _test_*
+test.md
+test_pressure.mjs
+test_ws_agent.cjs
+test_yinyue_fix.mjs
+tmp_*.png
+tmp_*.cjs
+tmp_*.js
+tmp_*.mjs
+tools_output.json
 kimi_full_test.py
 workflow_engine.py
 tmp_*.json
 update-check.json
+*.bak.*
+*.last-good
 skills-lock.json
 long_term_memory.json
 emergency_restore.bat
@@ -88,7 +99,39 @@ emergency_restore.bat
 openrelay.exe
 *.tar.gz
 cookie.txt
+temp_key.txt
+*.R
+_*.py
+_*.cjs
+_*.mjs
+_*.js
+# Bot 输出日志
+bot.out.*
+
+# --- 数据/存储目录 ---
+credentials/
+backups/
+storage/
+browser/
+telegram/
+media/
+plans/
+delivery-queue/
+npm/
+.chrome-*-temp/
+.chrome_test_profile/
+.chrome-debug-profile/
+_share/
+
+# --- 引用/参考素材 ---
+_star_office_ref/
+_product_images*/
+_tabbit_*
 
 # --- 子项目已有独立 Git ---
 openclaw-control-center/
 deer-flow/
+awesome-design-md/
+plugins/rtk/
+plugins/turix-cua/
+prompt-optimizer-deploy/

@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>银月钱庄 · 运营控制台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<style>
+:root {
+  --bg-deep: #0A0A0A;
+  --bg-surface: #0D1117;
+  --bg-card: #161B22;
+  --bg-elevated: #1C2128;
+  --bg-sidebar: #0B0E14;
+  --accent: #00D4FF;
+  --accent-dim: #0099CC;
+  --accent-subtle: rgba(0,212,255,0.1);
+  --secondary: #818CF8;
+  --secondary-dim: #6366F1;
+  --text-primary: #F1F5F9;
+  --text-secondary: #A1A1AA;
+  --text-tertiary: #52525B;
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-default: rgba(255,255,255,0.10);
+  --border-hover: rgba(255,255,255,0.16);
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: #3B82F6;
+  --sidebar-w: 220px;
+  --nav-h: 64px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{font-size:14px}
+body{font-family:var(--font-sans);background:var(--bg-deep);color:var(--text-primary);display:flex;min-height:100dvh;overflow:hidden}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--text-tertiary);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--text-secondary)}
+
+/* Sidebar */
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar-w);height:100dvh;background:var(--bg-sidebar);border-right:1px solid var(--border-subtle);display:flex;flex-direction:column;z-index:100}
+.sidebar-brand{padding:20px 20px 16px;border-bottom:1px solid var(--border-subtle)}
+.sidebar-brand .logo{font-size:18px;font-weight:700;color:var(--accent);letter-spacing:-0.3px}
+.sidebar-brand .logo-sub{font-size:11px;color:var(--text-tertiary);margin-top:2px;letter-spacing:0.5px}
+.sidebar-nav{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:2px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--radius-md);color:var(--text-secondary);cursor:pointer;transition:all 0.2s;font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--accent-subtle);color:var(--text-primary)}
+.nav-item.active{background:var(--accent-subtle);color:var(--accent)}
+.nav-item .nav-icon{width:18px;height:18px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-item .nav-icon svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.nav-divider{height:1px;background:var(--border-subtle);margin:8px 12px}
+.sidebar-footer{padding:12px 16px;border-top:1px solid var(--border-subtle);font-size:11px;color:var(--text-tertiary)}
+.sidebar-footer .status-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--success);margin-right:6px;vertical-align:middle}
+.sidebar-footer .status-dot.error{background:var(--error)}
+
+/* Main */
+.main{margin-left:var(--sidebar-w);flex:1;display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+.topbar{height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 28px;border-bottom:1px solid var(--border-subtle);background:rgba(10,10,10,0.8);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);flex-shrink:0}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-left h2{font-size:16px;font-weight:600;color:var(--text-primary)}
+.topbar-left .breadcrumb{font-size:12px;color:var(--text-tertiary)}
+.topbar-right{display:flex;align-items:center;gap:16px}
+.topbar-time{font-size:12px;color:var(--text-secondary);font-family:var(--font-mono)}
+.topbar-stats{display:flex;align-items:center;gap:12px}
+.topbar-stat{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text-secondary)}
+.topbar-stat .num{font-weight:600;color:var(--text-primary);font-family:var(--font-mono)}
+.topbar-stat .num.online{color:var(--success)}
+.topbar-stat .num.offline{color:var(--error)}
+
+/* Content */
+.content{flex:1;overflow-y:auto;padding:24px 28px}
+.view{display:none}
+.view.active{display:block;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Stats Bar */
+.stats-bar{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:18px 20px;transition:all 0.3s}
+.stat-card:hover{border-color:var(--border-default);background:var(--bg-elevated);transform:translateY(-1px)}
+.stat-card .stat-label{font-size:12px;color:var(--text-tertiary);font-weight:500;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.stat-card .stat-value{font-size:28px;font-weight:700;color:var(--text-primary);font-family:var(--font-mono);line-height:1.2}
+.stat-card .stat-value.accent{color:var(--accent)}
+.stat-card .stat-value.success{color:var(--success)}
+.stat-card .stat-value.warning{color:var(--warning)}
+.stat-card .stat-sub{font-size:11px;color:var(--text-tertiary);margin-top:4px}
+
+/* Section */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-header h3{font-size:14px;font-weight:600;color:var(--text-primary)}
+.section-header .section-badge{font-size:11px;padding:2px 8px;border-radius:9999px;background:var(--accent-subtle);color:var(--accent)}
+
+/* Agent Grid */
+.agent-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:24px}
+.agent-card{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all 0.3s;position:relative;overflow:hidden}
+.agent-card:hover{border-color:var(--border-hover);background:var(--bg-elevated);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.agent-card .agent-glow{position:absolute;top:-50%;right:-50%;width:100%;height:100%;border-radius:50%;opacity:0;transition:opacity 0.5s;pointer-events:none}
+.agent-card:hover .agent-glow{opacity:0.05}
+.agent-card .agent-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.agent-card .agent-name{font-size:13px;font-weight:600;color:var(--text-primary)}
+.agent-card .agent-badge{font-size:10px;padding:1px 6px;border-radius:9999px;background:var(--bg-elevated);color:var(--text-tertiary);font-weight:500}
+.agent-card .agent-role{font-size:11px;color:var(--text-tertiary);margin-bottom:10px;line-height:1.3}
+.agent-card .agent-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border-subtle)}
+.agent-card .status-indicator{display:flex;align-items:center;gap:6px;font-size:11px}
+.agent-card .status-dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.agent-card .status-dot.online{background:var(--success);box-shadow:0 0 8px rgba(34,197,94,0.4)}
+.agent-card .status-dot.offline{background:var(--text-tertiary)}
+.agent-card .status-dot.busy{background:var(--warning);box-shadow:0 0 8px rgba(245,158,11,0.4)}
+.agent-card .status-dot.error{background:var(--error);box-shadow:0 0 8px rgba(239,68,68,0.4)}
+.agent-card .agent-lastseen{font-size:10px;color:var(--text-tertiary)}
+
+/* Panels (Side by side) */
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px}
+.panel{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px}
+.panel-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.panel-header h3{font-size:13px;font-weight:600;color:var(--text-primary)}
+.panel-header .panel-badge{font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono)}
+.panel-footer{margin-top:12px;padding-top:12px;border-top:1px solid var(--border-subtle);font-size:11px;color:var(--text-tertiary)}
+
+/* Health Items */
+.health-item{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-subtle)}
+.health-item:last-child{border-bottom:none}
+.health-item .health-label{font-size:12px;color:var(--text-secondary)}
+.health-item .health-value{font-size:12px;font-weight:500;font-family:var(--font-mono)}
+.health-item .health-bar{width:100px;height:4px;background:var(--bg-elevated);border-radius:2px;overflow:hidden;margin-left:8px}
+.health-item .health-bar-fill{height:100%;border-radius:2px;transition:width 1s ease}
+
+/* Heartbeat timeline */
+.timeline{max-height:240px;overflow-y:auto}
+.timeline-item{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border-subtle);font-size:12px}
+.timeline-item:last-child{border-bottom:none}
+.timeline-item .tl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.timeline-item .tl-dot.heartbeat{background:var(--accent)}
+.timeline-item .tl-dot.metrics{background:var(--secondary)}
+.timeline-item .tl-agent{font-weight:500;color:var(--text-primary);min-width:80px;font-family:var(--font-mono);font-size:11px}
+.timeline-item .tl-reason{color:var(--text-secondary);flex:1;font-size:11px}
+.timeline-item .tl-time{color:var(--text-tertiary);font-size:10px;font-family:var(--font-mono);white-space:nowrap}
+
+/* Chart container */
+.chart-container{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);padding:16px;margin-bottom:16px}
+.chart-container h3{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--text-primary)}
+.chart-wrap{position:relative;width:100%;height:220px}
+
+/* Table */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{padding:10px 12px;text-align:left;font-size:11px;color:var(--text-tertiary);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;border-bottom:1px solid var(--border-subtle)}
+.data-table td{padding:8px 12px;font-size:12px;color:var(--text-secondary);border-bottom:1px solid var(--border-subtle)}
+.data-table tr:hover td{background:var(--accent-subtle)}
+.data-table .cell-mono{font-family:var(--font-mono);font-size:11px}
+.data-table .status-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:500}
+.data-table .status-badge.online{background:rgba(34,197,94,0.1);color:var(--success)}
+.data-table .status-badge.offline{background:rgba(82,82,91,0.15);color:var(--text-tertiary)}
+.data-table .status-badge.busy{background:rgba(245,158,11,0.1);color:var(--warning)}
+.data-table .status-badge.error{background:rgba(239,68,68,0.1);color:var(--error)}
+.data-table .cell-agent{display:flex;align-items:center;gap:8px}
+
+/* Log view */
+.log-viewer{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden}
+.log-toolbar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--border-subtle);background:var(--bg-elevated)}
+.log-toolbar select,.log-toolbar input{padding:6px 10px;border-radius:var(--radius-sm);border:1px solid var(--border-default);background:var(--bg-card);color:var(--text-primary);font-size:12px;font-family:var(--font-sans)}
+.log-toolbar select:focus,.log-toolbar input:focus{outline:none;border-color:var(--accent)}
+.log-toolbar .log-count{font-size:11px;color:var(--text-tertiary);margin-left:auto}
+.log-stream{height:380px;overflow-y:auto;padding:10px 14px;font-family:var(--font-mono);font-size:11px;line-height:1.7}
+.log-line{display:flex;gap:8px;padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.02)}
+.log-line .log-time{color:var(--text-tertiary);white-space:nowrap;min-width:140px}
+.log-line .log-level{min-width:48px;font-weight:600}
+.log-line .log-level.INFO{color:var(--info)}
+.log-line .log-level.WARN{color:var(--warning)}
+.log-line .log-level.ERROR{color:var(--error)}
+.log-line .log-msg{color:var(--text-secondary);word-break:break-all}
+
+/* Loading */
+.loading-shimmer{background:linear-gradient(90deg,var(--bg-card) 25%,var(--bg-elevated) 50%,var(--bg-card) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:var(--radius-sm)}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Empty state */
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-tertiary)}
+.empty-state .empty-icon{margin-bottom:12px;opacity:0.3}
+.empty-state p{font-size:13px}
+
+/* Responsive */
+@media(max-width:1024px){
+  .stats-bar{grid-template-columns:repeat(2,1fr)}
+  .panels{grid-template-columns:1fr}
+  .agent-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+}
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0}
+  .stats-bar{grid-template-columns:1fr 1fr}
+  .content{padding:16px}
+  .topbar{padding:0 16px}
+}
+
+/* Agent Detail Modal */
+.modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg-surface);border:1px solid var(--border-default);border-radius:var(--radius-xl);width:520px;max-width:90vw;max-height:80vh;overflow-y:auto;animation:fadeIn 0.2s ease}
+.modal-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border-subtle)}
+.modal-header h3{font-size:15px;font-weight:600}
+.modal-close{background:none;border:none;color:var(--text-tertiary);cursor:pointer;font-size:18px;padding:4px;border-radius:var(--radius-sm);transition:color 0.2s}
+.modal-close:hover{color:var(--text-primary)}
+.modal-body{padding:20px}
+.modal-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.modal-info-item{background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-md);padding:12px}
+.modal-info-item .mi-label{font-size:11px;color:var(--text-tertiary);margin-bottom:4px}
+.modal-info-item .mi-value{font-size:13px;font-weight:500;color:var(--text-primary);font-family:var(--font-mono)}
+.modal-actions{display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border-subtle)}
+.modal-actions button{padding:8px 16px;border-radius:var(--radius-md);font-size:12px;font-weight:500;cursor:pointer;transition:all 0.2s}
+.btn-primary{background:var(--accent);color:#fff;border:none}
+.btn-primary:hover{background:var(--accent-dim)}
+.btn-ghost{background:transparent;border:1px solid var(--border-default);color:var(--text-secondary)}
+.btn-ghost:hover{background:var(--accent-subtle);color:var(--text-primary);border-color:var(--border-hover)}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="logo">🌙 银月钱庄</div>
+    <div class="logo-sub">SilverMoon · Control Center</div>
+  </div>
+  <nav class="sidebar-nav">
+    <button class="nav-item active" data-view="overview">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>
+      总览
+    </button>
+    <button class="nav-item" data-view="agents">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+      Agent
+    </button>
+    <button class="nav-item" data-view="pipelines">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></span>
+      管道
+    </button>
+    <button class="nav-item" data-view="logs">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span>
+      日志
+    </button>
+    <button class="nav-item" data-view="usage">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+      用量
+    </button>
+    <div class="nav-divider"></div>
+    <button class="nav-item" id="refreshBtn">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg></span>
+      刷新
+    </button>
+  </nav>
+  <div class="sidebar-footer">
+    <span class="status-dot" id="sysStatus"></span>
+    <span id="sysStatusText">连接中...</span>
+  </div>
+</aside>
+
+<!-- Main -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-left">
+      <h2 id="pageTitle">总览</h2>
+      <span class="breadcrumb" id="breadcrumb">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-stats">
+        <span class="topbar-stat">车队 <span class="num" id="totalAgents">0</span></span>
+        <span class="topbar-stat">在线 <span class="num online" id="onlineAgents">0</span></span>
+        <span class="topbar-stat">离线 <span class="num offline" id="offlineAgents">0</span></span>
+      </div>
+      <span class="topbar-time" id="currentTime">--:--:--</span>
+    </div>
+  </header>
+
+  <div class="content">
+    <!-- ===== Overview ===== -->
+    <div class="view active" id="view-overview">
+      <div class="stats-bar" id="statsBar"></div>
+      <div class="section-header">
+        <h3>Agent 舰队</h3>
+        <span class="section-badge" id="fleetBadge"></span>
+      </div>
+      <div class="agent-grid" id="agentGrid"></div>
+      <div class="panels">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>🩺 系统健康</h3>
+            <span class="panel-badge" id="uptimeBadge">--</span>
+          </div>
+          <div id="healthPanel"></div>
+          <div class="panel-footer" id="startedAt">--</div>
+        </div>
+        <div class="panel">
+          <div class="panel-header">
+            <h3>💓 实时心跳</h3>
+            <span class="panel-badge" id="heartbeatCount">0</span>
+          </div>
+          <div class="timeline" id="heartbeatTimeline"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Agents ===== -->
+    <div class="view" id="view-agents">
+      <div class="section-header">
+        <h3>Agent 列表</h3>
+        <span class="section-badge" id="agentListBadge">--</span>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden">
+        <div style="overflow-x:auto">
+          <table class="data-table" id="agentTable">
+            <thead><tr>
+              <th>Agent</th><th>席位</th><th>归属</th><th>状态</th><th>心跳数</th><th>最后活跃</th><th>最后原因</th>
+            </tr></thead>
+            <tbody id="agentTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Pipelines ===== -->
+    <div class="view" id="view-pipelines">
+      <div class="section-header">
+        <h3>CRON 管道</h3>
+        <span class="section-badge">自动化流水线</span>
+      </div>
+      <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--radius-lg);overflow:hidden">
+        <div style="overflow-x:auto">
+          <table class="data-table" id="pipelineTable">
+            <thead><tr>
+              <th>管道名称</th><th>调度</th><th>状态</th><th>上次执行</th><th>下次执行</th><th>成功/失败</th>
+            </tr></thead>
+            <tbody id="pipelineBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top:16px">
+        <div class="chart-container">
+          <h3>📈 执行统计</h3>
+          <div class="chart-wrap"><canvas id="pipelineChart"></canvas></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Logs ===== -->
+    <div class="view" id="view-logs">
+      <div class="log-viewer">
+        <div class="log-toolbar">
+          <select id="logLevelFilter">
+            <option value="all">全部级别</option>
+            <option value="INFO">INFO</option>
+            <option value="WARN">WARN</option>
+            <option value="ERROR">ERROR</option>
+          </select>
+          <input type="text" id="logSearch" placeholder="搜索 Agent / 消息..." style="width:200px">
+          <span class="log-count" id="logCount">0 条</span>
+        </div>
+        <div class="log-stream" id="logStream">
+          <div class="empty-state"><p>等待日志数据...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== Usage ===== -->
+    <div class="view" id="view-usage">
+      <div class="stats-bar" id="usageStatsBar">
+        <div class="stat-card">
+          <div class="stat-label">Token 总计</div>
+          <div class="stat-value accent" id="totalTokens">0</div>
+          <div class="stat-sub">自启动以来</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">LLM 调用</div>
+          <div class="stat-value" id="totalLLMCalls">0</div>
+          <div class="stat-sub">自启动以来</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">消息总数</div>
+          <div class="stat-value success" id="totalMessages">0</div>
+          <div class="stat-sub">自启动以来</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">平均响应</div>
+          <div class="stat-value warning" id="avgResponse">0ms</div>
+          <div class="stat-sub">所有 Agent</div>
+        </div>
+      </div>
+      <div class="chart-container">
+        <h3>Token 消耗 · 按 Agent</h3>
+        <div class="chart-wrap"><canvas id="tokenChart"></canvas></div>
+      </div>
+      <div class="chart-container">
+        <h3>LLM 调用次数 · 按 Agent</h3>
+        <div class="chart-wrap"><canvas id="llmChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Agent Detail Modal -->
+<div class="modal-overlay" id="agentModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalAgentName">Agent</h3>
+      <button class="modal-close" onclick="closeAgentModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info-grid" id="modalInfoGrid"></div>
+      <div class="section-header" style="margin-top:12px"><h3>活动记录</h3></div>
+      <div class="timeline" id="modalTimeline" style="max-height:200px"></div>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="closeAgentModal()">关闭</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = '';
+
+// State
+let state = { agents: {}, heartbeats: [], metrics: {}, status: null };
+let tokenChart = null;
+let llmChart = null;
+let pipelineChart = null;
+
+// Navigation
+document.querySelectorAll('.nav-item[data-view]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item[data-view]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const view = btn.dataset.view;
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById('view-' + view).classList.add('active');
+    const titles = { overview:'总览', agents:'Agent 管理', pipelines:'管道监控', logs:'系统日志', usage:'用量分析' };
+    document.getElementById('pageTitle').textContent = titles[view] || view;
+    document.getElementById('breadcrumb').textContent = 'Dashboard / ' + (titles[view] || view);
+    if (view === 'usage') renderCharts();
+  });
+});
+document.getElementById('refreshBtn').addEventListener('click', () => { fetchAll(); showToast('已刷新'); });
+
+// Toast
+function showToast(msg) {
+  let el = document.createElement('div');
+  el.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--bg-elevated);border:1px solid var(--border-default);border-radius:8px;padding:10px 16px;font-size:13px;color:var(--text-primary);z-index:9999;animation:fadeIn 0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.4)';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity 0.3s'; setTimeout(()=>el.remove(),300); }, 1500);
+}
+
+// Clock
+function updateClock() {
+  const now = new Date();
+  document.getElementById('currentTime').textContent = now.toLocaleTimeString('zh-CN', {hour12:false, timeZone:'Asia/Singapore'});
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// Fetch
+async function fetchAll() {
+  try {
+    const [statusRes, heartbeatsRes, metricsRes] = await Promise.all([
+      fetch(API_BASE + '/api/status'),
+      fetch(API_BASE + '/api/heartbeats?limit=100'),
+      fetch(API_BASE + '/api/metrics')
+    ]);
+    state.status = await statusRes.json();
+    state.heartbeats = await heartbeatsRes.json();
+    state.metrics = await metricsRes.json();
+    state.agents = state.status.agents || {};
+    render();
+  } catch(e) {
+    console.error('fetch error:', e);
+  }
+}
+
+// Render all
+function render() {
+  renderTopbar();
+  renderStats();
+  renderAgentGrid();
+  renderAgentTable();
+  renderHealth();
+  renderHeartbeatTimeline();
+  renderLogs();
+  renderPipelines();
+  renderUsageStats();
+  if (document.getElementById('view-usage').classList.contains('active')) renderCharts();
+  document.getElementById('sysStatus').className = 'status-dot' + (state.status ? '' : ' error');
+  document.getElementById('sysStatusText').textContent = state.status ? '已连接' : '离线';
+}
+
+function renderTopbar() {
+  const agents = state.agents;
+  const entries = Object.entries(agents);
+  const total = entries.length;
+  const online = entries.filter(([_,a]) => a.connected).length;
+  document.getElementById('totalAgents').textContent = total;
+  document.getElementById('onlineAgents').textContent = online;
+  document.getElementById('offlineAgents').textContent = total - online;
+}
+
+function renderStats() {
+  const agents = state.agents;
+  const entries = Object.entries(agents);
+  const online = entries.filter(([_,a]) => a.connected).length;
+  const hbs = state.heartbeats.length;
+  const metricsEntries = Object.entries(state.metrics);
+  const totalTokens = metricsEntries.reduce((s, [_,m]) => s + (m.totalTokens||0), 0);
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card"><div class="stat-label">Agent 总数</div><div class="stat-value">${entries.length}</div><div class="stat-sub">银月钱庄舰队</div></div>
+    <div class="stat-card"><div class="stat-label">在线率</div><div class="stat-value success">${entries.length ? Math.round(online/entries.length*100) : 0}%</div><div class="stat-sub">${online}/${entries.length} 在线</div></div>
+    <div class="stat-card"><div class="stat-label">心跳总数</div><div class="stat-value accent">${hbs}</div><div class="stat-sub">系统启动以来</div></div>
+    <div class="stat-card"><div class="stat-label">Token 消耗</div><div class="stat-value warning">${(totalTokens/1000).toFixed(1)}K</div><div class="stat-sub">所有 Agent 累计</div></div>
+  `;
+}
+
+function renderAgentGrid() {
+  const agents = state.agents;
+  const knownOrder = [
+    '银月','韩立','雅妃','墨影','许青','紫灵','紫妍','紫研',
+    '李长寿','药老','萧炎','美杜莎','寻宝鼠','小医仙','海波东','蓝灵儿',
+    '曹操'
+  ];
+  let sorted = knownOrder.map(n => [n, agents[n]]).filter(([_,a]) => a);
+  const extra = Object.entries(agents).filter(([n]) => !knownOrder.includes(n));
+  sorted = sorted.concat(extra);
+
+  document.getElementById('fleetBadge').textContent = sorted.length + ' 人';
+  const grid = document.getElementById('agentGrid');
+  if (!sorted.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><p>暂无 Agent 数据</p></div>';
+    return;
+  }
+  grid.innerHTML = sorted.map(([name, info]) => {
+    const statusClass = info.connected ? 'online' : 'offline';
+    const statusText = info.connected ? '在线' : '离线';
+    const lastSeen = info.lastHeartbeatAt ? timeAgo(info.lastHeartbeatAt) : '从未';
+    const role = getAgentRole(name);
+    const badge = getAgentBadge(name);
+    return `<div class="agent-card" onclick="showAgentDetail('${name}')">
+      <div class="agent-glow" style="background:radial-gradient(circle,${info.connected ? 'rgba(34,197,94,0.15)' : 'rgba(82,82,91,0.1)'},transparent)"></div>
+      <div class="agent-top">
+        <span class="agent-name">${badge}_${name}</span>
+        <span class="agent-badge">${badge}</span>
+      </div>
+      <div class="agent-role">${role}</div>
+      <div class="agent-bottom">
+        <span class="status-indicator"><span class="status-dot ${statusClass}"></span>${statusText}</span>
+        <span class="agent-lastseen">${lastSeen}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderAgentTable() {
+  const agents = state.agents;
+  const entries = Object.entries(agents);
+  const tbody = document.getElementById('agentTableBody');
+  if (!entries.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state" style="padding:24px">暂无数据</td></tr>';
+    return;
+  }
+  const knownOrder = [
+    '银月','韩立','雅妃','墨影','许青','紫灵','紫妍','紫研',
+    '李长寿','药老','萧炎','美杜莎','寻宝鼠','小医仙','海波东','蓝灵儿',
+    '曹操'
+  ];
+  let sorted = knownOrder.map(n => [n, agents[n]]).filter(([_,a]) => a);
+  const extra = Object.entries(agents).filter(([n]) => !knownOrder.includes(n));
+  sorted = sorted.concat(extra);
+  document.getElementById('agentListBadge').textContent = sorted.length + ' 人';
+  tbody.innerHTML = sorted.map(([name, info]) => {
+    const statusClass = info.connected ? 'online' : 'offline';
+    const statusText = info.connected ? '在线' : '离线';
+    const lastSeen = info.lastHeartbeatAt ? new Date(info.lastHeartbeatAt).toLocaleString('zh-SG', {timeZone:'Asia/Singapore',hour12:false}) : '--';
+    const reason = info.lastReason || '--';
+    return `<tr onclick="showAgentDetail('${name}')" style="cursor:pointer">
+      <td><div class="cell-agent"><span class="status-dot ${statusClass}" style="width:7px;height:7px;border-radius:50%;display:inline-block"></span>${getAgentBadge(name)}_${name}</div></td>
+      <td>${getAgentRole(name)}</td>
+      <td>${getAgentBadge(name)}</td>
+      <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+      <td class="cell-mono">${info.heartbeatCount || 0}</td>
+      <td class="cell-mono">${lastSeen}</td>
+      <td class="cell-mono">${reason}</td>
+    </tr>`;
+  }).join('');
+}
+
+function renderHealth() {
+  const status = state.status;
+  if (!status) { document.getElementById('healthPanel').innerHTML = '<div class="empty-state"><p>等待数据...</p></div>'; return; }
+  const uptime = status.uptime || 0;
+  const secs = Math.floor(uptime / 1000);
+  const d = Math.floor(secs / 86400);
+  const h = Math.floor((secs % 86400) / 3600);
+  const m = Math.floor((secs % 3600) / 60);
+  const uptimeStr = d + '天 ' + h + '时 ' + m + '分';
+  document.getElementById('uptimeBadge').textContent = '运行 ' + uptimeStr;
+
+  const agents = state.agents;
+  const entries = Object.entries(agents);
+  const online = entries.filter(([_,a]) => a.connected).length;
+  const hbTotal = state.heartbeats.length;
+  const metricsCount = Object.keys(state.metrics).length;
+
+  document.getElementById('healthPanel').innerHTML = `
+    <div class="health-item"><span class="health-label">运行时间</span><span class="health-value">${uptimeStr}</span></div>
+    <div class="health-item"><span class="health-label">在线 Agent</span><span class="health-value" style="color:var(--success)">${online}/${entries.length}</span></div>
+    <div class="health-item"><span class="health-label">心跳记录</span><span class="health-value">${hbTotal}</span></div>
+    <div class="health-item"><span class="health-label">指标报告</span><span class="health-value">${metricsCount} agents</span></div>
+    <div class="health-item">
+      <span class="health-label">系统负载</span>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="health-value" style="color:var(--success)">正常</span>
+        <div class="health-bar"><div class="health-bar-fill" style="width:${Math.min(online * 6, 100)}%;background:var(--success)"></div></div>
+      </div>
+    </div>
+  `;
+  document.getElementById('startedAt').textContent = '系统启动: ' + (status.startedAt ? new Date(status.startedAt).toLocaleString('zh-SG', {timeZone:'Asia/Singapore',hour12:false}) : '--');
+}
+
+function renderHeartbeatTimeline() {
+  const hbs = state.heartbeats;
+  const container = document.getElementById('heartbeatTimeline');
+  document.getElementById('heartbeatCount').textContent = hbs.length + ' 条';
+  if (!hbs.length) {
+    container.innerHTML = '<div class="empty-state"><p>暂无心跳记录</p></div>';
+    return;
+  }
+  container.innerHTML = hbs.slice(0, 30).map(hb => {
+    const t = new Date(hb.timestamp).toLocaleTimeString('zh-SG', {timeZone:'Asia/Singapore',hour12:false});
+    const dotClass = hb.type === 'metrics' ? 'metrics' : 'heartbeat';
+    return `<div class="timeline-item">
+      <span class="tl-dot ${dotClass}"></span>
+      <span class="tl-agent">${hb.agent || '?'}</span>
+      <span class="tl-reason">${hb.reason || 'tick'}</span>
+      <span class="tl-time">${t}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderLogs() {
+  const hbs = state.heartbeats;
+  const container = document.getElementById('logStream');
+  const filter = document.getElementById('logLevelFilter').value;
+  const search = document.getElementById('logSearch').value.toLowerCase();
+  const countEl = document.getElementById('logCount');
+  if (!hbs.length) {
+    container.innerHTML = '<div class="empty-state"><p>等待日志数据...</p></div>';
+    countEl.textContent = '0 条';
+    return;
+  }
+  let lines = hbs.map(hb => {
+    const level = hb.type === 'metrics' ? 'INFO' : hb.reason?.includes('error') || hb.reason?.includes('fail') ? 'ERROR' : hb.reason?.includes('warn') ? 'WARN' : 'INFO';
+    return { time: hb.timestamp, level, agent: hb.agent || '?', msg: hb.reason || 'tick', raw: hb };
+  });
+  if (filter !== 'all') lines = lines.filter(l => l.level === filter);
+  if (search) lines = lines.filter(l => (l.agent+'').toLowerCase().includes(search) || (l.msg+'').toLowerCase().includes(search));
+  countEl.textContent = lines.length + ' 条';
+  if (!lines.length) {
+    container.innerHTML = '<div class="empty-state"><p>无匹配日志</p></div>';
+    return;
+  }
+  container.innerHTML = lines.slice(0, 80).map(l => {
+    const t = new Date(l.time).toLocaleString('zh-SG', {timeZone:'Asia/Singapore',hour12:false});
+    return `<div class="log-line"><span class="log-time">${t}</span><span class="log-level ${l.level}">${l.level}</span><span class="log-msg">[${l.agent}] ${l.msg}</span></div>`;
+  }).join('');
+  container.scrollTop = 0;
+}
+
+document.getElementById('logLevelFilter').addEventListener('change', renderLogs);
+document.getElementById('logSearch').addEventListener('input', renderLogs);
+
+function renderPipelines() {
+  const tbody = document.getElementById('pipelineBody');
+  tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="padding:24px;text-align:center;color:var(--text-tertiary)">管道数据需要从 OpenClaw 主进程获取<br><span style="font-size:11px">启动 main.js 后自动载入 CRON 管道信息</span></td></tr>';
+}
+
+function renderUsageStats() {
+  const metrics = state.metrics;
+  const entries = Object.entries(metrics);
+  const totalTokens = entries.reduce((s, [_,m]) => s + (m.totalTokens||0), 0);
+  const totalLLM = entries.reduce((s, [_,m]) => s + (m.llmCalls||0), 0);
+  const totalMsg = entries.reduce((s, [_,m]) => s + (m.totalMessages||0), 0);
+  const avgRes = entries.length ? entries.reduce((s, [_,m]) => s + (m.avgResponseTimeMs||0), 0) / entries.length : 0;
+  document.getElementById('totalTokens').textContent = totalTokens.toLocaleString();
+  document.getElementById('totalLLMCalls').textContent = totalLLM.toLocaleString();
+  document.getElementById('totalMessages').textContent = totalMsg.toLocaleString();
+  document.getElementById('avgResponse').textContent = Math.round(avgRes) + 'ms';
+}
+
+function renderCharts() {
+  const metrics = state.metrics;
+  const entries = Object.entries(metrics);
+  const names = entries.map(([n]) => n);
+  const tokens = entries.map(([_,m]) => m.totalTokens||0);
+  const calls = entries.map(([_,m]) => m.llmCalls||0);
+
+  const chartConfig = {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { color: '#A1A1AA', font: { size: 11 } } }
+    },
+    scales: {
+      x: { ticks: { color: '#52525B', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+      y: { ticks: { color: '#52525B', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.03)' } }
+    }
+  };
+
+  if (tokenChart) tokenChart.destroy();
+  const tc = document.getElementById('tokenChart').getContext('2d');
+  tokenChart = new Chart(tc, {
+    type: 'bar',
+    data: {
+      labels: names,
+      datasets: [{
+        label: 'Token',
+        data: tokens,
+        backgroundColor: 'rgba(0,212,255,0.6)',
+        borderColor: '#00D4FF',
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: { ...chartConfig, indexAxis: 'y' }
+  });
+
+  if (llmChart) llmChart.destroy();
+  const lc = document.getElementById('llmChart').getContext('2d');
+  llmChart = new Chart(lc, {
+    type: 'bar',
+    data: {
+      labels: names,
+      datasets: [{
+        label: '调用次数',
+        data: calls,
+        backgroundColor: 'rgba(129,140,248,0.6)',
+        borderColor: '#818CF8',
+        borderWidth: 1,
+        borderRadius: 4
+      }]
+    },
+    options: { ...chartConfig, indexAxis: 'y' }
+  });
+}
+
+// Agent detail
+function showAgentDetail(name) {
+  const info = state.agents[name];
+  if (!info) return;
+  document.getElementById('modalAgentName').textContent = '🤖 ' + getAgentBadge(name) + '_' + name;
+  const statusText = info.connected ? '在线' : '离线';
+  const statusColor = info.connected ? 'var(--success)' : 'var(--text-tertiary)';
+  const lastSeen = info.lastHeartbeatAt ? new Date(info.lastHeartbeatAt).toLocaleString('zh-SG', {timeZone:'Asia/Singapore',hour12:false}) : '--';
+  document.getElementById('modalInfoGrid').innerHTML = `
+    <div class="modal-info-item"><div class="mi-label">状态</div><div class="mi-value" style="color:${statusColor}">${statusText}</div></div>
+    <div class="modal-info-item"><div class="mi-label">心跳次数</div><div class="mi-value">${info.heartbeatCount || 0}</div></div>
+    <div class="modal-info-item"><div class="mi-label">席位</div><div class="mi-value">${getAgentRole(name)}</div></div>
+    <div class="modal-info-item"><div class="mi-label">归属</div><div class="mi-value">${getAgentBadge(name)}</div></div>
+    <div class="modal-info-item" style="grid-column:1/-1"><div class="mi-label">最后活跃</div><div class="mi-value">${lastSeen}</div></div>
+    <div class="modal-info-item" style="grid-column:1/-1"><div class="mi-label">最后原因</div><div class="mi-value">${info.lastReason || '--'}</div></div>
+  `;
+  const relatedHbs = state.heartbeats.filter(h => h.agent === name).slice(0, 15);
+  const tl = document.getElementById('modalTimeline');
+  if (!relatedHbs.length) {
+    tl.innerHTML = '<div class="empty-state"><p>无活动记录</p></div>';
+  } else {
+    tl.innerHTML = relatedHbs.map(hb => {
+      const t = new Date(hb.timestamp).toLocaleTimeString('zh-SG', {timeZone:'Asia/Singapore',hour12:false});
+      return `<div class="timeline-item"><span class="tl-dot heartbeat"></span><span class="tl-reason">${hb.reason || 'tick'}</span><span class="tl-time">${t}</span></div>`;
+    }).join('');
+  }
+  document.getElementById('agentModal').classList.add('open');
+}
+function closeAgentModal() {
+  document.getElementById('agentModal').classList.remove('open');
+}
+document.getElementById('agentModal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeAgentModal();
+});
+
+// Helpers
+function timeAgo(iso) {
+  const diff = Date.now() - new Date(iso).getTime();
+  if (diff < 60000) return '刚刚';
+  if (diff < 3600000) return Math.floor(diff/60000) + ' 分钟前';
+  if (diff < 86400000) return Math.floor(diff/3600000) + ' 小时前';
+  return Math.floor(diff/86400000) + ' 天前';
+}
+
+function getAgentRole(name) {
+  const map = {
+    '银月':'总管 · 网关调度','韩立':'侦查 · 情报采集','雅妃':'商务 · 资源对接','墨影':'巡检 · 系统通知',
+    '许青':'电商运营','紫灵':'只读 · 知识库','紫妍':'数字人 · FlashShow','紫研':'内部运营 · 流程自动化',
+    '李长寿':'全栈研发','药老':'电商增长 · SEO','萧炎':'金融交易','美杜莎':'UI/UX 设计',
+    '寻宝鼠':'选品 · 资源挖掘','小医仙':'社媒运营','海波东':'风控 · 合规','蓝灵儿':'多媒体 · 自动化',
+    '曹操':'战术参谋 · Claude Code'
+  };
+  return map[name] || '--';
+}
+
+function getAgentBadge(name) {
+  const oc = ['银月','韩立','雅妃','墨影','许青','紫灵','紫妍','紫研'];
+  const tr = ['李长寿','药老','萧炎','美杜莎','寻宝鼠','小医仙','海波东','蓝灵儿'];
+  if (oc.includes(name)) return 'OC';
+  if (tr.includes(name)) return 'TR';
+  if (name === '曹操') return 'CC';
+  return '--';
+}
+
+// Fetch loop
+fetchAll();
+setInterval(fetchAll, 5000);
+</script>
+</body>
+</html>

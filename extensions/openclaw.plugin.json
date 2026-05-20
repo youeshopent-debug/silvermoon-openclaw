@@ -1,0 +1,7 @@
+{
+  "id": "openclaw",
+  "name": "OpenClaw",
+  "version": "2026.4.26",
+  "description": "OpenClaw Gateway Core",
+  "configSchema": {}
+}

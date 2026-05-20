@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "uptime_hours": 6.76874,
+  "queue_depth": 0,
+  "error_rate_24h": 0,
+  "total_errors_24h": 0,
+  "total_calls_24h": 0,
+  "reflection_count": 0,
+  "mood": "normal",
+  "master_mood_detected": "neutral",
+  "task_success_rate_7d": 1,
+  "total_tasks_7d": 0,
+  "successful_tasks_7d": 0,
+  "last_reflection_at": null,
+  "last_plan_effectiveness": 0.5,
+  "total_tasks_completed": 0,
+  "last_restart_at": "2026-05-20T01:27:23.690Z",
+  "consecutive_errors": 0,
+  "consecutive_owner_displeasure": 0,
+  "last_updated": "2026-05-20T08:13:31.154Z"
+}

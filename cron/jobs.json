@@ -1,0 +1,60 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "cc36330f-a9a3-4e03-b800-1fe9c2521804",
+      "agentId": "trae_yinyue",
+      "sessionKey": "agent:trae_yinyue:telegram:direct:1837906909",
+      "name": "银月-每日科技热搜搜索",
+      "description": "已调整：每天10:00搜热门话题+准备素材，避免占用主人早上电脑使用时间",
+      "enabled": true,
+      "deleteAfterRun": false,
+      "createdAtMs": 1779027339894,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 10 * * *",
+        "tz": "Asia/Singapore"
+      },
+      "sessionTarget": "session:agent:trae_yinyue:telegram:direct:1837906909",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "现在搜索当天的科技领域热门话题和搜索增长最高的标题TOP 5。结合SilverMoon Bank的定位（主推自动化，AI自动化与智能体编排系统，出海团队专用），选出最适合发帖的2-3个热门话题。每个话题给出：话题名称、搜索增长数据、简短分析、建议的帖文方向。准备好后通知主人审核。"
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "telegram",
+        "to": "1837906909"
+      },
+      "state": {}
+    },
+    {
+      "id": "09ede591-96f8-4a55-ae22-aaef5a99f121",
+      "agentId": "trae_moying",
+      "sessionKey": "agent:trae_yinyue:telegram:direct:1837906909",
+      "name": "墨影-凌晨3点团队体检迭代升级",
+      "description": "每天凌晨3:00为OpenClaw团队做系统体检、迭代与升级",
+      "enabled": true,
+      "deleteAfterRun": false,
+      "createdAtMs": 1779028303301,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 3 * * *",
+        "tz": "Asia/Singapore"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "现在为OpenClaw团队做每日系统体检和迭代升级。检查流程：1. 检查系统运行状态（浏览器、网关、各agent状态）2. 检查日志有无异常 3. 执行必要的迭代优化 4. 检查资源占用情况 5. 生成体检报告。完成后把报告发到主人的Telegram。",
+        "timeoutSeconds": 600
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "telegram",
+        "to": "1837906909"
+      },
+      "state": {}
+    }
+  ]
+}

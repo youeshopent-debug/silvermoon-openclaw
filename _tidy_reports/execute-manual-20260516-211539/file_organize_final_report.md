@@ -1,0 +1,263 @@
+﻿# File Organization Final Report
+
+Generated (UTC): 2026-05-16 13:16:42Z
+
+Roots:
+- C:\Users\User\Desktop
+- C:\Users\User\Downloads
+
+Archive root:
+- C:\_Archive
+
+Archive results (moved file counts):
+- Images: 107
+- Code: 89
+- Documents: 84
+- Other: 47
+- Installers: 16
+- Videos: 3
+- Archives: 1
+
+Duplicate cleanup (content SHA256; delete only earliest-created in each group; any group containing core keywords is protected):
+- Protected duplicate groups (core keywords): 0 (no deletion)
+- Deleted: 2654
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\Agent_video_Pippit_20260225121727.mp4 | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vercel-composition-patterns\README.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\ai-humanizer\tests\fixtures\ai-sample-1.txt | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\reorder_tasks.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\pinia\references\advanced-nuxt.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\kaggle\README.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\weather\SKILL.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\tushare-finance\reference\接口文档\美股基础信息.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\youtube-transcript\references\SETUP.md | 2026-03-19 01:56:34Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\Star-Office-UI\electron-shell\standalone-assets\layout.js | 2026-03-19 01:56:37Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\.dockerignore | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\partnerships-ecosystem\README.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\git\memory-template.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\code\verification.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\LICENSE | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\free-ride\skill.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\migration\script.py.mako | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\computer-use\scripts\hold_key.sh | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\Dockerfile | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\index.html | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\opencode-controller\assets\operator-prompts.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vercel-react-best-practices\rules\rendering-activity.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\miniade-agent-lifecycle-manager\scripts\lifecycle-log.sh | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\ai-humanizer\eslint.config.js | 2026-03-19 01:56:32Z
+  - C:\_Archive\Installers\Downloads\Dola_online_installer.exe | 2026-04-16 09:00:10Z
+  - C:\_Archive\Images\Downloads\flashshow_view_2026-05-09T10-10-17-063Z.png | 2026-05-09 10:10:17Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\theme-factory\themes\arctic-frost.md | 2026-03-19 01:56:33Z
+  - C:\_Archive\Images\Downloads\screenshot_2026-05-09T08-52-58-279Z.png | 2026-05-09 08:52:58Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\demo.gif | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\01-kanban-main.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\02-monitor.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\03-task-detail.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\04-model-config.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\05-skills-config.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\06-official-overview.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\07-sessions.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\08-memorials.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\09-templates.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\10-morning-briefing.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\11-ceremony.png | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\assets\wechat-qrcode.jpg | 2026-04-09 11:51:31Z
+  - C:\_Archive\Documents\Downloads\Telegram Desktop\Lau Sii Lun-2.pdf | 2026-03-26 03:30:32Z
+  - C:\_Archive\Documents\Downloads\Telegram Desktop\应聘申请表 Interview Application Form.pdf | 2026-03-25 06:03:11Z
+  - C:\_Archive\Documents\Downloads\Telegram Desktop\AVAILABLE UNIT 26012026.pdf | 2026-01-26 03:39:56Z
+  - C:\_Archive\Documents\Downloads\Telegram Desktop\test_audio.txt | 2026-03-16 13:18:16Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\searxng\CHANGELOG.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict_agent_architecture.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\openclaw.json.clobbered.2026-04-12T03-04-47-357Z | 2026-04-12 03:04:47Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\ROADMAP.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\examples\code-review.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\examples\competitive-analysis.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\linear\SKILL.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\examples\README.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\examples\weekly-report.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\requirements.txt | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\upgrading-react-native\agents\openai.yaml | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\remote-skills-guide.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\remote-skills-quickstart.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\wechat-article.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\wechat.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docs\screenshots\README.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\agents\zaochao\SOUL.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\agents\xingbu\SOUL.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\word-docx\SKILL.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\agents\taizi\SOUL.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\nuxt\references\features-state.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\auto-updater\references\agent-guide.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\agents\menxia\SOUL.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\agents\libu_hr\SOUL.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\agents\libu\SOUL.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\agents\hubu\SOUL.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\.github\pull_request_template.md | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\feishu-doc\validate_patch.js | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\mark_task_as_completed.json | 2026-03-19 01:56:32Z
+  - C:\_Archive\Code\Downloads\shape.json | 2026-03-29 04:28:15Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\tushare-finance\requirements.txt | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vue-best-practices\reference\props-are-read-only.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\tavily\references\api-reference.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\firecrawl-search\SKILL.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docker-compose.yml | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vercel-composition-patterns\rules\_template.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\skill-finder-cn\scripts\search.sh | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\tests\test_e2e_kanban.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\tests\test_file_lock.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\tests\test_server.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\scripts\record_demo.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\notion\SKILL.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\scripts\take_screenshots.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\scripts\kanban_update_edict.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\home-assistant\scripts\ha.sh | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\package-lock.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\package.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\postcss.config.js | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\tailwind.config.js | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\personal-finish-notifier\references\architecture.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\tsconfig.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\widget\scripts\list-widgets.sh | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\delete_calendar_event.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vue-best-practices\reference\self-referencing-component-name.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\main.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\MemOS\apps\openwork-memos-integration\apps\desktop\src\vite-env.d.ts | 2026-03-19 01:56:34Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\ConfirmDialog.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\CourtCeremony.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\EdictBoard.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\MemorialPanel.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\MonitorPanel.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\MorningPanel.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\OfficialPanel.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\SessionsPanel.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\SkillsConfig.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\TaskModal.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\TemplatePanel.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\src\components\Toaster.tsx | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\main.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vercel-composition-patterns\rules\patterns-explicit-variants.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\__init__.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\workers\__init__.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\clawddocs\scripts\cache.sh | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\services\__init__.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\slidev\SYNC.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\models\event.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\models\thought.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\models\todo.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\tushare-finance\reference\接口文档\基金销售行业数据.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\api\admin.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\api\agents.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\stock-analysis\docs\README.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\api\websocket.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\backend\app\api\__init__.py | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docker\demo_data\agent_config.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docker\demo_data\last_model_change_result.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docker\demo_data\model_change_log.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docker\demo_data\live_status.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docker\demo_data\morning_brief.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\scrapling-official\LICENSE.txt | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docker\demo_data\officials_stats.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\self-reflection\README.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\docker\demo_data\tasks_source.json | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\backups_isolated\pre-install-20260409-195436\workspace-avatar\USER.md | 2026-04-09 11:54:36Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\delete_task.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\self-improving\reflections.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\pdf-extract\SKILL.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\.env.development | 2026-04-09 11:51:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\notion-mcp\schemas\notion-get-comments.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\erpclaw\scripts\erpclaw-setup\lib\erpclaw_lib\vendor\pypika\__init__.py | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\memory-manager\init.sh | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\tushare-finance\reference\接口文档\通用行情接口.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\capability-evolver\src\gep\narrativeMemory.js | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\canvas-design\canvas-fonts\Lora-OFL.txt | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vue-best-practices\reference\dynamic-component-registration-vite.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\slack-gif-creator\requirements.txt | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\add_subtasks_to_task.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\turborepo\references\ci\vercel.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\tushare-finance\reference\接口文档\数据索引.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\internal-comms\examples\general-comms.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\slidev\references\layout-global-layers.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\safe-exec\scripts\safe-exec-list.sh | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\frontend-design-ultimate\references\mobile-patterns.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\shopify-seo-optimizer\SKILL.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\caldav-calendar\SKILL.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\README.ja.md | 2026-03-19 01:56:31Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\data\morning_brief_20260410.json | 2026-04-10 02:58:48Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\ppt-generator\references\design-spec.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\webapp-testing\examples\static_html_automation.py | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\proactive-agent\assets\MEMORY.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\feishu-doc\package.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\stop_task_timer.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\get_archived_tasks.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\search_tasks.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\backups_isolated\pre-install-20260409-195436\workspace-avatar\AGENTS.md | 2026-04-09 11:54:36Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\backups_isolated\pre-install-20260409-195436\workspace-avatar\BOOTSTRAP.md | 2026-04-09 11:54:36Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\backups_isolated\pre-install-20260409-195436\workspace-avatar\MEMORY.md | 2026-04-09 11:54:36Z
+  - C:\Users\User\Desktop\OpenClaw_Old_Life\backups_isolated\pre-install-20260409-195436\workspace-avatar\THINK.md | 2026-04-09 11:54:36Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\email-sequence\references\sequence-templates.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\docx\scripts\__init__.py | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\docx\scripts\office\validators\__init__.py | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\delete_all_incomplete_recurring_task_instances.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\api-gateway\references\sunsama-mcp\schemas\update_all_incomplete_recurring_task_instances.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\TTS-dev\TTS.egg-info\dependency_links.txt | 2026-03-19 01:56:38Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\shopify-seo-bot\SKILL.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vercel-react-best-practices\rules\js-index-maps.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\opencode-controller\references\workflow.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\local-places\src\local_places\__init__.py | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\browser\SKILL.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\AGENTS.md | 2026-03-19 01:56:34Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace-gig\BOOTSTRAP.md | 2026-03-19 01:56:38Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\HEARTBEAT.md | 2026-03-19 01:56:34Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace-gig\IDENTITY.md | 2026-03-19 01:56:38Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace-gig\TOOLS.md | 2026-03-19 01:56:38Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace-gig\USER.md | 2026-03-19 01:56:38Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\media\inbound\file_4---80039a26-8cd2-4300-bd75-f5b1f72fc42d.ogg | 2026-03-19 01:56:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\media\inbound\file_11---e68e9897-8e6a-4d3f-bef6-dca651422eef.ogg | 2026-03-19 01:56:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\expo-cicd-workflows\scripts\package.json | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\tushare-finance\reference\接口文档\同花顺App热榜数.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\vite\references\rolldown-migration.md | 2026-03-19 01:56:33Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\media\inbound\file_3---b4c57c20-5dfe-4b0b-a4e5-2f85cf4d261f.ogg | 2026-03-19 01:56:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\media\inbound\file_2---7cf594d2-2865-4abf-88fc-9dfdd2d35446.ogg | 2026-03-19 01:56:31Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\next-best-practices\hydration-error.md | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\clawddocs\scripts\fetch-doc.sh | 2026-03-19 01:56:32Z
+  - C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\openclaw-master-skills\skills\clawddocs\scripts\recent.sh | 2026-03-19 01:56:32Z
+  - ... and 2454 more
+
+Core preserved (no move/delete/modify; name/path contains OPENCLAW/TRAE/DEEPCLAM/SILVERMOON):
+- [Top level] File: C:\Users\User\Desktop\openclaw.docx
+- [Top level] File: C:\Users\User\Desktop\openclaw.zip
+- [Top level] Directory: C:\Users\User\Desktop\OpenClaw_Backup_20260319
+- [Top level] Directory: C:\Users\User\Desktop\OpenClaw_Old_Life
+- [Top level] File: C:\Users\User\Desktop\Trae.lnk
+- [Top level] File: C:\Users\User\Downloads\TRAE_PROMPT_10597754.md
+- [Top level] File: C:\Users\User\Downloads\TRAE_SOLO-darwin-arm64.dmg
+- [Top level] File: C:\Users\User\Downloads\Trae-Setup-x64.exe
+  - Contains core files: C:\Users\User\Desktop\OpenClaw_Backup_20260319 | 11981 | 647.78 MB
+  - Contains core files: C:\Users\User\Desktop\OpenClaw_Old_Life | 333 | 45.55 MB
+- Loose matches:
+  - C:\Users\User\Desktop\sansheng-dashboard\scripts\sync_from_openclaw_runtime.py
+
+Sensitive preserved (common key/env patterns; no move/delete):
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\.env
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\skills\notebooklm\.env.example
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\MemOS\apps\memos-local-openclaw\.env.example
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\MemOS\docker\.env.example
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\openclaw-mission-control\.env.example
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\openclaw-mission-control\backend\.env.example
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\openclaw-mission-control\backend\.env.test
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\openclaw-mission-control\frontend\.env.example
+- C:\Users\User\Desktop\OpenClaw_Backup_20260319\workspace\Star-Office-UI\.env.example
+- C:\Users\User\Desktop\OpenClaw_Old_Life\.env.openai
+- C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\.env.example
+- C:\Users\User\Desktop\OpenClaw_Old_Life\edict_isolated\edict\frontend\.env.development
+- C:\Users\User\Desktop\sansheng-dashboard\edict\.env.example
+- C:\Users\User\Desktop\sansheng-dashboard\edict\frontend\.env.development
+- C:\Users\User\Downloads\ssh-key-2026-03-29.key
+
+Skipped moves/deletes: 6
+- SkipMove: C:\Users\User\Desktop\desktop.ini | SystemAttribute
+- SkipMove: C:\Users\User\Desktop\sansheng-dashboard\edict\.env.example | SensitivePattern
+- SkipMove: C:\Users\User\Desktop\sansheng-dashboard\edict\frontend\.env.development | SensitivePattern
+- SkipMove: C:\Users\User\Desktop\DeepCalm\desktop.ini | SystemAttribute
+- SkipMove: C:\Users\User\Downloads\desktop.ini | SystemAttribute
+- SkipMove: C:\Users\User\Downloads\ssh-key-2026-03-29.key | SensitivePattern

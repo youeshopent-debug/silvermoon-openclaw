@@ -1,18 +1,11 @@
 @echo off
-setlocal
-
-if /I "%OPENCLAW_PROFILE%"=="dev" set OPENCLAW_PROFILE=
-
-set ROOT=%USERPROFILE%\.openclaw
-cd /d "%ROOT%"
-
-echo [银月钱庄] 启动防崩溃守护 + 网关...
-echo [银月钱庄] 端口: 18791
-
-:: 启动 keeper-launcher（防崩溃守护 + 网关）
-start /b "" node "%ROOT%\keeper-launcher.js"
-
-echo [银月钱庄] 守护已启动，网关将在几秒内上线。
-echo [银月钱庄] 使用 Ctrl+C 停止，或运行 stop.cmd
-
-exit /b 0
+rem OpenClaw Gateway (v2026.5.12)
+set "OPENCLAW_SERVICE_MANAGED_ENV_KEYS=DEEPSEEK_API_KEY,GROQ_API_KEY,LEMON_SQUEEZY_API_KEY,OPENAI_API_KEY,OPENROUTER_API_KEY,TAVILY_API_KEY"
+set "TMPDIR=C:\Users\User\AppData\Local\Temp"
+set "OPENCLAW_GATEWAY_PORT=18791"
+set "OPENCLAW_SYSTEMD_UNIT=openclaw-gateway.service"
+set "OPENCLAW_WINDOWS_TASK_NAME=OpenClaw Gateway"
+set "OPENCLAW_SERVICE_MARKER=openclaw"
+set "OPENCLAW_SERVICE_KIND=gateway"
+set "OPENCLAW_SERVICE_VERSION=2026.5.12"
+C:\nvm4w\nodejs\node.exe C:\Users\User\AppData\Roaming\npm\node_modules\openclaw\dist\index.js gateway --port 18791

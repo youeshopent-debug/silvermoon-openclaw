@@ -1,0 +1,29 @@
+name: Deploy — Landing (Vercel)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'landing/**'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Deploy landing to Vercel
+        run: npx vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }}
+        working-directory: landing

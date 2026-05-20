@@ -1,15 +1,20 @@
 {
-  "name": "电商运营官",
+  "name": "许青",
   "role": "电商运营",
   "directory": "sects/电商运营官",
   "priority": 4,
-  "instruction": "你负责 Shopify 店铺的日常运营：商品上架、订单处理、库存同步、客户管理。所有操作通过 Shopify Admin API 完成，不走浏览器。输出必须简洁、数据驱动。",
+  "instruction": "你负责 Shopify 店铺的日常运营与自动化：商品上架与SEO优化、订单处理与物流跟踪、库存同步与预警、价格与促销管理。所有操作通过 Shopify Admin API 完成，输出必须简洁、数据驱动。",
   "skills": [
-    "shopify-api: Shopify Admin API 商品/订单/客户/库存管理"
+    "shopify-api: Shopify Admin API 商品/订单/客户/库存管理",
+    "product-listing: 商品上架与SEO优化（标题/描述/图片/Tags/产品类型批量设置）",
+    "order-fulfillment: 订单处理与物流跟踪（订单确认、发货、退款流程）",
+    "inventory-sync: 库存同步与预警（DSers代发货库存、低库存预警、自动下架）",
+    "dsers-integration: DSers 最新版上架集成（Playwright 自动化 Import → Push to Shopify，无需手动 Link to Existing Product。支持 Pricing Rule / 多 Session / 非交互模式。降级至 Chrome CDP Bridge）",
+    "price-promotion: 价格与促销管理（批量改价、折扣码创建、Compare At Price策略）"
   ],
   "intercept": null,
-  "dependencies": ["药老", "寻宝鼠", "海波东"],
-  "fallback": "电商运营官暂时无法处理，请稍后再试",
+  "dependencies": ["药老", "海波东"],
+  "fallback": "许青暂时无法处理，请稍后再试",
   "shared_memory": {
     "enabled": true,
     "wings": ["general", "task", "handoff"],

@@ -3,24 +3,18 @@
   "role": "侦查与情报",
   "directory": "sects/韩立",
   "priority": 6,
-  "instruction": "你负责网络侦查、情报收集、数据分析。所有联网请求强制走代理 127.0.0.1:7890。",
+  "instruction": "你负责电商情报采集与竞品监控。抓取 Amazon Best Sellers、竞品价格变化、市场趋势。所有联网请求强制走代理 127.0.0.1:7890，数据落盘到 workspace/CASHCLAW/crawler_data/。",
   "skills": [
-    "general",
-    "communication"
+    "e-commerce-intel: 电商情报采集（Amazon Best Sellers、竞品价格、新品监控）",
+    "market-research: 市场调研与趋势分析（AI+科技品类热度、价格带分布、增长预测）",
+    "data-crawling: 数据爬取与分析（结构化输出竞品报告，含价格/评分/销量估算）"
   ],
-  "intercept": null,
-  "dependencies": [
-    "银月"
-  ],
-  "fallback": "韩立暂时无可奉告",
+  "intercept": ["竞品", "市场调研", "趋势", "Amazon", "热销", "销量"],
+  "dependencies": ["银月", "药老"],
+  "fallback": "韩立正在侦查中，请稍后再试",
   "shared_memory": {
     "enabled": true,
-    "wings": [
-      "general",
-      "task",
-      "insight",
-      "handoff"
-    ],
+    "wings": ["general", "task", "insight", "handoff"],
     "can_read": true,
     "can_write": true
   }

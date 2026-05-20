@@ -1,0 +1,24 @@
+llm:
+  provider: openai-compatible
+  base_url: https://api.deepseek.com
+  api_key_env: DEEPSEEK_API_KEY
+  model: deepseek-chat
+  max_tokens: 4096
+
+threads:
+  default:
+    observer_threshold: 30000
+    reflector_threshold: 40000
+
+sessions:
+  scan_dir: ~/.openclaw/agents/main/sessions
+  max_age_hours: 48
+
+storage:
+  base_dir: ~/.openclaw/workspace/memory/engram
+
+concurrency:
+  max_workers: 4
+
+logging:
+  level: INFO

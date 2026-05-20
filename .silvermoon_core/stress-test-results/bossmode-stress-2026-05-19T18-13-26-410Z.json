@@ -1,0 +1,194 @@
+{
+  "timestamp": "2026-05-19T18:13:26.410Z",
+  "totalTests": 28,
+  "passed": 17,
+  "failed": 11,
+  "capabilities": {
+    "1-高配合度": [
+      {
+        "name": "银月网关健康检查",
+        "status": "FAIL",
+        "ms": 9,
+        "error": "预期200，实际404"
+      },
+      {
+        "name": "银月网关状态查询",
+        "status": "FAIL",
+        "ms": 3,
+        "error": "预期200，实际404"
+      },
+      {
+        "name": "消息发送延迟测试（3轮100ms以内）",
+        "status": "FAIL",
+        "ms": 3,
+        "error": "消息0返回404"
+      }
+    ],
+    "2-高智商": [
+      {
+        "name": "Scheduler CRON 注册完整性",
+        "status": "PASS",
+        "ms": 2
+      },
+      {
+        "name": "System Prompt 完备性检查",
+        "status": "PASS",
+        "ms": 2
+      }
+    ],
+    "3-高执行力": [
+      {
+        "name": "团队编排器可用性",
+        "status": "FAIL",
+        "ms": 4,
+        "error": "getOrchestratorBlock 返回内容不足"
+      },
+      {
+        "name": "团队工作负载查询",
+        "status": "FAIL",
+        "ms": 0,
+        "error": "getTeamWorkload 应返回数组"
+      },
+      {
+        "name": "进度统计",
+        "status": "PASS",
+        "ms": 0
+      }
+    ],
+    "4-反省能力": [
+      {
+        "name": "反省引擎改进建议生成",
+        "status": "PASS",
+        "ms": 1
+      },
+      {
+        "name": "反省引擎经验教训提取",
+        "status": "FAIL",
+        "ms": 1,
+        "error": "getRecentLessons 应返回数组"
+      },
+      {
+        "name": "反省引擎反思触发逻辑",
+        "status": "FAIL",
+        "ms": 0,
+        "error": "shouldReflect 应返回 {shouldReflect, reason}"
+      }
+    ],
+    "5-时间管理": [
+      {
+        "name": "Scheduler 初始化参数完整性",
+        "status": "PASS",
+        "ms": 2
+      },
+      {
+        "name": "Scheduler 模块加载",
+        "status": "PASS",
+        "ms": 28
+      }
+    ],
+    "6-自修复": [
+      {
+        "name": "自修复模块熔断机制",
+        "status": "PASS",
+        "ms": 6
+      },
+      {
+        "name": "自修复重试队列",
+        "status": "PASS",
+        "ms": 0
+      },
+      {
+        "name": "自修复 heal block 生成",
+        "status": "PASS",
+        "ms": 0
+      },
+      {
+        "name": "自修复错误分类器",
+        "status": "PASS",
+        "ms": 1
+      }
+    ],
+    "7-团队管理": [
+      {
+        "name": "团队编排器任务分派",
+        "status": "FAIL",
+        "ms": 0,
+        "error": "未知成员ID: stress_tester"
+      },
+      {
+        "name": "团队编排器状态流转",
+        "status": "FAIL",
+        "ms": 0,
+        "error": "未知成员ID: stress_tester_flow"
+      },
+      {
+        "name": "团队编排器活跃任务查询",
+        "status": "PASS",
+        "ms": 1
+      }
+    ],
+    "8-共情能力": [
+      {
+        "name": "共情引擎情绪检测",
+        "status": "PASS",
+        "ms": 2
+      },
+      {
+        "name": "共情引擎用户偏好积累",
+        "status": "PASS",
+        "ms": 1
+      },
+      {
+        "name": "共情引擎结构化输出",
+        "status": "PASS",
+        "ms": 0
+      }
+    ],
+    "9-电商操盘": [
+      {
+        "name": "Crawlee 模块存在性",
+        "status": "PASS",
+        "ms": 1
+      },
+      {
+        "name": "Shopify/Stripe 支付配置存在性",
+        "status": "PASS",
+        "ms": 1
+      },
+      {
+        "name": "银月钱庄主目录完整性",
+        "status": "PASS",
+        "ms": 1
+      }
+    ],
+    "并发-稳定性": [
+      {
+        "name": "并发测试 20条",
+        "status": "FAIL",
+        "ms": 39,
+        "detail": {
+          "success": 0,
+          "failed": 20,
+          "total": 20
+        }
+      },
+      {
+        "name": "负载测试 10轮",
+        "status": "FAIL",
+        "ms": 2.4,
+        "detail": {
+          "avg": 2.4,
+          "max": 3,
+          "iterations": 10
+        }
+      }
+    ]
+  },
+  "score": "C",
+  "passRate": "60.7%",
+  "environment": {
+    "node": "v22.22.1",
+    "platform": "win32",
+    "timestamp": "2026-05-19T18:13:27.542Z"
+  }
+}

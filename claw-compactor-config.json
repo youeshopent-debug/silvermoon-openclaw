@@ -1,0 +1,17 @@
+{
+  "chars_per_token": 4,
+  "level0_max_tokens": 200,
+  "level1_max_tokens": 500,
+  "dedup_similarity_threshold": 0.6,
+  "dedup_shingle_size": 3,
+  "dedup_max_results": 50,
+  "dedup_min_line_length": 20,
+  "compress_min_tokens": 50,
+  "compress_target_ratio": 0.4,
+  "date_format": "%Y-%m-%d",
+  "memory_dir": "memory",
+  "memory_file": "MEMORY.md",
+  "summary_tiers_file": "memory/summary-tiers.md",
+  "compressed_suffix": ".compressed.md",
+  "log_level": "INFO"
+}

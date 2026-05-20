@@ -1,0 +1,90 @@
+{
+  "meta": {
+    "script": "flashshow_script_01.md (AIGenie Vision)",
+    "segment": "13s-18s (产品展示段落)",
+    "language": "英文",
+    "created_by": "蓝灵儿 (media-producer-llER)",
+    "target_platform": "TikTok / Instagram Reels / YouTube Shorts",
+    "date": "2026-05-09"
+  },
+  "digital_human": {
+    "appearance": {
+      "shot_type": "半身 (Half Body)",
+      "clothing": "浅米色针织衫 (Light Beige Knitted Sweater)",
+      "accessories": "极简无装饰 (Minimal, no accessories)",
+      "hairstyle": "自然微乱 (Natural slightly tousled)",
+      "facial_expression": "自信微笑 + 轻微挑眉 (Confident smile + slight eyebrow raise)"
+    },
+    "lighting": {
+      "type": "暖黄光 (Warm Yellow Light)",
+      "color_temp": "3200K-3800K (暖色调)",
+      "key_light_direction": "左前上方45° (45° upper-left front)",
+      "fill_light": "右前30% 柔光补光",
+      "rim_light": "后侧冷白背光 (边缘分离用)",
+      "shadow": "柔和阴影，人物脚底有接触阴影（增强真实感）"
+    },
+    "background": {
+      "type": "纯色深色背景 (Solid Dark Background)",
+      "color": "#1A1A2E (深蓝黑)",
+      "style": "微渐变，底部稍亮，顶部渐暗",
+      "vignette": "暗角晕影 15% (增强沉浸感)",
+      "texture": "无纹理，纯色磨砂质感"
+    },
+    "position_and_framing": {
+      "horizontal": "居中偏左 10% (Center-left 10%)",
+      "vertical": "人物头部在画面上1/3处，胸口以下裁切",
+      "size": "占画面 45-50%",
+      "eye_line": "略微高于镜头中心线 5° (轻微仰视感)",
+      "depth_of_field": "浅景深，背景虚化 (背景与人物分离)"
+    }
+  },
+  "voiceover": {
+    "text": "Meet AIGenie Vision. 0.5-second latency. It looks like premium eyewear, but works like your personal interpreter.",
+    "speaker_style": "Tech Founder / Startup (年轻自信美式英语男声)",
+    "tone": "自信、揭秘感 — 每句结尾微微上扬",
+    "speed": "比正常快 12%",
+    "pitch": "中低音域，略带温暖感",
+    "emphasis_words": ["AIGenie Vision", "0.5-second", "premium eyewear", "personal interpreter"]
+  },
+  "subtitles": {
+    "style": "Alex Hormozi 弹跳式动态字幕",
+    "layout": "底部居中，单行不超过6词",
+    "highlight_color": "#00D4FF (品牌蓝)",
+    "secondary_color": "#FFFFFF (白色)",
+    "animation": "逐词弹入 (Word-by-word pop-in)",
+    "timing": {
+      "line_1_0_0.8s": "Meet AIGenie Vision.",
+      "line_2_0.8s_1.6s": "0.5-second latency.",
+      "line_3_1.6s_2.8s": "It looks like premium eyewear,",
+      "line_4_2.8s_4.0s": "but works like your",
+      "line_5_4.0s_5.0s": "personal interpreter."
+    }
+  },
+  "background_music": {
+    "genre": "Tech/Phonk 纯器乐",
+    "volume_profile": {
+      "0s-3s": "-20dB (环境音)",
+      "3s-8s": "鼓点淡入至 -18dB",
+      "8s-15s": "-18dB 稳定节奏",
+      "15s-22s": "-18dB 继续",
+      "22s-30s": "和弦收束至 -22dB"
+    }
+  },
+  "video_output": {
+    "aspect_ratio": "9:16 (竖屏)",
+    "resolution": "1080x1920",
+    "fps": 30,
+    "duration_seconds": 30,
+    "format": "MP4 H.264"
+  },
+  "render_pipeline_order": {
+    "step_1": "配置数字人形象：选择公共数字人 → 调整服装为浅米色针织衫",
+    "step_2": "设置背景：选择深色背景(纯色) → 调色为 #1A1A2E",
+    "step_3": "调整灯光：选择暖黄预设 → 微调亮度对比度",
+    "step_4": "输入口播台词：粘贴英文台词文本",
+    "step_5": "选择配音：Tech Founder 风格美式男声 → 语速+12%",
+    "step_6": "添加字幕：启用动态字幕 → 逐词弹入风格 → 高亮关键词",
+    "step_7": "配置BGM：选择Tech/Phonk → 按音量曲线调整",
+    "step_8": "预览 → 导出渲染"
+  }
+}

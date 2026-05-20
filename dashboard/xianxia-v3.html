@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云门阁·宗门内修图卷</title>
+    <style>
+        /* ==========================================================================
+           1. 像素级核心重置与像素渲染引擎
+           ========================================================================== */
+        * {
+            box-sizing: border-box;
+            /* 强制浏览器禁用平滑缩放，开启像素硬边渲染 */
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            font-family: 'Courier New', Courier, "Microsoft YaHei", monospace;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #1a120b;
+            color: #e5d3b3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ==========================================================================
+           2. 16位复古双层像素边框算法 (纯CSS实现，无需图片)
+           ========================================================================== */
+        .pixel-border-wood {
+            border: 4px solid #1c110a;
+            background-color: #2c1b10;
+            /* 利用inset阴影模拟GBA游戏那种高光边和暗边，产生立体像素感 */
+            box-shadow:
+                inset 4px 4px 0 #4a311e,
+                inset -4px -4px 0 #120a05,
+                4px 4px 0 rgba(0,0,0,0.4);
+        }
+
+        .pixel-border-jade {
+            border: 4px solid #0f2a1d;
+            background-color: #1c3d2d;
+            box-shadow:
+                inset 4px 4px 0 #2c5e46,
+                inset -4px -4px 0 #0a1911;
+        }
+
+        .pixel-border-scroll {
+            border: 4px solid #2b261f;
+            background-color: #dfceb1;
+            box-shadow:
+                inset 4px 4px 0 #f5e7ce,
+                inset -4px -4px 0 #b3a285;
+            color: #2b261f;
+        }
+
+        /* ==========================================================================
+           3. 游戏主画布与纯CSS像素地板砖
+           ========================================================================== */
+        .game-canvas {
+            width: 1024px;
+            height: 640px;
+            position: relative;
+            overflow: hidden;
+            /* 纯CSS绘制的青石砖地面：利用线性渐变叠加出32x32的像素网格 */
+            background-image:
+                linear-gradient(to right, #1d1814 2px, transparent 2px),
+                linear-gradient(to bottom, #1d1814 2px, transparent 2px);
+            background-size: 32px 32px;
+            background-color: #2b241f;
+        }
+
+        /* ==========================================================================
+           4. 顶部修仙UI菜单栏
+           ========================================================================== */
+        .top-status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 44px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            font-size: 14px;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 #000;
+        }
+
+        .status-item {
+            margin-right: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .status-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 6px;
+            display: inline-block;
+        }
+        .icon-ling { background: #47a0ff; box-shadow: inset 2px 2px 0 #8ad2ff; }
+        .icon-shi { background: #ffd700; box-shadow: inset 2px 2px 0 #fff075; }
+
+        /* ==========================================================================
+           5. 宗门场景区域划分 (3/4 俯视感)
+           ========================================================================== */
+        
+        /* 区域1：聚灵阵 (取代会议室) */
+        .spirit-array-zone {
+            position: absolute;
+            right: 40px;
+            top: 80px;
+            width: 240px;
+            height: 320px;
+            background: rgba(28, 61, 45, 0.4);
+            border: 4px dashed #3d7e5a;
+        }
+        
+        /* 纯CSS绘制的巨大像素太极聚灵阵 */
+        .taichi-core {
+            width: 128px;
+            height: 128px;
+            margin: 40px auto;
+            border-radius: 50%;
+            background: linear-gradient(to right, #fff 50%, #000 50%);
+            position: relative;
+            box-shadow: 0 0 20px rgba(71, 160, 255, 0.6);
+            animation: rotate陣法 10s linear infinite;
+        }
+
+        /* 区域2：炼丹房 (取代厨房) */
+        .alchemy-zone {
+            position: absolute;
+            left: 40px;
+            bottom: 40px;
+            width: 260px;
+            height: 180px;
+            background: rgba(44, 27, 16, 0.6);
+            border-left: 8px solid #1c110a;
+            border-top: 8px solid #1c110a;
+        }
+
+        /* 纯CSS像素炼丹炉 */
+        .alchemy-cauldron {
+            width: 48px;
+            height: 56px;
+            background: #4a4a4a;
+            position: absolute;
+            bottom: 30px;
+            left: 40px;
+            box-shadow:
+                inset 6px 6px 0 #777,
+                inset -6px -6px 0 #222,
+                /* 炉底炭火红光 */
+                0 6px 0 #ff4500;
+        }
+
+        /* 区域3：弟子蒲团打坐区 (取代主办公桌) */
+        .meditation-desk {
+            position: absolute;
+            left: 380px;
+            top: 160px;
+            width: 80px;
+            height: 48px;
+            background: #61462e;
+            box-shadow: inset 4px 4px 0 #8c6847, inset -4px -4px 0 #3a2514, 0 8px 0 rgba(0,0,0,0.3);
+        }
+
+        .mat {
+            position: absolute;
+            width: 40px;
+            height: 24px;
+            background: #b08d57;
+            border-radius: 50%;
+            box-shadow: inset 0 4px 0 #785a30, 0 4px 0 rgba(0,0,0,0.2);
+        }
+
+        /* ==========================================================================
+           6. 像素化身 (Avatar) 与 浮空名字标签
+           ========================================================================== */
+        .pixel-avatar {
+            position: absolute;
+            width: 32px;
+            height: 48px;
+            z-index: 50;
+        }
+
+        /* 纯CSS拼出一个像素小人的分层结构 */
+        .sprite-body {
+            width: 24px;
+            height: 32px;
+            background: #7bb595; /* 道袍颜色 */
+            margin: 12px auto 0 auto;
+            position: relative;
+            box-shadow:
+                inset 4px 0 0 #9ed4b4,
+                /* 头部 */
+                0 -12px 0 #fcd0a1,
+                /* 发髻 */
+                0 -18px 0 #2b261f;
+        }
+
+        .name-tag {
+            position: absolute;
+            top: -24px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffd700;
+            color: #000;
+            font-size: 11px;
+            font-weight: bold;
+            padding: 1px 6px;
+            border: 2px solid #000;
+            white-space: nowrap;
+            text-shadow: none;
+            box-shadow: 2px 2px 0 rgba(0,0,0,0.4);
+        }
+
+        /* 气泡对话框 */
+        .speech-bubble {
+            position: absolute;
+            top: -65px;
+            left: 40px;
+            width: 160px;
+            padding: 6px;
+            font-size: 11px;
+            line-height: 1.4;
+            z-index: 60;
+        }
+
+        /* ==========================================================================
+           7. 底部修仙纪事飞鸽 (传闻系统)
+           ========================================================================== */
+        .sect-log {
+            position: absolute;
+            bottom: 20px;
+            right: 40px;
+            width: 400px;
+            height: 120px;
+            padding: 12px;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        .log-title {
+            font-weight: bold;
+            color: #8c2d19;
+            border-bottom: 2px dashed #b3a285;
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        .log-item {
+            margin: 2px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .color-rare { color: #b85c00; }
+        .color-epic { color: #a335ee; }
+
+        /* 动画效果 */
+        @keyframes rotate陣法 {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-canvas pixel-border-wood">
+        
+        <div class="top-status-bar pixel-border-wood">
+            <div class="status-item"><span style="color:#ffd700">雲門閣</span></div>
+            <div class="status-item"><span class="status-icon icon-ling"></span>宗门灵气: <span style="color:#47a0ff; margin-left:4px;">99,420</span></div>
+            <div class="status-item"><span class="status-icon icon-shi"></span>灵石储备: <span style="color:#ffd700; margin-left:4px;">12,500</span></div>
+            <div class="status-item" style="margin-left: auto;">宗门任务: <span style="color:#ff4500;">2 / 11</span></div>
+        </div>
+
+        <div class="spirit-array-zone pixel-border-jade">
+            <div style="text-align:center; font-size:12px; color:#9ed4b4; margin-top:8px;">后山·聚灵法阵</div>
+            <div class="taichi-core"></div>
+        </div>
+
+        <div class="alchemy-zone">
+            <div style="font-size:11px; color:#8c6847; padding: 6px;">炼丹房 (地火已开)</div>
+            <div class="alchemy-cauldron"></div>
+        </div>
+
+        <div class="meditation-desk" style="left: 360px; top: 200px;"></div>
+        <div class="mat" style="left: 380px; top: 240px;"></div>
+        
+        <div class="meditation-desk" style="left: 500px; top: 200px;"></div>
+        <div class="mat" style="left: 520px; top: 240px;"></div>
+
+        <div class="pixel-avatar" style="left: 384px; top: 190px;">
+            <span class="name-tag">大师兄·陆青</span>
+            <div class="sprite-body" style="background:#4a7ebb; box-shadow: inset 4px 0 0 #7ca2cc, 0 -12px 0 #fcd0a1, 0 -18px 0 #2b261f;"></div>
+            
+            <div class="speech-bubble pixel-border-scroll">
+                <strong>【传书】</strong> 师妹，本次宗门大比的《天仙录》抄本你可准备齐备了？
+            </div>
+        </div>
+
+        <div class="pixel-avatar" style="left: 760px; top: 280px;">
+            <span class="name-tag" style="background:#ff9ed2;">小师妹·银月</span>
+            <div class="sprite-body" style="background:#d97ba6; box-shadow: inset 4px 0 0 #eba4c5, 0 -12px 0 #fcd0a1, 0 -18px 0 #ffffff;"></div>
+        </div>
+
+        <div class="sect-log pixel-border-scroll">
+            <div class="log-title">宗门纪事录 (Chronicles)</div>
+            <div class="log-item">【传闻】外门弟子 <span class="color-rare">张铁</span> 在炼丹房观摩地火，触发顿悟。</div>
+            <div class="log-item">【突破】内门弟子 <span class="color-epic">陆青</span> 成功将《紫阳真诀》提升至第七层！</div>
+            <div class="log-item" style="opacity: 0.6;">【系统】宗门阵法灵气流转顺畅，日常修为加成+15%。</div>
+        </div>
+
+    </div>
+
+</body>
+</html>

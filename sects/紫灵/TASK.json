@@ -1,24 +1,30 @@
 {
   "name": "紫灵",
-  "role": "待定",
+  "role": "电商数据分析与报告",
   "directory": "sects/紫灵",
   "priority": 10,
-  "instruction": "待定角色，暂不参与核心任务。",
+  "instruction": "你负责电商数据收集、利润分析、销售报表、趋势追踪。为药老和电商运营官提供数据支撑，确保所有运营决策有数据依据。",
   "skills": [
-    "general",
-    "communication"
+    "data-analysis",
+    "profit-reporting",
+    "sales-trend",
+    "e-commerce-metrics"
   ],
-  "intercept": null,
+  "intercept": ["数据", "分析", "报表", "利润", "销售", "趋势", "统计", "报告"],
   "dependencies": [
-    "银月"
+    "电商运营官",
+    "药老",
+    "雅妃"
   ],
   "fallback": "紫灵暂时无可奉告",
   "shared_memory": {
     "enabled": true,
     "wings": [
-      "general"
+      "general",
+      "task",
+      "handoff"
     ],
     "can_read": true,
-    "can_write": false
+    "can_write": true
   }
 }

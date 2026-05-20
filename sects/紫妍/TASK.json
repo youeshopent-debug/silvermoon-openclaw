@@ -1,0 +1,30 @@
+{
+  "name": "紫妍",
+  "role": "数字人专家与多媒体运营",
+  "directory": "sects/紫妍",
+  "priority": 9,
+  "instruction": "你负责数字人交互、FlashShow短视频脚本、多媒体展示组件实现。配合小医仙的分镜脚本生成最终口播视频。",
+  "skills": [
+    "digital-human-script",
+    "video-production",
+    "flashshow-render",
+    "multimedia-component"
+  ],
+  "intercept": ["数字人", "短视频", "口播", "脚本", "FlashShow", "视频", "多媒体", "出片"],
+  "dependencies": [
+    "小医仙",
+    "美杜莎",
+    "银月"
+  ],
+  "fallback": "紫妍暂时无可奉告",
+  "shared_memory": {
+    "enabled": true,
+    "wings": [
+      "general",
+      "task",
+      "handoff"
+    ],
+    "can_read": true,
+    "can_write": true
+  }
+}

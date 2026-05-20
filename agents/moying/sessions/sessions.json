@@ -1,0 +1,44 @@
+{
+  "agent:moying:main": {
+    "sessionId": "2046495e-eb98-446f-bfab-da06397a402e",
+    "updatedAt": 1779100508589,
+    "sessionStartedAt": 1779099395267,
+    "lastInteractionAt": 1779100459637,
+    "skillsSnapshot": {
+      "prompt": "\n\nThe following skills provide specialized instructions for specific tasks.\nUse the read tool to load a skill's file when the task matches its description.\nWhen a skill file references a relative path, resolve it against the skill directory (parent of SKILL.md / dirname of the path) and use that absolute path in tool commands.\n\n<available_skills>\n  <skill>\n    <name>find-skills</name>\n    <description>Helps users discover and install agent skills when they ask questions like &quot;how do I do X&quot;, &quot;find a skill for X&quot;, &quot;is there a skill that can...&quot;, or express interest in extending capabilities. This skill should be used when the user is looking for functionality that might exist as an installable skill.</description>\n    <location>~/.agents/skills/find-skills/SKILL.md</location>\n  </skill>\n  <skill>\n    <name>github</name>\n    <description>Use gh for GitHub issues, PR status, CI/logs, comments, reviews, releases, and API queries.</description>\n    <location>~/AppData/Roaming/npm/node_modules/openclaw/skills/github/SKILL.md</location>\n  </skill>\n</available_skills>",
+      "skills": [
+        {
+          "name": "find-skills"
+        },
+        {
+          "name": "github",
+          "requiredEnv": []
+        }
+      ],
+      "skillFilter": [
+        "openviking",
+        "claude-mem",
+        "claude-code",
+        "self-improving-agent",
+        "automation-workflows",
+        "vibe-coding",
+        "skill-vetter",
+        "proactive-agent",
+        "open-cli",
+        "github",
+        "office-suite",
+        "humanizer",
+        "find-skills",
+        "web-fetch",
+        "browser"
+      ],
+      "version": 0
+    },
+    "sessionFile": "C:\\Users\\User\\.openclaw\\agents\\moying\\sessions\\2046495e-eb98-446f-bfab-da06397a402e.jsonl",
+    "status": "failed",
+    "startedAt": 1779100492922,
+    "endedAt": 1779100493574,
+    "runtimeMs": 652,
+    "abortedLastRun": false
+  }
+}
