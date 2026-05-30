@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BWXKOEN Pro - Image Grabber</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0a0a0a; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; padding: 20px; }
+h1 { color: #00d4ff; text-align: center; margin-bottom: 8px; font-size: 22px; }
+.sub { text-align: center; color: #888; font-size: 13px; margin-bottom: 20px; }
+.controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; flex-wrap: wrap; }
+.btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; font-weight: 600; transition: all .2s; }
+.btn-primary { background: #00d4ff; color: #0a0a0a; }
+.btn-primary:hover { background: #00b8d9; }
+.btn-primary:disabled { background: #444; color: #888; cursor: not-allowed; }
+.btn-secondary { background: #2a2a2a; color: #e0e0e0; border: 1px solid #444; }
+.btn-secondary:hover { background: #3a3a3a; }
+.progress { text-align: center; margin-bottom: 16px; font-size: 13px; color: #aaa; min-height: 20px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.card { background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; transition: border-color .2s; }
+.card:hover { border-color: #00d4ff44; }
+.card img { width: 100%; height: 200px; object-fit: cover; display: block; background: #1a1a1a; }
+.card .info { padding: 8px 10px; display: flex; justify-content: space-between; align-items: center; }
+.card .name { font-size: 12px; color: #aaa; }
+.card .status { font-size: 11px; padding: 2px 8px; border-radius: 4px; }
+.status-done { background: #00d4ff22; color: #00d4ff; }
+.status-loading { background: #ffaa0022; color: #ffaa00; }
+.status-error { background: #ff444422; color: #ff4444; }
+.status-pending { background: #333; color: #888; }
+.status-saved { background: #44ff4422; color: #44ff44; }
+.footer { text-align: center; margin-top: 20px; font-size: 12px; color: #555; }
+</style>
+</head>
+<body>
+<h1>📷 BWXKOEN Pro 图片抓取器</h1>
+<p class="sub">浏览器直连 byteimg CDN · 加载后一键下载</p>
+
+<div class="controls">
+  <button class="btn btn-primary" id="btnLoad">🔄 加载全部图片</button>
+  <button class="btn btn-primary" id="btnSaveAll" disabled>💾 全部保存</button>
+  <button class="btn btn-secondary" id="btnSelectAll">☑️ 全选</button>
+  <button class="btn btn-secondary" id="btnDeselectAll">⬜ 取消全选</button>
+</div>
+
+<div class="progress" id="progress">点击「加载全部图片」开始获取</div>
+
+<div class="gallery" id="gallery"></div>
+
+<div class="footer">图片来自 byteimg CDN · 在浏览器中加载后即可正常访问</div>
+
+<script>
+const IMAGES = [
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/7f750af9a51f2be175d97254e0ff33b5~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_main.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/9a99f617a23b3bde9578906537fa84d3~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_01_model.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/cdebc1dc5c22a5a84ba24824237f7a60~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_02_angle.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/e5e05f2055fa2a8e631c8b4a6a04be88~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_03_front.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/e777ac119a6b3cabf5adb053bb561c58~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_04_detail.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/ddf37056b8a8453abc283c0750b67e3c~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_05_side.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/e524a64a32fe15af4a7e34a2c14f8945~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_06_lifestyle.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/ad7d9e0b48e11a8d453808d41b4de0c8~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_07_wear.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/007d8d4a8a1c1e6cd4b8de56f6976ed7~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_08_box.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/13d27e7f20703a0cbb51f0e952bc0e30~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_09_feature.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/b6b1c08b45bae62add34a174271a5cd9~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_10_ui.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/f4f4821cf53e2fdd6a3466f8c88e21a3~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_11_app.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/6b5fdef831b4f186f5970985dc9e33d0~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_12_translate.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/51795f147e1b310c72310e3a377d5f42~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_13_nav.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/8b9b13667bb5095fe4272585800e7bd8~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_14_specs.jpg' },
+  { url: 'https://p16-cc-image-search-sign-sg.ibyteimg.com/tos-alisg-i-h9hire4aei-sg/image/97dd346c7545077974e779b6e0e77b2d~tplv-h9hire4aei-image.jpeg', name: 'bwxkoen_15_package.jpg' }
+];
+
+let loadedCount = 0;
+let selectedNames = new Set();
+
+const gallery = document.getElementById('gallery');
+const progress = document.getElementById('progress');
+const btnLoad = document.getElementById('btnLoad');
+const btnSaveAll = document.getElementById('btnSaveAll');
+
+function renderCards() {
+  gallery.innerHTML = '';
+  IMAGES.forEach((img, i) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.index = i;
+    card.innerHTML = `
+      <img src="" data-src="${img.url}" alt="${img.name}" style="opacity:0.5">
+      <div class="info">
+        <span class="name">${img.name}</span>
+        <span class="status status-pending">pending</span>
+      </div>
+    `;
+    const imgEl = card.querySelector('img');
+    const statusEl = card.querySelector('.status');
+    card.addEventListener('click', () => {
+      if (statusEl.classList.contains('status-done') || statusEl.classList.contains('status-saved')) {
+        if (selectedNames.has(img.name)) {
+          selectedNames.delete(img.name);
+          card.style.borderColor = '#2a2a2a';
+        } else {
+          selectedNames.add(img.name);
+          card.style.borderColor = '#00d4ff';
+        }
+        updateSaveBtn();
+      }
+    });
+    gallery.appendChild(card);
+  });
+}
+
+function updateProgress() {
+  progress.textContent = `进度：${loadedCount} / ${IMAGES.length}`;
+  if (loadedCount === IMAGES.length) {
+    progress.textContent += ' ✅ 全部加载完毕！勾选后点击「全部保存」';
+    btnSaveAll.disabled = false;
+  }
+}
+
+function updateSaveBtn() {
+  const count = selectedNames.size;
+  btnSaveAll.textContent = count > 0 ? `💾 保存选中 (${count})` : '💾 全部保存';
+}
+
+async function loadImage(index) {
+  const img = IMAGES[index];
+  const card = gallery.children[index];
+  const imgEl = card.querySelector('img');
+  const statusEl = card.querySelector('.status');
+
+  statusEl.className = 'status status-loading';
+  statusEl.textContent = 'loading...';
+
+  return new Promise((resolve) => {
+    imgEl.onload = () => {
+      loadedCount++;
+      statusEl.className = 'status status-done';
+      statusEl.textContent = '✅ loaded';
+      imgEl.style.opacity = '1';
+      updateProgress();
+      resolve(true);
+    };
+    imgEl.onerror = () => {
+      statusEl.className = 'status status-error';
+      statusEl.textContent = '❌ error';
+      updateProgress();
+      resolve(false);
+    };
+    imgEl.src = imgEl.dataset.src;
+  });
+}
+
+async function loadAll() {
+  btnLoad.disabled = true;
+  btnLoad.textContent = '⏳ 加载中...';
+  loadedCount = 0;
+  progress.textContent = '开始加载图片...';
+
+  const concurrency = 6;
+  for (let i = 0; i < IMAGES.length; i += concurrency) {
+    const batch = [];
+    for (let j = i; j < Math.min(i + concurrency, IMAGES.length); j++) {
+      batch.push(loadImage(j));
+    }
+    await Promise.all(batch);
+  }
+
+  btnLoad.textContent = '✅ 已完成';
+  selectedNames = new Set(IMAGES.map(i => i.name));
+  document.querySelectorAll('.card').forEach(c => c.style.borderColor = '#00d4ff');
+  updateSaveBtn();
+}
+
+function saveSelected() {
+  const namesToSave = selectedNames.size > 0 ? selectedNames : new Set(IMAGES.map(i => i.name));
+  let saved = 0;
+  IMAGES.forEach((img, i) => {
+    if (!namesToSave.has(img.name)) return;
+    const card = gallery.children[i];
+    const imgEl = card.querySelector('img');
+    const statusEl = card.querySelector('.status');
+    if (!imgEl.complete || imgEl.naturalWidth === 0) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = imgEl.naturalWidth;
+    canvas.height = imgEl.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(imgEl, 0, 0);
+
+    const a = document.createElement('a');
+    a.download = img.name;
+    a.href = canvas.toDataURL('image/jpeg', 0.95);
+    a.click();
+    saved++;
+    statusEl.className = 'status status-saved';
+    statusEl.textContent = '💾 saved';
+  });
+  progress.textContent = `已触发 ${saved} 个文件下载！`;
+}
+
+renderCards();
+document.getElementById('btnLoad').addEventListener('click', loadAll);
+document.getElementById('btnSaveAll').addEventListener('click', saveSelected);
+document.getElementById('btnSelectAll').addEventListener('click', () => {
+  selectedNames = new Set(IMAGES.map(i => i.name));
+  document.querySelectorAll('.card').forEach(c => {
+    const idx = parseInt(c.dataset.index);
+    const statusEl = c.querySelector('.status');
+    if (statusEl.classList.contains('status-done') || statusEl.classList.contains('status-saved')) {
+      c.style.borderColor = '#00d4ff';
+    }
+  });
+  updateSaveBtn();
+});
+document.getElementById('btnDeselectAll').addEventListener('click', () => {
+  selectedNames.clear();
+  document.querySelectorAll('.card').forEach(c => c.style.borderColor = '#2a2a2a');
+  updateSaveBtn();
+});
+</script>
+</body>
+</html>

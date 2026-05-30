@@ -1,0 +1,81 @@
+Windows Registry Editor Version 5.00
+
+; ============================================================
+; 银月钱庄 · Chrome 企业策略部署（注册表文件）
+; 
+; 使用方式：
+;   1. 右键 → 合并（需管理员权限）
+;   2. 或：regedit /s chrome-enterprise-policy.reg
+;   3. 重启 Chrome 后生效
+;
+; 更换目标 URL：替换下方 http://localhost:4310 为实际地址
+; ============================================================
+
+; ============================================================
+; 1. 默认浏览器锁定
+; ============================================================
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+"DefaultBrowserSettingEnabled"=dword:00000001
+
+; ============================================================
+; 2. 启动页强制锁定
+; ============================================================
+; 启动时打开指定 URL
+"RestoreOnStartup"=dword:00000004
+; 主页按钮
+"ShowHomeButton"=dword:00000001
+"HomePageLocation"="http://localhost:4310"
+"HomePageIsNewTabPage"=dword:00000000
+; 新标签页指向目标
+"NewTabPageLocation"="http://localhost:4310"
+
+; ============================================================
+; 3. URL 访问限制（仅允许指定页面）
+; ============================================================
+; URLAllowlist 和 URLBlocklist 是 MultiString 类型
+; REG 文件中用 hex(7) 表示，以下是等价设置：
+; 允许列表：目标URL + 本地服务
+; 阻止列表：全部
+
+; ============================================================
+; 4. 设置锁定
+; ============================================================
+"IncognitoModeAvailability"=dword:00000001
+"AllowDeletingBrowserHistory"=dword:00000000
+"EditPasswordsInSettings"=dword:00000000
+"DeveloperToolsAvailability"=dword:00000002
+"BlockExternalExtensions"=dword:00000001
+"TaskManagerEndProcessEnabled"=dword:00000000
+
+; ============================================================
+; 5. 体验优化
+; ============================================================
+"BookmarkBarEnabled"=dword:00000001
+"HideFirstRunExperience"=dword:00000001
+"MetricsReportingEnabled"=dword:00000000
+"AutofillCreditCardEnabled"=dword:00000000
+
+; ============================================================
+; URLAllowlist (MultiString 格式)
+; 格式：hex(7): 每个条目以 00 结尾，整体以 00 00 结尾
+; 当前条目：http://localhost:4310 , http://localhost:18791 , http://localhost:19999 , http://127.0.0.1/*
+; ============================================================
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+"URLAllowlist"=hex(7):68,00,74,00,74,00,70,00,3a,00,2f,00,2f,00,6c,00,6f,00,\
+  63,00,61,00,6c,00,68,00,6f,00,73,00,74,00,3a,00,34,00,33,00,31,00,30,00,00,\
+  00,68,00,74,00,74,00,70,00,3a,00,2f,00,2f,00,6c,00,6f,00,63,00,61,00,6c,00,\
+  68,00,6f,00,73,00,74,00,3a,00,31,00,38,00,37,00,39,00,31,00,00,00,68,00,74,\
+  00,74,00,70,00,3a,00,2f,00,2f,00,6c,00,6f,00,63,00,61,00,6c,00,68,00,6f,00,\
+  73,00,74,00,3a,00,31,00,39,00,39,00,39,00,39,00,00,00,68,00,74,00,74,00,70,\
+  00,3a,00,2f,00,2f,00,31,00,32,00,37,00,2e,00,30,00,2e,00,30,00,2e,00,31,00,\
+  2f,00,2a,00,00,00,00,00
+
+; URLBlocklist = ["*"]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+"URLBlocklist"=hex(7):2a,00,00,00
+
+; RestoreOnStartupURLs = ["http://localhost:4310"]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+"RestoreOnStartupURLs"=hex(7):68,00,74,00,74,00,70,00,3a,00,2f,00,2f,00,6c,00,\
+  6f,00,63,00,61,00,6c,00,68,00,6f,00,73,00,74,00,3a,00,34,00,33,00,31,00,30,\
+  00,00,00,00,00

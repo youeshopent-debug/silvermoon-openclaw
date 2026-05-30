@@ -18,10 +18,9 @@ workspace/
 workspace-dev/
 canvas/
 devices/
-docs/
+docs/.generated/
 flows/
 identity/
-scripts/
 skills/
 tools/
 user_data/
@@ -32,7 +31,6 @@ __pycache__/
 .qwen/
 .playwright-cli/
 .rtk/cache/
-.agents/
 
 # --- IDE/编辑器 ---
 .vscode/
@@ -55,12 +53,15 @@ secrets/
 # --- 操作系统 ---
 Thumbs.db
 .DS_Store
+**/.DS_Store
 Desktop.ini
 
 # --- 构建产物 ---
 dist/
 build/
 *.tsbuildinfo
+dist-sea/
+dist-runtime/
 
 # --- Git hooks (模板) ---
 .githooks/
@@ -83,10 +84,10 @@ tmp_*.png
 tmp_*.cjs
 tmp_*.js
 tmp_*.mjs
+tmp_*.json
 tools_output.json
 kimi_full_test.py
 workflow_engine.py
-tmp_*.json
 update-check.json
 *.bak.*
 *.last-good
@@ -105,7 +106,6 @@ _*.py
 _*.cjs
 _*.mjs
 _*.js
-# Bot 输出日志
 bot.out.*
 
 # --- 数据/存储目录 ---
@@ -135,3 +135,217 @@ awesome-design-md/
 plugins/rtk/
 plugins/turix-cua/
 prompt-optimizer-deploy/
+
+# ========== Upstream v2026.5.27 合并规则 ==========
+
+# Lock 文件
+pnpm-lock.yaml
+bun.lock
+bun.lockb
+
+# 测试覆盖率
+coverage
+__openclaw_vitest__/
+
+# Worktrees
+.worktrees/
+
+# UI 测试产物
+ui/src/ui/__screenshots__/
+ui/playwright-report/
+ui/test-results/
+
+# Next.js 构建
+packages/dashboard-next/.next/
+packages/dashboard-next/out/
+
+# Mise 配置
+mise.toml
+
+# Android 构建产物
+apps/android/.gradle/
+apps/android/app/build/
+apps/android/.cxx/
+apps/android/.kotlin/
+apps/android/benchmark/results/
+
+# Bun 构建
+*.bun-build
+
+# macOS/iOS 构建
+apps/macos/.build/
+apps/macos-mlx-tts/.build/
+apps/shared/MoltbotKit/.build/
+apps/shared/OpenClawKit/.build/
+apps/shared/*/.build/
+apps/shared/OpenClawKit/Package.resolved
+**/ModuleCache/
+bin/
+bin/clawdbot-mac
+bin/docs-list
+apps/macos/.build-local/
+apps/macos/.swiftpm/
+apps/shared/MoltbotKit/.swiftpm/
+apps/shared/OpenClawKit/.swiftpm/
+apps/shared/*/.swiftpm/
+Core/
+apps/ios/*.xcodeproj/
+apps/ios/*.xcworkspace/
+apps/ios/.swiftpm/
+apps/ios/.derivedData/
+apps/ios/.local-signing.xcconfig
+apps/ios/Clawdbot.xcodeproj/
+apps/ios/Clawdbot.xcodeproj/**
+apps/macos/.build/**
+apps/macos-mlx-tts/.build/**
+apps/ios/*.xcfilelist
+
+# Vendor 构建产物
+vendor/a2ui/renderers/lit/dist/
+src/canvas-host/a2ui/*.bundle.js
+src/canvas-host/a2ui/*.map
+extensions/canvas/src/host/a2ui/*.bundle.js
+extensions/canvas/src/host/a2ui/*.map
+.bundle.hash
+
+# fastlane (iOS)
+apps/ios/fastlane/README.md
+apps/ios/fastlane/report.xml
+apps/ios/fastlane/Preview.html
+apps/ios/fastlane/screenshots/
+apps/ios/fastlane/test_output/
+apps/ios/fastlane/logs/
+apps/ios/fastlane/.env
+apps/ios/*.ipa
+apps/ios/*.dSYM.zip
+apps/ios/*.mobileprovision
+
+# 本地 untracked 文件
+.local/
+docs/.local/
+docs/internal/
+IDENTITY.md
+USER.md
+!extensions/oc-path/src/oc-path/tests/fixtures/real/IDENTITY.md
+!extensions/oc-path/src/oc-path/tests/fixtures/real/USER.md
+*.tgz
+*.zip
+.idea
+
+# 本地工具链
+.antigravitycli/
+.serena/
+.crabbox/
+
+# 本地 QA 证据镜像
+mantis/
+
+# Agent skills — 仅 whitelist 仓库自有 skills
+.agents/skills/*
+!.agents/skills/blacksmith-testbox/**
+!.agents/skills/crabbox/**
+!.agents/skills/clawdtributor/**
+!.agents/skills/control-ui-e2e/**
+!.agents/skills/gitcrawl/**
+!.agents/skills/technical-documentation/**
+!.agents/skills/openclaw-refactor-docs/**
+!.agents/skills/openclaw-debugging/**
+!.agents/skills/openclaw-ghsa-maintainer/**
+!.agents/skills/openclaw-landable-bug-sweep/**
+!.agents/skills/openclaw-parallels-smoke/**
+!.agents/skills/openclaw-pr-maintainer/**
+!.agents/skills/openclaw-qa-testing/**
+!.agents/skills/openclaw-release-ci/**
+!.agents/skills/openclaw-release-maintainer/**
+!.agents/skills/openclaw-secret-scanning-maintainer/**
+!.agents/skills/openclaw-test-heap-leaks/**
+!.agents/skills/openclaw-test-performance/**
+!.agents/skills/openclaw-testing/**
+!.agents/skills/optimizetests/**
+!.agents/skills/parallels-discord-roundtrip/**
+!.agents/skills/security-triage/**
+!.agents/skills/tag-duplicate-prs-issues/**
+!.agents/skills/autoreview/**
+.agents/skills/**/__pycache__/
+.agents/skills/**/*.py[cod]
+
+# Agent 凭据与记忆（绝不提交）
+/memory/
+.agent/*.json
+!.agent/workflows/
+/local/
+/client_secret_*.json
+package-lock.json
+.agent/
+skills-lock.json
+
+# iOS 签名
+apps/ios/LocalSigning.xcconfig
+
+# Xcode 构建
+apps/ios/build/
+apps/shared/OpenClawKit/build/
+apps/swabble/build/
+*.xcresult
+*.trace
+*.profraw
+
+# 生成协议 schema
+dist/protocol.schema.json
+.ant-colony/
+
+# Eclipse
+**/.project
+**/.classpath
+**/.settings/
+**/.gradle/
+
+# Synthing
+**/.stfolder/
+.dev-state
+docs/superpowers
+.superpowers/
+.gitignore
+test/config-form.analyze.telegram.test.ts
+ui/src/ui/theme-variants.browser.test.ts
+ui/src/ui/__screenshots__
+ui/src/ui/views/__screenshots__
+ui/.vitest-attachments
+
+# 生成文档基线
+docs/.generated/*.json
+docs/.generated/*.jsonl
+
+# Deprecated changelog
+changelog/fragments/
+
+# 本地 scratch
+.tmp/
+.cache/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.vmux*
+.artifacts/
+.openclaw-config-doc-cache/
+openclaw-path-alias-*/
+/.pi/
+/C:\\openclaw/
+*.heapsnapshot
+*.cpuprofile
+*.prof
+test/fixtures/openclaw-vitest-unit-report.json
+analysis/
+.artifacts/qa-e2e/
+/runs/
+/data/rtt.jsonl
+extensions/qa-lab/web/dist/
+
+# 生成 bundled plugin 运行时依赖清单
+extensions/**/.openclaw-runtime-deps.json
+extensions/**/.openclaw-runtime-deps-stamp.json
+
+# Opengrep 输出
+/.opengrep-out/
+/.crabbox-artifacts
+.comux*

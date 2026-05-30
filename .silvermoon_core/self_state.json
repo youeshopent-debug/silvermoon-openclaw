@@ -1,21 +1,36 @@
 {
   "version": 1,
-  "uptime_hours": 6.76874,
+  "uptime_hours": 252.37894666666668,
   "queue_depth": 0,
-  "error_rate_24h": 0,
-  "total_errors_24h": 0,
-  "total_calls_24h": 0,
-  "reflection_count": 0,
+  "error_rate_24h": 0.022900763358778626,
+  "total_errors_24h": 3,
+  "total_calls_24h": 131,
+  "reflection_count": 75,
   "mood": "normal",
   "master_mood_detected": "neutral",
   "task_success_rate_7d": 1,
   "total_tasks_7d": 0,
   "successful_tasks_7d": 0,
-  "last_reflection_at": null,
+  "last_reflection_at": "2026-05-30T11:59:35.034Z",
   "last_plan_effectiveness": 0.5,
   "total_tasks_completed": 0,
   "last_restart_at": "2026-05-20T01:27:23.690Z",
   "consecutive_errors": 0,
   "consecutive_owner_displeasure": 0,
-  "last_updated": "2026-05-20T08:13:31.154Z"
+  "current_task": "修复writefile工具",
+  "task_queue": [],
+  "lessons": [
+    {
+      "text": "写文件必须先检查路径安全",
+      "timestamp": "2026-05-21T17:52:17.854Z",
+      "count": 1
+    }
+  ],
+  "completed_items": [
+    {
+      "desc": "① writefile修复完成",
+      "completed_at": "2026-05-21T17:52:17.855Z"
+    }
+  ],
+  "last_updated": "2026-05-30T13:50:07.898Z"
 }

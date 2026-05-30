@@ -1,0 +1,14 @@
+[Unit]
+Description=silvermoon-control
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/silvermoon/openclaw
+ExecStart=/usr/bin/env bash -lc 'set -euo pipefail; export CASHCLAW_ENABLED=1; export CASHCLAW_STRIPE_RELAY_MODE=1; export CASHCLAW_LOCAL_ENDPOINT_URL="${CASHCLAW_LOCAL_ENDPOINT_URL}"; export DISCORD_TOKEN="$(gcloud secrets versions access latest --secret=silvermoon-discord-token)"; export STRIPE_WEBHOOK_SECRET="$(gcloud secrets versions access latest --secret=silvermoon-stripe-webhook-secret)"; export GROQ_API_KEY="$(gcloud secrets versions access latest --secret=silvermoon-groq-api-key)"; export GEMINI_API_KEY="$(gcloud secrets versions access latest --secret=silvermoon-gemini-api-key)"; export CASHCLAW_RELAY_SECRET="$(gcloud secrets versions access latest --secret=silvermoon-cashclaw-relay-secret)"; export OPENCLAW_LINK_BIND=127.0.0.1; export OPENCLAW_LINK_PORT=18791; exec node main.js'
+Restart=always
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target

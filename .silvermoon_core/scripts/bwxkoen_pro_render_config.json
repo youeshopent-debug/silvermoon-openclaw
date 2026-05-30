@@ -1,0 +1,106 @@
+{
+  "project": {
+    "name": "BWXKOEN Pro - 30s TikTok Ad v2.0",
+    "resolution": { "width": 1080, "height": 1920 },
+    "fps": 30,
+    "duration": 30,
+    "orientation": "portrait",
+    "color_profile": "cold_tone",
+    "vignette": true
+  },
+  "digital_human": {
+    "model": "BWXKOEN_DH_v1",
+    "timeline_segments": [
+      { "start": 0, "end": 3, "visible": false, "note": "纯POV镜头, 无数字人" },
+      { "start": 3, "end": 8, "visible": true, "position": "right_30", "scale": 0.25, "frame": "waist_up", "note": "中近景, 画面右侧30%" },
+      { "start": 8, "end": 15, "visible": true, "position": "bottom_right", "scale": 0.15, "frame": "bubble_round", "note": "圆形小窗, 右下角15%" },
+      { "start": 15, "end": 22, "visible": false, "note": "纯分屏对比+参数动画" },
+      { "start": 22, "end": 28, "visible": true, "position": "center", "scale": 0.7, "frame": "closeup", "note": "面部特写, 居中70%" },
+      { "start": 28, "end": 30, "visible": false, "note": "产品End Card" }
+    ],
+    "emotion_timeline": [
+      { "start": 0, "end": 3, "emotion": "serious_to_curious", "eyebrow": "slight_frown", "gaze": "focused" },
+      { "start": 3, "end": 8, "emotion": "confident_reveal", "eyebrow": "raised", "mouth": "confident_smile" },
+      { "start": 8, "end": 15, "emotion": "amazed_excited", "eyes": "wide", "gesture": "palms_up" },
+      { "start": 15, "end": 22, "emotion": "calm_data", "gaze": "steady", "gesture": "tap_temple" },
+      { "start": 22, "end": 28, "emotion": "warm_sincere", "eyebrow": "soft", "mouth": "genuine_smile", "body": "lean_forward" }
+    ]
+  },
+  "audio": {
+    "voiceover": {
+      "file": ".silvermoon_core/assets/bwxkoen_pro_voiceover.mp3",
+      "engine": "edge-tts",
+      "voice": "en-US-AndrewMultilingualNeural",
+      "rate": "+15%"
+    },
+    "bgm": {
+      "tracks": [
+        { "start": 0, "end": 3, "type": "ambient_city_low", "volume_db": -24, "note": "都市环境音低频" },
+        { "start": 3, "end": 8, "type": "tech_drums_fadein", "volume_db": -18, "note": "科技鼓点淡入" },
+        { "start": 8, "end": 22, "type": "tech_phonk_drums", "volume_db": -18, "note": "Tech/Phonk节奏鼓点, 人声优先" },
+        { "start": 22, "end": 28, "type": "drums_resolve_chord", "volume_db": -20, "note": "鼓点收束+和弦终结" },
+        { "start": 28, "end": 30, "type": "brand_sting_fadeout", "volume_db": -24, "note": "品牌尾音淡出至静音" }
+      ]
+    },
+    "sfx": [
+      { "time": 3.0, "type": "oled_glow", "duration": 0.5, "note": "OLED亮起柔光音效" },
+      { "time": 8.0, "type": "swish_transition", "duration": 0.3, "note": "段落切换过渡音" },
+      { "time": 15.0, "type": "swish_transition", "duration": 0.3, "note": "段落切换过渡音" },
+      { "time": 22.0, "type": "risk_badge_ding", "duration": 0.5, "note": "风险逆转徽章提示音" },
+      { "time": 28.0, "type": "swish_transition", "duration": 0.3, "note": "End Card过渡音" }
+    ]
+  },
+  "subtitles": {
+    "style": "alex_hormozi_bounce",
+    "highlight_color": "#00D4FF",
+    "secondary_color": "#FFFFFF",
+    "max_words_per_line": 6,
+    "animation": "word_bounce_in_hold_fade_out",
+    "position_y_percent": 80,
+    "srt_file": ".silvermoon_core/assets/bwxkoen_pro_voiceover.srt",
+    "manual_timestamps": [
+      { "index": 1, "start": "00:00:00,500", "end": "00:00:03,000", "text": "Stop scrolling if you have ever\nfelt completely lost in a foreign country." },
+      { "index": 2, "start": "00:00:03,500", "end": "00:00:08,000", "text": "This is not a $3,500 Apple Vision Pro.\nNot a bulky AR headset.\nThis is BWXKOEN Pro." },
+      { "index": 3, "start": "00:00:08,500", "end": "00:00:15,000", "text": "Real-time AI translation glasses\nthat work the moment you put them on.\n100+ languages. 200ms latency." },
+      { "index": 4, "start": "00:00:15,500", "end": "00:00:22,000", "text": "32 grams. Titanium frame.\nBone conduction audio.\n48h standby. Prescription ready." },
+      { "index": 5, "start": "00:00:22,500", "end": "00:00:28,000", "text": "Try it for 30 days — risk-free.\nFree shipping worldwide.\nLink in bio." }
+    ]
+  },
+  "visual_effects": {
+    "color_filter": "cold_blue_shift",
+    "contrast": "high",
+    "vignette_intensity": 0.3,
+    "transitions": {
+      "type": "swish_slide",
+      "duration": 0.3
+    },
+    "overlay_effects": [
+      { "time_start": 3, "time_end": 8, "type": "oled_edge_glow", "note": "镜片边缘光效" },
+      { "time_start": 8, "time_end": 15, "type": "oled_text_reveal", "note": "OLED字幕逐字浮现" },
+      { "time_start": 15, "time_end": 22, "type": "split_screen", "config": { "left_clip": "pov_tourist_anxiety", "right_clip": "pov_natural_chat", "divider": "center_line" } },
+      { "time_start": 15, "time_end": 22, "type": "number_animation", "config": { "items": ["32g", "48h", "6h"], "animation": "bounce_in", "progress_bar": true } },
+      { "time_start": 22, "time_end": 28, "type": "risk_badge_pulse", "config": { "text": "30-Day Risk-Free", "color": "#00FF88", "animation": "pulse" } },
+      { "time_start": 28, "time_end": 30, "type": "end_card", "config": { "product_image": ".silvermoon_core/assets/amz_glasses_01_main.jpg", "background": "dark_gradient", "glow": true, "bottom_text": "BWXKOEN Pro  $129.99  silvermoon.bank" } }
+    ]
+  },
+  "assets": {
+    "pov_clips": [
+      { "id": "pov_shibuya", "description": "东京涩谷十字路口POV", "duration": 3, "file": ".silvermoon_core/assets/pov_shibuya_crossing.mp4" },
+      { "id": "pov_paris_cafe", "description": "巴黎咖啡馆POV看服务员", "duration": 2.5, "file": ".silvermoon_core/assets/pov_paris_cafe.mp4" },
+      { "id": "pov_shanghai", "description": "上海商务会议POV看对方", "duration": 2.5, "file": ".silvermoon_core/assets/pov_business_meeting.mp4" },
+      { "id": "pov_tokyo_metro", "description": "东京地铁POV看路牌", "duration": 2.5, "file": ".silvermoon_core/assets/pov_tokyo_metro.mp4" },
+      { "id": "pov_tourist_anxiety", "description": "游客掏手机焦虑(分屏左)", "duration": 3.5, "file": ".silvermoon_core/assets/pov_tourist_anxiety.mp4" },
+      { "id": "pov_natural_chat", "description": "佩戴眼镜自然交流(分屏右)", "duration": 3.5, "file": ".silvermoon_core/assets/pov_natural_chat.mp4" }
+    ],
+    "product_images": [
+      { "id": "prod_front", "description": "产品正面主图 暗色背景+光效", "file": ".silvermoon_core/assets/amz_glasses_01_main.jpg" },
+      { "id": "prod_worn", "description": "真人佩戴效果 展示使用场景", "file": ".silvermoon_core/assets/amz_glasses_04_worn.jpg" },
+      { "id": "prod_temple", "description": "镜腿细节+触控功能特写", "file": ".silvermoon_core/assets/amz_glasses_06_detail.jpg" },
+      { "id": "prod_titanium", "description": "侧视图 展示钛合金镜架 32g质感", "file": ".silvermoon_core/assets/amz_glasses_03_side.jpg" },
+      { "id": "prod_features", "description": "功能参数图 变色镜片/AI翻译", "file": ".silvermoon_core/assets/amz_glasses_05_feature.jpg" },
+      { "id": "prod_lifestyle", "description": "lifestyle商务场景佩戴", "file": ".silvermoon_core/assets/amz_glasses_07_lifestyle.jpg" },
+      { "id": "prod_trust_bar", "description": "信任条 ★4.8/5", "file": ".silvermoon_core/assets/bwxkoen_trust_bar.svg" },
+      { "id": "prod_end_card", "description": "包装全家福 End Card", "file": ".silvermoon_core/assets/amz_glasses_08_pack.jpg" }
+    ]
+  }
+}

@@ -1,5 +1,12 @@
 {
-  "version": "2026.5.0",
+  "name": "openclaw",
+  "version": "2026.5.27",
+  "description": "Multi-channel AI gateway with extensible messaging integrations",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openclaw/openclaw.git"
+  },
   "dependencies": {
     "better-sqlite3": "^12.9.0",
     "canvas": "^3.2.3",

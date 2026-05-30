@@ -1,0 +1,1 @@
+{"status":200,"sid":"b6bb4bdb-fabe-418e-a5be-35052762ff69","body":"event: message\ndata: {\"result\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{\"tools\":{}},\"serverInfo\":{\"name\":\"ChromeMcpServer\",\"version\":\"1.0.0\"}},\"jsonrpc\":\"2.0\",\"id\":1}\n\n"}
