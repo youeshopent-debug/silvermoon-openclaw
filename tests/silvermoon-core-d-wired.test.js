@@ -1,20 +1,23 @@
-const assert = require('assert');
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-async function run() {
-  const p = path.join(__dirname, '..', 'main.js');
-  const s = fs.readFileSync(p, 'utf-8');
-  assert.equal(s.includes("require('./lib/persona-silvermoon')"), true);
-  assert.equal(s.includes("require('./lib/brain-router')"), true);
-  assert.equal(s.includes("require('./lib/tools')"), true);
-  assert.equal(s.includes('askSilvermoonAutonomyD'), true);
-}
+describe("silvermoon-core-d-wired", () => {
+  const mainJsPath = path.join(__dirname, "..", "main.js");
+  const mainJs = fs.readFileSync(mainJsPath, "utf-8");
 
-run()
-  .then(() => {})
-  .catch((e) => {
-    console.error(e);
-    process.exitCode = 1;
+  it("should require persona-silvermoon", () => {
+    expect(mainJs.includes("require('./lib/persona-silvermoon')")).toBe(true);
   });
 
+  it("should require brain-router", () => {
+    expect(mainJs.includes("require('./lib/brain-router')")).toBe(true);
+  });
+
+  it("should require tools", () => {
+    expect(mainJs.includes("require('./lib/tools')")).toBe(true);
+  });
+
+  it("should reference askSilvermoonAutonomyD", () => {
+    expect(mainJs.includes("askSilvermoonAutonomyD")).toBe(true);
+  });
+});

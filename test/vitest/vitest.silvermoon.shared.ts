@@ -3,9 +3,10 @@ import { defineConfig } from "vitest/config";
 export const silvermoonRoot = new URL("../../", import.meta.url).pathname;
 
 export const silvermoonTestPatterns = [
-  // 仅匹配 lib/ 下新创建的 TypeScript 契约测试文件
-  // 排除 tests/ 下 39 个已有 TAP/node 测试文件（使用 run() IIFE，非 vitest 兼容）
+  // lib/ 下的 TypeScript 契约测试文件
   "lib/**/*.test.ts",
+  // tests/ 下已迁移至 vitest 模式的 silvermoon 测试文件
+  "tests/silvermoon-*.test.js",
 ];
 
 export const silvermoonExcludePatterns = [
