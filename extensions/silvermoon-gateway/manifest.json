@@ -1,0 +1,20 @@
+{
+  "name": "silvermoon-gateway",
+  "version": "2026.5.27",
+  "description": "银月钱庄核心网关 — 意图路由 + Agent 调度 + 工具链",
+  "main": "dist/index.js",
+  "type": "module",
+  "openclaw": {
+    "kind": "gateway",
+    "minCoreVersion": "2026.5.27",
+    "hooks": {
+      "onMessage": "handleMessage",
+      "onStartup": "onStartup",
+      "onShutdown": "onShutdown"
+    }
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^0.67.0",
+    "discord.js": "^14.26.2"
+  }
+}
