@@ -10,6 +10,7 @@ export interface Message {
 export class SilvermoonGateway {
   private brainRouter: BrainRouter;
   private ready = false;
+  private staleCheckTimer: ReturnType<typeof setInterval> | null = null;
 
   constructor() {
     this.brainRouter = new BrainRouter();
@@ -20,6 +21,11 @@ export class SilvermoonGateway {
     this.brainRouter.registerDefaultAgents();
     this.ready = true;
     console.log("[silvermoon-gateway] 银月网关就绪 — 8 位 OC 已在线待命");
+
+    // 启动心跳超时巡检：每 30 秒检查一次，120 秒无心跳的 OC 自动降级 offline
+    this.staleCheckTimer = setInterval(() => {
+      this.brainRouter.checkStaleAgents(120_000);
+    }, 30_000);
   }
 
   async handleMessage(msg: Message): Promise<string> {
@@ -46,17 +52,20 @@ export class SilvermoonGateway {
     const lead = ranked[0];
     const targetName = intent.entities?.targetAgent as string | undefined;
 
-    // 如果命中了特定 OC，展示该 OC 的技能域
+    // 如果命中了特定 OC，刷新其心跳 + 展示状态
     if (targetName) {
-      const allAgents = this.brainRouter.getAllAgents();
-      const targetAgent = allAgents.find((a) => a.name === targetName);
+      this.brainRouter.heartbeat(targetName);
+      const targetAgent = this.brainRouter.getAgentStatus(targetName);
       if (targetAgent) {
         const skillDisplay = targetAgent.skills.join(" / ");
+        const statusIcon = targetAgent.status === "online" ? "🟢 在线" :
+                           targetAgent.status === "idle"   ? "🟡 待命" :
+                                                             "🔴 离线";
         return `【${targetAgent.displayName}】在呢，随时听候差遣 ✨
 
 🎯 领域: ${skillDisplay}
 📋 意图: ${intent.intent}
-⚡ 状态: ${targetAgent.status === "online" ? "🟢 在线" : "🟡 待命"}`;
+⚡ 状态: ${statusIcon}`;
       }
     }
 
@@ -72,5 +81,9 @@ export class SilvermoonGateway {
   async onShutdown(): Promise<void> {
     console.log("[silvermoon-gateway] 银月网关正在关闭...");
     this.ready = false;
+    if (this.staleCheckTimer) {
+      clearInterval(this.staleCheckTimer);
+      this.staleCheckTimer = null;
+    }
   }
 }

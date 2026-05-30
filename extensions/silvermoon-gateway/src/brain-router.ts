@@ -2,7 +2,8 @@ export interface AgentInfo {
   name: string;
   displayName: string;
   skills: string[];
-  status: "online" | "idle" | "busy";
+  status: "online" | "idle" | "busy" | "offline";
+  lastHeartbeatAt: number | null;
 }
 
 export interface IntentResult {
@@ -29,28 +30,35 @@ export interface AgentRanking {
  *   ecommerce/shopify/research       — 产品搜索、Shopify（韩立）
  *   payment/admin/gateway            — 支付、管理、网关调度（银月）
  *
- * 状态: online（常驻在线）/ idle（待命）/ busy（忙碌）
+ * 状态: online（常驻在线）/ idle（待命）/ busy（忙碌）/ offline（离线）
  */
 const DEFAULT_AGENTS: AgentInfo[] = [
-  { name: "OC银月",  displayName: "银月",   skills: ["payment", "admin", "gateway"],              status: "online" },
-  { name: "OC李长寿", displayName: "李长寿", skills: ["code", "architecture", "engineering"],      status: "idle"   },
-  { name: "OC墨影",   displayName: "墨影",   skills: ["monitoring", "watchdog", "health", "ops"],  status: "idle"   },
-  { name: "OC药老",   displayName: "药老",   skills: ["copywriting", "seo", "content"],            status: "idle"   },
-  { name: "OC美杜莎", displayName: "美杜莎", skills: ["design", "ui", "ux", "social_media", "image"], status: "idle"},
-  { name: "OC雅妃",   displayName: "雅妃",   skills: ["accounting", "bookkeeping", "investment"],  status: "idle"   },
-  { name: "OC萧炎",   displayName: "萧炎",   skills: ["trading", "forex", "options", "stocks"],    status: "idle"   },
-  { name: "OC韩立",   displayName: "韩立",   skills: ["ecommerce", "shopify", "research"],         status: "idle"   },
+  { name: "OC银月",  displayName: "银月",   skills: ["payment", "admin", "gateway"],              status: "online",  lastHeartbeatAt: null },
+  { name: "OC李长寿", displayName: "李长寿", skills: ["code", "architecture", "engineering"],      status: "idle",    lastHeartbeatAt: null },
+  { name: "OC墨影",   displayName: "墨影",   skills: ["monitoring", "watchdog", "health", "ops"],  status: "idle",    lastHeartbeatAt: null },
+  { name: "OC药老",   displayName: "药老",   skills: ["copywriting", "seo", "content"],            status: "idle",    lastHeartbeatAt: null },
+  { name: "OC美杜莎", displayName: "美杜莎", skills: ["design", "ui", "ux", "social_media", "image"], status: "idle", lastHeartbeatAt: null },
+  { name: "OC雅妃",   displayName: "雅妃",   skills: ["accounting", "bookkeeping", "investment"],  status: "idle",    lastHeartbeatAt: null },
+  { name: "OC萧炎",   displayName: "萧炎",   skills: ["trading", "forex", "options", "stocks"],    status: "idle",    lastHeartbeatAt: null },
+  { name: "OC韩立",   displayName: "韩立",   skills: ["ecommerce", "shopify", "research"],         status: "idle",    lastHeartbeatAt: null },
 ];
 
 export class BrainRouter {
   private agentRegistry: Map<string, AgentInfo> = new Map();
+  /** Agent 名称 → 上次心跳时间戳 (ms) */
+  private heartbeatTimestamps: Map<string, number> = new Map();
 
   /**
    * 注册 8 位核心 OC
    */
   registerDefaultAgents(): void {
+    const now = Date.now();
     for (const agent of DEFAULT_AGENTS) {
       this.agentRegistry.set(agent.name, { ...agent });
+      // 银月以 online 启动，立即记录心跳；其余 idle 启动不记录
+      if (agent.status === "online") {
+        this.heartbeatTimestamps.set(agent.name, now);
+      }
     }
     console.log(`[brain-router] ${DEFAULT_AGENTS.length} 位 OC 已注册`);
   }
@@ -78,6 +86,45 @@ export class BrainRouter {
       return all;
     }
     return all.filter((a) => a.skills.includes(skill));
+  }
+
+  /**
+   * 发送心跳：标记指定 OC 当前在线
+   * 每次用户消息命中该 OC 或外部探针调用时触发
+   */
+  heartbeat(agentName: string): void {
+    const agent = this.agentRegistry.get(agentName);
+    if (!agent) return;
+    const now = Date.now();
+    this.heartbeatTimestamps.set(agentName, now);
+    agent.lastHeartbeatAt = now;
+    // 只要有心跳，状态至少为 idle（优先保留原有 online）
+    if (agent.status === "offline") {
+      agent.status = "idle";
+    }
+  }
+
+  /**
+   * 检查过期 Agent：超过 timeoutMs 未心跳的自动降级为 offline
+   * 默认超时 120 秒（2 分钟）
+   */
+  checkStaleAgents(timeoutMs: number = 120_000): void {
+    const now = Date.now();
+    for (const [name, agent] of this.agentRegistry) {
+      const lastHb = this.heartbeatTimestamps.get(name);
+      // 从未心跳过的（如刚启动的 idle OC）不降级
+      if (lastHb === undefined) continue;
+      if (now - lastHb > timeoutMs) {
+        agent.status = "offline";
+      }
+    }
+  }
+
+  /**
+   * 获取指定 Agent 的状态快照（含心跳时间）
+   */
+  getAgentStatus(agentName: string): AgentInfo | undefined {
+    return this.agentRegistry.get(agentName);
   }
 
   /**

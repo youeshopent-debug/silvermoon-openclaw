@@ -330,6 +330,7 @@ describe("BrainRouter — agent registration", () => {
       displayName: "测试",
       skills: ["testing"],
       status: "online",
+      lastHeartbeatAt: null,
     });
     expect(router.getAllAgents()).toHaveLength(1);
   });
@@ -344,5 +345,83 @@ describe("BrainRouter — agent registration", () => {
   it("should return all agents when no skill filter provided", () => {
     const router = createRouter();
     expect(router.getAvailableAgents()).toHaveLength(8);
+  });
+});
+
+describe("BrainRouter — heartbeat & stale detection", () => {
+  let router: BrainRouter;
+
+  beforeEach(() => {
+    router = createRouter();
+  });
+
+  it("should record heartbeat for an agent", () => {
+    const before = Date.now();
+    router.heartbeat("OC银月");
+    const agent = router.getAgentStatus("OC银月");
+    expect(agent).toBeDefined();
+    expect(agent!.lastHeartbeatAt).toBeGreaterThanOrEqual(before);
+  });
+
+  it("should not throw when heartbeating a non-existent agent", () => {
+    expect(() => router.heartbeat("OC不存在")).not.toThrow();
+  });
+
+  it("should upgrade offline agent to idle on heartbeat", () => {
+    // 模拟银月离线
+    const agent = router.getAgentStatus("OC银月")!;
+    agent.status = "offline";
+    router.heartbeat("OC银月");
+    const updated = router.getAgentStatus("OC银月")!;
+    expect(updated.status).toBe("idle");
+  });
+
+  it("should keep online status after heartbeat", () => {
+    router.heartbeat("OC银月");
+    const agent = router.getAgentStatus("OC银月")!;
+    expect(agent.status).toBe("online");
+  });
+
+  it("should NOT offline agents that have never heartbeaten (idle defaults)", () => {
+    router.heartbeat("OC银月");
+    // 李长寿默认 idle，从未 heartbeat → heartbeatTimestamps 无条目
+    router.checkStaleAgents(0); // 0ms 超时 — 任何有心跳的都会触发
+    const 李长寿 = router.getAgentStatus("OC李长寿")!;
+    expect(李长寿.status).toBe("idle"); // 不应被降级
+  });
+
+  it("should detect stale agents (heartbeat timed out) and mark offline", () => {
+    // 创建一个干净的 router，手动注册一个 agent，心跳后立即用 0 超时检查
+    const r2 = new BrainRouter();
+    r2.registerAgent({
+      name: "OC测试离线",
+      displayName: "测试离线",
+      skills: ["test"],
+      status: "online",
+      lastHeartbeatAt: null,
+    });
+    r2.heartbeat("OC测试离线");               // 记录心跳时间戳
+    r2.checkStaleAgents(-1);                   // -1ms：任何正时间差都触发离线
+    const offlineAgent = r2.getAgentStatus("OC测试离线")!;
+    expect(offlineAgent.status).toBe("offline");
+  });
+
+  it("should not offline agents with recent heartbeat within timeout", () => {
+    const r2 = new BrainRouter();
+    r2.registerAgent({
+      name: "OC测试在线",
+      displayName: "测试在线",
+      skills: ["test"],
+      status: "online",
+      lastHeartbeatAt: null,
+    });
+    r2.heartbeat("OC测试在线");
+    r2.checkStaleAgents(360_000); // 6 分钟超时，新心跳远小于此值
+    const agent = r2.getAgentStatus("OC测试在线")!;
+    expect(agent.status).toBe("online");
+  });
+
+  it("should return undefined for non-existent agent in getAgentStatus", () => {
+    expect(router.getAgentStatus("OC不存在")).toBeUndefined();
   });
 });
