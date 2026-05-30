@@ -1,0 +1,91 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "title": "银月钱庄监控 Silvermoon",
+  "uid": "silvermoon-prod",
+  "version": 1,
+  "schemaVersion": 39,
+  "timezone": "browser",
+  "editable": true,
+  "tags": ["silvermoon", "production"],
+  "panels": [
+    {
+      "title": "网关健康状态",
+      "type": "stat",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "id": 1,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        { "expr": "up{job=\"silvermoon\"}", "legendFormat": "uptime" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "green", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "title": "Agent 请求速率",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 9, "x": 6, "y": 0 },
+      "id": 2,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        { "expr": "rate(silvermoon_agent_requests_total[5m])", "legendFormat": "req/s" }
+      ]
+    },
+    {
+      "title": "支付交易量",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 9, "x": 15, "y": 0 },
+      "id": 3,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        { "expr": "silvermoon_payment_transactions_total", "legendFormat": "tx" }
+      ]
+    },
+    {
+      "title": "内存使用",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 6 },
+      "id": 4,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        { "expr": "process_resident_memory_bytes{job=\"silvermoon\"}", "legendFormat": "RSS" }
+      ]
+    },
+    {
+      "title": "事件处理延迟",
+      "type": "graph",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 6 },
+      "id": 5,
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        { "expr": "rate(silvermoon_event_process_duration_seconds_sum[5m]) / rate(silvermoon_event_process_duration_seconds_count[5m])", "legendFormat": "avg ms" }
+      ]
+    }
+  ],
+  "refresh": "30s"
+}
