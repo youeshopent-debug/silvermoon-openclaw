@@ -7,6 +7,8 @@ export const silvermoonTestPatterns = [
   "lib/**/*.test.ts",
   // tests/ 下已迁移至 vitest 模式的 silvermoon 测试文件
   "tests/silvermoon-*.test.js",
+  // extensions/ 下的 TypeScript 契约测试文件
+  "extensions/**/*.test.ts",
 ];
 
 export const silvermoonExcludePatterns = [

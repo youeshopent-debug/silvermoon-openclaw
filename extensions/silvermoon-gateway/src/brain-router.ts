@@ -124,6 +124,32 @@ export class BrainRouter {
       return { intent: "admin", confidence: 0.85 };
     }
 
+    // ── 看图 / 图片识别（美杜莎 — vision.js） ──
+    if (
+      lower.includes("看这张图") || lower.includes("看看这张图") ||
+      lower.includes("帮我看看这张图") || lower.includes("图片里有什么") ||
+      lower.includes("分析图片") || lower.includes("图片识别") ||
+      lower.includes("识别图片") || lower.includes("vision") ||
+      lower.includes("这是什么图片") || lower.includes("这是什么图") ||
+      lower.includes("读取图片") || lower.includes("看图片") ||
+      lower.includes("看这张照片") || lower.includes("照片里") ||
+      lower.includes("处理图片") || lower.includes("图片分析")
+    ) {
+      return { intent: "vision", confidence: 0.95, entities: { type: "image_analysis" } };
+    }
+
+    // ── 截图 / 截屏（墨影 — agent-tools screenshot） ──
+    if (
+      lower.includes("截图") || lower.includes("截屏") ||
+      lower.includes("截个图") || lower.includes("屏幕截图") ||
+      lower.includes("帮我截图") || lower.includes("screenshot") ||
+      lower.includes("capture screen") || lower.includes("capturescreen") ||
+      lower.includes("桌面截图") || lower.includes("屏幕捕获") ||
+      lower.includes("拍照") || lower.includes("拍个照")
+    ) {
+      return { intent: "screenshot", confidence: 0.95 };
+    }
+
     // ── 代码 / 架构（李长寿） ──
     if (
       lower.includes("代码") || lower.includes("重构") ||
@@ -138,7 +164,7 @@ export class BrainRouter {
       return { intent: "code", confidence: 0.9 };
     }
 
-    // ── 系统健康 / 看门狗（墨影） ──
+    // ── 系统健康 / 看门狗 / 截屏（墨影） ──
     if (
       lower.includes("健康") || lower.includes("状态") ||
       lower.includes("看门狗") || lower.includes("watchdog") ||
@@ -147,7 +173,9 @@ export class BrainRouter {
       lower.includes("错误") || lower.includes("宕机") ||
       lower.includes("崩溃") || lower.includes("内存") ||
       lower.includes("cpu") || lower.includes("负载") ||
-      lower.includes("重启") || lower.includes("恢复")
+      lower.includes("重启") || lower.includes("恢复") ||
+      lower.includes("系统检查") || lower.includes("health check") ||
+      lower.includes("状态检查") || lower.includes("运行状态")
     ) {
       return { intent: "monitoring", confidence: 0.9 };
     }
@@ -165,7 +193,7 @@ export class BrainRouter {
       return { intent: "copywriting", confidence: 0.9 };
     }
 
-    // ── 设计 / UI/UX（美杜莎） ──
+    // ── 设计 / UI/UX / 图片处理（美杜莎） ──
     if (
       lower.includes("设计") || lower.includes("图片") ||
       lower.includes("图案") || lower.includes("ui") ||
@@ -173,7 +201,14 @@ export class BrainRouter {
       lower.includes("社交媒体图片") || lower.includes("海报") ||
       lower.includes("banner") || lower.includes("logo") ||
       lower.includes("配色") || lower.includes("字体") ||
-      lower.includes("布局") || lower.includes("视觉")
+      lower.includes("布局") || lower.includes("视觉") ||
+      lower.includes("修图") || lower.includes("改图") ||
+      lower.includes("处理图片") || lower.includes("制作图片") ||
+      lower.includes("生成图片") || lower.includes("作图") ||
+      lower.includes("画图") || lower.includes("横幅") ||
+      lower.includes("图标") || lower.includes("icon") ||
+      lower.includes("封面") || lower.includes("缩略图") ||
+      lower.includes("插图") || lower.includes("配图")
     ) {
       return { intent: "design", confidence: 0.9 };
     }
