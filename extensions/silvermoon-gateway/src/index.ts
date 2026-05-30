@@ -1,4 +1,4 @@
-import { BrainRouter, type IntentResult, type AgentRanking } from "./brain-router.js";
+import { BrainRouter, type IntentResult, type AgentRanking, type AgentInfo } from "./brain-router.js";
 
 export interface Message {
   channel: "telegram" | "discord" | "http";
@@ -44,6 +44,22 @@ export class SilvermoonGateway {
     }
 
     const lead = ranked[0];
+    const targetName = intent.entities?.targetAgent as string | undefined;
+
+    // 如果命中了特定 OC，展示该 OC 的技能域
+    if (targetName) {
+      const allAgents = this.brainRouter.getAllAgents();
+      const targetAgent = allAgents.find((a) => a.name === targetName);
+      if (targetAgent) {
+        const skillDisplay = targetAgent.skills.join(" / ");
+        return `【${targetAgent.displayName}】在呢，随时听候差遣 ✨
+
+🎯 领域: ${skillDisplay}
+📋 意图: ${intent.intent}
+⚡ 状态: ${targetAgent.status === "online" ? "🟢 在线" : "🟡 待命"}`;
+      }
+    }
+
     const idleCount = ranked.length - 1;
     const idleNote = idleCount > 0 ? `（另有 ${idleCount} 位 OC 待命中）` : "";
 

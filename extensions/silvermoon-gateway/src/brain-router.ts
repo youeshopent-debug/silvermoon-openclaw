@@ -18,17 +18,28 @@ export interface AgentRanking {
 
 /**
  * 8 位核心 OC 定义
- * 所有 OC 初始为 idle（待命）状态，银月为 online（常驻在线）
+ *
+ * 技能域说明:
+ *   code/architecture/engineering    — 代码工程、架构设计（李长寿）
+ *   monitoring/watchdog/health/ops   — 系统健康、看门狗、运维（墨影）
+ *   copywriting/seo/content          — 文案、小说、SEO（药老）
+ *   design/ui/ux/social_media/image  — 设计、UI/UX、社交媒体图片（美杜莎）
+ *   accounting/bookkeeping/investment— 个人账目、公司账目、投资（雅妃）
+ *   trading/forex/options/stocks     — 金融交易、外汇、期权（萧炎）
+ *   ecommerce/shopify/research       — 产品搜索、Shopify（韩立）
+ *   payment/admin/gateway            — 支付、管理、网关调度（银月）
+ *
+ * 状态: online（常驻在线）/ idle（待命）/ busy（忙碌）
  */
 const DEFAULT_AGENTS: AgentInfo[] = [
-  { name: "OC银月",  displayName: "银月",   skills: ["payment", "admin", "chat"],   status: "online" },
-  { name: "OC李长寿", displayName: "李长寿", skills: ["chat"],                       status: "idle"   },
-  { name: "OC墨影",   displayName: "墨影",   skills: ["chat"],                       status: "idle"   },
-  { name: "OC药老",   displayName: "药老",   skills: ["chat"],                       status: "idle"   },
-  { name: "OC美杜莎", displayName: "美杜莎", skills: ["chat"],                       status: "idle"   },
-  { name: "OC雅妃",   displayName: "雅妃",   skills: ["chat"],                       status: "idle"   },
-  { name: "OC萧炎",   displayName: "萧炎",   skills: ["chat"],                       status: "idle"   },
-  { name: "OC韩立",   displayName: "韩立",   skills: ["chat"],                       status: "idle"   },
+  { name: "OC银月",  displayName: "银月",   skills: ["payment", "admin", "gateway"],              status: "online" },
+  { name: "OC李长寿", displayName: "李长寿", skills: ["code", "architecture", "engineering"],      status: "idle"   },
+  { name: "OC墨影",   displayName: "墨影",   skills: ["monitoring", "watchdog", "health", "ops"],  status: "idle"   },
+  { name: "OC药老",   displayName: "药老",   skills: ["copywriting", "seo", "content"],            status: "idle"   },
+  { name: "OC美杜莎", displayName: "美杜莎", skills: ["design", "ui", "ux", "social_media", "image"], status: "idle"},
+  { name: "OC雅妃",   displayName: "雅妃",   skills: ["accounting", "bookkeeping", "investment"],  status: "idle"   },
+  { name: "OC萧炎",   displayName: "萧炎",   skills: ["trading", "forex", "options", "stocks"],    status: "idle"   },
+  { name: "OC韩立",   displayName: "韩立",   skills: ["ecommerce", "shopify", "research"],         status: "idle"   },
 ];
 
 export class BrainRouter {
@@ -113,6 +124,102 @@ export class BrainRouter {
       return { intent: "admin", confidence: 0.85 };
     }
 
+    // ── 代码 / 架构（李长寿） ──
+    if (
+      lower.includes("代码") || lower.includes("重构") ||
+      lower.includes("架构") || lower.includes("系统设计") ||
+      lower.includes("bug") || lower.includes("调试") ||
+      lower.includes("部署") || lower.includes("cicd") ||
+      lower.includes("ci/cd") || lower.includes("自动化") ||
+      lower.includes("重构") || lower.includes("单元测试") ||
+      lower.includes("测试") || lower.includes("pull request") ||
+      lower.includes("pr") || lower.includes("代码审查")
+    ) {
+      return { intent: "code", confidence: 0.9 };
+    }
+
+    // ── 系统健康 / 看门狗（墨影） ──
+    if (
+      lower.includes("健康") || lower.includes("状态") ||
+      lower.includes("看门狗") || lower.includes("watchdog") ||
+      lower.includes("监控") || lower.includes("报警") ||
+      lower.includes("日志") || lower.includes("异常") ||
+      lower.includes("错误") || lower.includes("宕机") ||
+      lower.includes("崩溃") || lower.includes("内存") ||
+      lower.includes("cpu") || lower.includes("负载") ||
+      lower.includes("重启") || lower.includes("恢复")
+    ) {
+      return { intent: "monitoring", confidence: 0.9 };
+    }
+
+    // ── 文案 / SEO（药老） ──
+    if (
+      lower.includes("文案") || lower.includes("写作") ||
+      lower.includes("小说") || lower.includes("文章") ||
+      lower.includes("seo") || lower.includes("seo标题") ||
+      lower.includes("标签") || lower.includes("meta") ||
+      lower.includes("描述") || lower.includes("内容") ||
+      lower.includes("创作") || lower.includes("润色") ||
+      lower.includes("修改文章") || lower.includes("标题优化")
+    ) {
+      return { intent: "copywriting", confidence: 0.9 };
+    }
+
+    // ── 设计 / UI/UX（美杜莎） ──
+    if (
+      lower.includes("设计") || lower.includes("图片") ||
+      lower.includes("图案") || lower.includes("ui") ||
+      lower.includes("ux") || lower.includes("界面") ||
+      lower.includes("社交媒体图片") || lower.includes("海报") ||
+      lower.includes("banner") || lower.includes("logo") ||
+      lower.includes("配色") || lower.includes("字体") ||
+      lower.includes("布局") || lower.includes("视觉")
+    ) {
+      return { intent: "design", confidence: 0.9 };
+    }
+
+    // ── 账目 / 投资（雅妃） ──
+    if (
+      lower.includes("账目") || lower.includes("记账") ||
+      lower.includes("账本") || lower.includes("财务报表") ||
+      lower.includes("收支") || lower.includes("利润") ||
+      lower.includes("成本") || lower.includes("税务") ||
+      lower.includes("发票") || lower.includes("对账") ||
+      lower.includes("投资回报") || lower.includes("roi") ||
+      lower.includes("稳定投资") || lower.includes("理财")
+    ) {
+      return { intent: "accounting", confidence: 0.9 };
+    }
+
+    // ── 金融交易 / 外汇 / 股票（萧炎） ──
+    if (
+      lower.includes("外汇") || lower.includes("forex") ||
+      lower.includes("期权") || lower.includes("options") ||
+      lower.includes("股票") || lower.includes("stocks") ||
+      lower.includes("交易") || lower.includes("trade") ||
+      lower.includes("买入") || lower.includes("卖出") ||
+      lower.includes("做多") || lower.includes("做空") ||
+      lower.includes("k线") || lower.includes("k线图") ||
+      lower.includes("技术分析") || lower.includes("行情分析") ||
+      lower.includes("纳斯达克") || lower.includes("标普") ||
+      lower.includes("a股") || lower.includes("港股")
+    ) {
+      return { intent: "trading", confidence: 0.9 };
+    }
+
+    // ── 电商 / Shopify / 产品搜索（韩立） ──
+    if (
+      lower.includes("产品") || lower.includes("商品") ||
+      lower.includes("shopify") || lower.includes("店铺") ||
+      lower.includes("上架") || lower.includes("采购") ||
+      lower.includes("搜索产品") || lower.includes("选品") ||
+      lower.includes("供应商") || lower.includes("货源") ||
+      lower.includes("eastel") || lower.includes("sim卡") ||
+      lower.includes("物流") || lower.includes("库存")
+    ) {
+      return { intent: "ecommerce", confidence: 0.9 };
+    }
+
     // 打招呼 / 闲聊类
     if (
       lower.includes("你好") || lower.includes("在吗") ||
@@ -123,11 +230,12 @@ export class BrainRouter {
       return { intent: "chat", confidence: 0.8 };
     }
 
-    // 唤出特定 OC
+    // 唤出特定 OC — 映射到对应技能域
     for (const agent of this.agentRegistry.values()) {
-      // 匹配 displayName 或 name（如 "银月"、"萧炎"）
       if (lower.includes(agent.displayName) || lower.includes(agent.name)) {
-        return { intent: "chat", confidence: 0.9, entities: { targetAgent: agent.name } };
+        // 取该 OC 的第一个技能作为主意图
+        const primarySkill = agent.skills.length > 0 ? agent.skills[0] : "chat";
+        return { intent: primarySkill, confidence: 0.9, entities: { targetAgent: agent.name } };
       }
     }
 
