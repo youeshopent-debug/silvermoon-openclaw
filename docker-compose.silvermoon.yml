@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  silvermoon:
+    build:
+      context: .
+      dockerfile: Dockerfile.silvermoon
+      target: production
+    ports:
+      - "18791:18791"
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18791/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  silvermoon-test:
+    profiles: ["test"]
+    build:
+      context: .
+      dockerfile: Dockerfile.silvermoon
+      target: test
+    env_file:
+      - .env
