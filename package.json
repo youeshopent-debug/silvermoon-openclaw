@@ -33,5 +33,8 @@
     "test:coverage": "node scripts/run-tests.js --coverage",
     "ci:full": "npm test && npm run lint && npm run test:coverage",
     "hooks:install": "node .githooks/setup-hooks.cjs"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.7"
   }
 }
