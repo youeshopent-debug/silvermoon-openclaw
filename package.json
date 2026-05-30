@@ -8,6 +8,11 @@
     "url": "git+https://github.com/openclaw/openclaw.git"
   },
   "dependencies": {
+    "@opentelemetry/exporter-trace-otlp-http": "^0.218.0",
+    "@opentelemetry/resources": "^2.7.1",
+    "@opentelemetry/sdk-node": "^0.218.0",
+    "@opentelemetry/sdk-trace-base": "^2.7.1",
+    "@opentelemetry/semantic-conventions": "^1.41.1",
     "better-sqlite3": "^12.9.0",
     "canvas": "^3.2.3",
     "crawlee": "^3.16.0",

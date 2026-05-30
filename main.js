@@ -314,6 +314,17 @@ const { getToolSystemPrompt, processToolCalls } = require('./lib/agent-tools');
 const { getUnifiedPersonaPrompt } = require('./lib/agent-thinking-modes');
 const { updateAnchor, getAnchorBlock } = require('./lib/conversation-anchor');
 
+// ═══════════════════════════════════════════════════════════
+// OTEL 遥测（可选，不阻塞启动）
+// ═══════════════════════════════════════════════════════════
+try {
+  const { initTelemetry } = require('./lib/telemetry');
+  initTelemetry();
+} catch (e) {
+  // OTEL 初始化失败不阻塞网关启动
+  console.warn('[main] OTEL 遥测未加载（可选模块）');
+}
+
 // ── 精准化快速回复表 (QUICK_REPLY_TABLE) ──
 // 仅拦截纯粹社交辞令，含"天气/如何/做什么"等关键词时跳过
 const QUICK_REPLY_TABLE = [
