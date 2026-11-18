@@ -81,7 +81,7 @@ export default function DeepCalmSection() {
                 </div>
 
                 <a
-                  href="https://deepcalm-ai.vercel.app/"
+                  href="https://deepcalm-ai.com/zh"
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex items-center gap-2 rounded-lg bg-secondary/10 border border-secondary/30 px-5 py-2.5 text-sm font-medium text-secondary transition-all duration-200 hover:bg-secondary/20"
